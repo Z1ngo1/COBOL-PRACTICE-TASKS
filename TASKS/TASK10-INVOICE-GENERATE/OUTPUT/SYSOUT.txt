@@ -1,0 +1,9 @@
+ ORDER 10006: PRODUCT 99999 NOT FOUND.   
+ ORDER 10010: PRODUCT 88888 NOT FOUND.   
+ ========================================
+ INVOICE GENERATION SUMMARY              
+ ========================================
+ TOTAL ORDERS PROCESSED:    12           
+ TOTAL INVOICES CREATED:    10           
+ TOTAL ERRORS:               2           
+ ========================================
