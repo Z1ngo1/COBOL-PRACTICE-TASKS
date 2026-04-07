@@ -1,0 +1,18 @@
+-- TASK 7: QUERY OUTPUT
+
+---------+---------+---------+---------+---------+---------+---------+---------+
+EMP_ID  EMP_NAME                        DEPT_CODE       SALARY                  
+---------+---------+---------+---------+---------+---------+---------+---------+
+00010   JOHN DOE                        IT            55000.00                  
+00020   JANE SMITH                      HR            46350.00                  
+00030   BOB WILSON                      SAL           63000.00                  
+00040   ALICE COOPER                    IT           100000.00                  
+00050   MICHAEL BROWN                   IT           100000.00                  
+00060   LISA WHITE                      SAL           98700.00                  
+00070   TOM GREEN                       FIN           30900.00                  
+00080   EMMA DAVIS                      IT            99999.99                  
+00090   DAVID CLARK                     MKT           56650.00                  
+00100   SARAH MILLER                    SAL           26250.00                  
+DSNE610I NUMBER OF ROWS DISPLAYED IS 10                                         
+DSNE616I STATEMENT EXECUTION WAS SUCCESSFUL, SQLCODE IS 100                     
+---------+---------+---------+---------+---------+---------+---------+---------+
