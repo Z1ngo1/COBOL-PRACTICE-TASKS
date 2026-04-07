@@ -1,0 +1,9 @@
+ ========================================
+ TAX CALCULATION SUMMARY                 
+ ========================================
+ TAX RATES LOADED:            7          
+ EMPLOYEES PROCESSED:        10          
+ PAYROLL RECORDS WRITTEN:    10          
+ RATE FOUND:                  8          
+ DEFAULT RATE USED:           2          
+ ======================================== 
