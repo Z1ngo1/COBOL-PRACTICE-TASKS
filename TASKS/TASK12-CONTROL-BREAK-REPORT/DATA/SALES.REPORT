@@ -1,0 +1,42 @@
+RECORD: NORTH SHOP1: 100.00              
+RECORD: NORTH SHOP1: 50.00               
+   --> SUM FOR SHOP: 150.00              
+                                         
+RECORD: NORTH SHOP2: 200.00              
+   --> SUM FOR SHOP: 200.00              
+====== TOTAL FOR NORTH: 350.00 (SHOPS: 2)
+                                         
+                                         
+RECORD: SOUTH SHOP1: 300.00              
+RECORD: SOUTH SHOP1: 100.00              
+   --> SUM FOR SHOP: 400.00              
+                                         
+RECORD: SOUTH SHOP2: 150.00              
+RECORD: SOUTH SHOP2: 100.00              
+   --> SUM FOR SHOP: 250.00              
+====== TOTAL FOR SOUTH: 650.00 (SHOPS: 2)
+                                         
+                                         
+RECORD: EAST  SHOP1: 250.00              
+   --> SUM FOR SHOP: 250.00              
+                                         
+RECORD: EAST  SHOP2: 350.00              
+RECORD: EAST  SHOP2: 150.00         
+   --> SUM FOR SHOP: 500.00              
+====== TOTAL FOR EAST : 750.00 (SHOPS: 2)
+                                         
+                                         
+RECORD: WEST  SHOP1: 200.00              
+   --> SUM FOR SHOP: 200.00              
+                                         
+RECORD: WEST  SHOP2: 300.00              
+   --> SUM FOR SHOP: 300.00              
+====== TOTAL FOR WEST : 500.00 (SHOPS: 2)
+                                         
+                                         
+********************************         
+GRAND TOTAL SALES: 2250.00               
+********************************         
+REGIONS: 4                               
+TOTAL SHOPS: 8                           
+TOTAL RECORDS: 12                             
