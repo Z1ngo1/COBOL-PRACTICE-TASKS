@@ -1,0 +1,7 @@
+ ========================================
+ DUPLICATE REPORT SUMMARY                
+ ========================================
+ TOTAL RECORDS PROCESSED:     10         
+ GROUPS WITH DUPLICATES:       3         
+ SUSPICIOUS RECORDS FOUND:     8         
+ ========================================
