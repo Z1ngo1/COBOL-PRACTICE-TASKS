@@ -1,0 +1,9 @@
+ ========================================
+ LIBRARY SEARCH SUMMARY                  
+ ========================================
+ SEARCHES READ:             8            
+ SEARCHES PROCESSED:        7            
+ AUTHORS FOUND:             5            
+ AUTHORS NOT FOUND:         2            
+ BOOKS FOUND (TOTAL):      14            
+ ======================================== 
