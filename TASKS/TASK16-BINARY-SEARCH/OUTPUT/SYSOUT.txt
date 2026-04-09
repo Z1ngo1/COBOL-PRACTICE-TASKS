@@ -1,0 +1,9 @@
+ ======================================== 
+ INVOICE GENERATION SUMMARY               
+ ======================================== 
+ PARTS LOADED:             9              
+ ORDERS PROCESSED:        12              
+ INVOICES WRITTEN:        12              
+ PARTS FOUND:              6              
+ PARTS NOT FOUND:          6              
+ ========================================  
