@@ -19,8 +19,8 @@
       * DATE: 2026/01/01                                               *
       *                                                                *
       * FILES:                                                         *
-      * INPUT:  COMMDD (COMM.TIERS) - COMMISSION TIERS (PS, 80 B)      *
-      * INPUT:  SALDD (EMP.SALARY) - EMPLOYEE SALARIES (PS, 80 B)      *
+      * INPUT:  COMMDD (COMM.TIERS) - COMMISSION TIERS (PS, 9 B)       *
+      * INPUT:  SALDD (EMP.SALARY) - EMPLOYEE SALARIES (PS, 13 B)      *
       * OUTPUT: OUTDD (COMM.OUTPUT) - CALCULATED COMMISSIONS (PS, 80 B)*
       ******************************************************************
 
