@@ -1,0 +1,8 @@
+ ========================================
+ PRICE UPDATE SUMMARY
+ ========================================
+ COMMIT COUNT: 2
+ RECORDS PROCESSED: 52
+ RECORDS UPDATED: 51
+ RECORDS NOT FOUND: 1
+ ========================================
