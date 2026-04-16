@@ -1,0 +1,9 @@
+OP0001 000100 OK BALANCE CHECK PASSED                                           
+OP0002 000200 OK BALANCE CHECK PASSED                                           
+OP0003 000300 ERROR DB2 ROW MISSING                                             
+OP0004 000400 SKIPPED ACCOUNT STATUS CLOSED                                     
+OP0005 000500 ERROR DB2 ROW MISSING                                             
+OP0006 000600 ERROR ACCOUNT NOT FOUND IN KSDS                                   
+OP0007 000700 ERROR INVALID INPUT DATA                                          
+OP0008 000100 ERROR INVALID INPUT DATA                                          
+OP0009 000100 OK BALANCE CHECK PASSED                                           
