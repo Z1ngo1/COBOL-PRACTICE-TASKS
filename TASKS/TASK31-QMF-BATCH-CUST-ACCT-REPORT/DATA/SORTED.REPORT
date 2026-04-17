@@ -1,0 +1,46 @@
+                   TEST TABLES DATED:  04/17/2026@11:30:33                      
+                                                                                
+                    ***FIRST TEST - TABLE***                                    
+                    ACTIVE CUSTOMERS BY REGION AND SEGMENT.                     
+                                                                                
+                                                                                
+                      CUSTOMET                                                  
+  REGION  SEGMENT      COUNT                                                    
+  ------  -------  -----------                                                  
+  AS      C                  6                                                  
+  AS      R                 10                                                  
+  EU      C                  6                                                  
+  EU      R                 10                                                  
+  NE      C                  9                                                  
+  NE      R                 16                                                  
+  SW      C                  9                                                  
+  SW      R                 14                                                  
+  ======                                                                        
+       8                                                                        
+                                                                                
+                                                                                
+                     ***SECOND TEST - TABLE***                                  
+                     ACCOUNT BALANCES BY TYPE AND REGION.                       
+                                                                                
+
+  ACCT                      TOTAL         ACCT                                  
+  TYPE  REGION             BALANCE        COUNT                                 
+  ----  ------  ------------------  -----------                                 
+  CD    AS               162271.78            6                                 
+  CD    EU               142573.40            5                                 
+  CD    NE                91259.96            4                                 
+  CD    SW               199722.59            7                                 
+  CH    AS                33113.75            2                                 
+  CH    EU                64799.89            3                                 
+  CH    NE               139455.00            7                                 
+  CH    SW                89615.89            5                                 
+  LN    AS               109672.32            4                                 
+  LN    EU               110203.47            6                                 
+  LN    NE               240775.50           10                                 
+  LN    SW               245911.92            8                                 
+  SV    AS               117704.12            4                                 
+  SV    EU                76935.12            2                                 
+  SV    NE                77882.34            4                                 
+  SV    SW                91366.02            3                                 
+                ==================  ===========                                 
+           SUM          1993263.07           80                                 
