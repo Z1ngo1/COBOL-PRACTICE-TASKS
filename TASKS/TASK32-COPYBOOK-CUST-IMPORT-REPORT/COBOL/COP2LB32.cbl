@@ -26,8 +26,8 @@
       * DATE: 2026/02/13                                               *
       *                                                                *
       * FILES:                                                         *
-      * INPUT:  MASTDD  (CUST.MASTER.VSAM) - VSAM KSDS MASTER FILE   *  
-      * OUTPUT: OUTDD   (CUST.REPORT.PS)   - PS FILTERED REPORT FILE *  
+      * INPUT:  MASTDD  (CUST.MASTER.VSAM) - VSAM KSDS MASTER FILE     *  
+      * OUTPUT: OUTDD   (CUST.REPORT.PS)   - PS FILTERED REPORT FILE   *  
       ******************************************************************
        IDENTIFICATION DIVISION.                                         
        PROGRAM-ID. COP2LB32.                                            
