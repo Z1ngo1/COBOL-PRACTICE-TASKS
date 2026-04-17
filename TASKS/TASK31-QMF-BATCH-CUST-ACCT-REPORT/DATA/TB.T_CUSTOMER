@@ -106,4 +106,3 @@ CUST_ID  CUST_NAME                                 REGION  SEGMENT  STATUS
 DSNE610I NUMBER OF ROWS DISPLAYED IS 100                                        
 DSNE616I STATEMENT EXECUTION WAS SUCCESSFUL, SQLCODE IS 100                     
 ---------+---------+---------+---------+---------+---------+---------+---------+
----------+---------+---------+---------+---------+---------+---------+---------+
