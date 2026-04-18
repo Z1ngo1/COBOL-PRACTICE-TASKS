@@ -167,3 +167,5 @@ TOTAL:  10 RECORDS UPDATED
 - `COMMIT-COUNT` is reset to `0` after each intermediate commit — it counts records since the last commit, not total records
 - Records where `NEW-SALARY` exactly equals `100000` after the multiplier (not capped) get status `OK`, not `MAXCAP`
 - Tested on IBM z/OS with Enterprise COBOL and DB2 for z/OS
+
+> **Warning:** On error, `ROLLBACK` only undoes changes since the last intermediate `COMMIT`. Records processed in prior committed batches (every 100 rows) are permanently updated and cannot be rolled back. Full recovery requires restoring from backup or manual correction.
