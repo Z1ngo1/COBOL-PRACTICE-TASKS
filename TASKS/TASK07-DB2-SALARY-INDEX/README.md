@@ -35,7 +35,7 @@ DCLGEN host variable structure is declared in [`DCLGEN/TASK7.cpy`](DCLGEN/TASK7.
 ## Files
 
 | DD Name | File | Org | Mode | Description |
-|---|---|---|---|
+|---|---|---|---|---|
 | `OUTDD` | `REPORT.FILE` | PS | OUTPUT | Salary change report, LRECL=80 |
 
 ### Report Record Layout (`OUTDD`) — LRECL=80, RECFM=F
