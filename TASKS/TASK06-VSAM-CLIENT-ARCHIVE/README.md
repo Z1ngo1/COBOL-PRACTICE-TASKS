@@ -111,6 +111,27 @@ Input and expected output files are stored in the [`DATA/`](DATA/) folder:
 
 ---
 
+## Expected SYSOUT
+
+Actual job output is stored in [`OUTPUT/SYSOUT.txt`](OUTPUT/SYSOUT.txt).
+
+```
+DATE IS: 20231231
+ARCH AND DELETE: 000100
+ARCH AND DELETE: 000105
+ARCH AND DELETE: 000110
+ARCH AND DELETE: 000130
+ARCH AND DELETE: 000135
+----------------------------------------
+STATISTIC REPORT:
+RECORDS READ:      10
+RECORDS DELETE:     5
+RECORDS KEPT:       5
+----------------------------------------
+```
+
+---
+
 ## How to Run
 
 1. **Define VSAM cluster** — run [`JCL/DEFKSDS.jcl`](JCL/DEFKSDS.jcl)
