@@ -162,3 +162,7 @@ RECORDS KEPT:       5
 - After `DELETE`, the next `READ NEXT` automatically moves to the next remaining record — no `START` repositioning needed
 - Date field is `PIC 9(8)` (numeric) — comparison `<=` works correctly for `YYYYMMDD` format
 - Tested on IBM z/OS with Enterprise COBOL
+
+> **Warning:** Archive and delete are not atomic. If the job abends between `WRITE` to `ARCH-FILE` and `DELETE` from VSAM, the client record will be archived but NOT deleted. Manual cleanup may be required on restart.
+
+> **Note:** If `CLIENT-MASTER` is empty (STATUS `'23'` on `START`), the program exits cleanly with zero records processed.
