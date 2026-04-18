@@ -37,7 +37,7 @@ Runs a compiled COBOL program. Deletes old output datasets before execution, the
 ---
 
 ### [COMPRUN.jcl](./COMPRUN.jcl)
-Combines compile and run in a single job using a **[MYCOMPGO](JCLPROC/MYCOMPGO.jcl)** catalogued procedure. Deletes old output before compiling, then passes DD statements directly to the RUN step.
+Combines compile and run in a single job using a **[MYCOMPGO](../JCLPROC/MYCOMPGO.jcl)** catalogued procedure. Deletes old output before compiling, then passes DD statements directly to the RUN step.
 
 | Parameter | Description | When to set |
 |---|---|---|
