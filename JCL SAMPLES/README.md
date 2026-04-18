@@ -20,7 +20,7 @@ Prints `COMPILATION SUCCESSFUL` if `RC <= 4`.
 
 ---
 
-### [JCLRUN.jcl](JCL%20SAMPLES/JCLRUN.jcl)
+### [JCLRUN.jcl](./JCLRUN.jcl)
 Runs a compiled COBOL program. Deletes old output datasets before execution, then executes the load module with configurable I/O DD statements.
 
 | Parameter | Description | When to set |
@@ -36,7 +36,7 @@ Runs a compiled COBOL program. Deletes old output datasets before execution, the
 
 ---
 
-### [COMPRUN.jcl](JCL%20SAMPLES/COMPRUN.jcl)
+### [COMPRUN.jcl](./COMPRUN.jcl)
 Combines compile and run in a single job using a **[MYCOMPGO](JCLPROC/MYCOMPGO.jcl)** catalogued procedure. Deletes old output before compiling, then passes DD statements directly to the RUN step.
 
 | Parameter | Description | When to set |
@@ -49,7 +49,7 @@ Combines compile and run in a single job using a **[MYCOMPGO](JCLPROC/MYCOMPGO.j
 
 ---
 
-### [COBDB2CP.jcl](JCL%20SAMPLES/COBDB2CP.jcl)
+### [COBDB2CP.jcl](./COBDB2CP.jcl)
 Full COBOL + DB2 compile-and-run pipeline: deletes old output → compiles with DB2 precompile via **DB2CBL** procedure → runs the bound program under IKJEFT01.
 
 | Parameter | Description | When to set |
@@ -68,7 +68,7 @@ Full COBOL + DB2 compile-and-run pipeline: deletes old output → compiles with 
 
 ## VSAM Dataset Management
 
-### [DEFKSDS.jcl](JCL%20SAMPLES/DEFKSDS.jcl)
+### [DEFKSDS.jcl](./DEFKSDS.jcl)
 Defines a **KSDS** (Key-Sequenced Dataset) VSAM cluster using IDCAMS. Records are stored and accessed by a key field.
 
 | Parameter | Description | When to set |
@@ -84,7 +84,7 @@ Defines a **KSDS** (Key-Sequenced Dataset) VSAM cluster using IDCAMS. Records ar
 
 ---
 
-### [DEFESDS.jcl](JCL%20SAMPLES/DEFESDS.jcl)
+### [DEFESDS.jcl](./DEFESDS.jcl)
 Defines an **ESDS** (Entry-Sequenced Dataset) VSAM cluster. Records are stored in insertion order — no key, no random access by key. Used for logs, audit trails, sequential output.
 
 | Parameter | Description | When to set |
@@ -99,7 +99,7 @@ Defines an **ESDS** (Entry-Sequenced Dataset) VSAM cluster. Records are stored i
 
 ---
 
-### [DEFAIX.jcl](JCL%20SAMPLES/DEFAIX.jcl)
+### [DEFAIX.jcl](./DEFAIX.jcl)
 Defines an **Alternate Index (AIX)** on an existing KSDS cluster. Allows accessing records by a secondary key (e.g., last name, department) in addition to the primary key.
 
 > **Order of steps:** DEFKSDS → **DEFAIX** → DEFPATH → BLDINDEX
@@ -118,7 +118,7 @@ Defines an **Alternate Index (AIX)** on an existing KSDS cluster. Allows accessi
 
 ---
 
-### [DEFPATH.jcl](JCL%20SAMPLES/DEFPATH.jcl)
+### [DEFPATH.jcl](./DEFPATH.jcl)
 Defines a **PATH** that connects an Alternate Index (AIX) to its base KSDS cluster. Without a PATH, the AIX exists but cannot be used to retrieve records.
 
 > **Prerequisites:** base KSDS and AIX must already exist before running this JCL.
@@ -130,7 +130,7 @@ Defines a **PATH** that connects an Alternate Index (AIX) to its base KSDS clust
 
 ---
 
-### [BLDINDX.jcl](JCL%20SAMPLES/BLDINDX.jcl)
+### [BLDINDX.jcl](./BLDINDX.jcl)
 Populates an **Alternate Index** with key values and pointers from the base KSDS cluster. Must be run after data has been loaded into the base cluster.
 
 > **Must be re-run manually** if `NOUPGRADE` was set in DEFAIX. If `UPGRADE` was used, this step is only needed for the initial load.
@@ -142,7 +142,7 @@ Populates an **Alternate Index** with key values and pointers from the base KSDS
 
 ---
 
-### [DATAVSAM.jcl](JCL%20SAMPLES/DATAVSAM.jcl)
+### [DATAVSAM.jcl](./DATAVSAM.jcl)
 Three-step job that: (1) deletes and redefines a KSDS cluster, (2) creates a temp PS file from inline data using SORT, (3) loads the data into the KSDS cluster using `REPRO`.
 
 | Parameter | Description | When to set |
@@ -173,7 +173,7 @@ Three-step job that: (1) deletes and redefines a KSDS cluster, (2) creates a tem
 
 ---
 
-### [DATA2PS.jcl](JCL%20SAMPLES/DATA2PS.jcl)
+### [DATA2PS.jcl](./DATA2PS.jcl)
 Loads inline data records into a **PS (Physical Sequential)** dataset using IEBGENER. Useful for creating small test datasets quickly.
 
 | Parameter | Description | When to set |
@@ -205,7 +205,7 @@ Loads inline data records into a **PS (Physical Sequential)** dataset using IEBG
 
 ## GDG Management
 
-### [DEFGDG.jcl](JCL%20SAMPLES/DEFGDG.jcl)
+### [DEFGDG.jcl](./DEFGDG.jcl)
 Defines a **GDG (Generation Data Group)** base entry in the catalog. The base itself is not a physical dataset — each generation (GDS) is allocated separately at job time.
 
 | Parameter | Description | When to set |
