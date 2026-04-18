@@ -72,6 +72,24 @@ Run [`DEFKSDS.jcl`](JCL/DEFKSDS.jcl) to create the cluster.
 
 > Unknown transaction types (not `D` or `W`) are silently ignored — no update, no error logged.
 
+## Program Flow
+
+1. **OPEN** — transaction file (`INDD`) opened as INPUT, VSAM master (`EMPDD`) opened as I-O, error report (`REPDD`) opened as OUTPUT
+2. **READ** next transaction record from `INDD` — if EOF, go to step 7
+3. **READ VSAM** master by key (`TRANS-ACCT-ID` → `ACCT-ID`):
+   - FILE STATUS `00` → record found, continue
+   - FILE STATUS `23` → record not found → write `ACCOUNT NOT FOUND` to error report → go to step 2
+   - Any other status → abnormal termination (`STOP RUN`)
+4. **Check transaction type:**
+   - `D` (Deposit) → `ACCT-BAL = ACCT-BAL + TRANS-AMOUNT` → go to step 5
+   - `W` (Withdrawal) → check balance:
+     - `ACCT-BAL >= TRANS-AMOUNT` → `ACCT-BAL = ACCT-BAL - TRANS-AMOUNT` → go to step 5
+     - `ACCT-BAL < TRANS-AMOUNT` → write `INSUFFICIENT FUNDS` to error report → go to step 2
+   - Unknown type → skip silently → go to step 2
+5. **REWRITE** updated record back to VSAM master
+6. Go to step 2
+7. **CLOSE** all files → `STOP RUN`
+
 ---
 
 ## Test Data
