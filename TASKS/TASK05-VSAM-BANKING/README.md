@@ -43,24 +43,6 @@ Invalid transactions (account not found, insufficient funds) are written to a se
 
 ---
 
-## VSAM KSDS Definition
-
-Кластер определяется так (`DEFKSDS.jcl`):
-
-```
-DEFINE CLUSTER (NAME(Z73460.TASK5.ACCT.MASTER.VSAM)
-    RECORDSIZE(32,32)
-    TRACKS(15)
-    KEYS(5 0)
-    CISZ(4096)
-    FREESPACE(10,20)
-    INDEXED)
-```
-
-Run [`DEFKSDS.jcl`](JCL/DEFKSDS.jcl) to create the cluster.
-
----
-
 ## Business Logic
 
 | Transaction Type | Condition | Action |
