@@ -7,7 +7,7 @@ Replace all `YOUR.*` placeholders with your actual dataset, member, and library 
 
 ## COBOL Compilation & Execution
 
-### [JCLCOMP.jcl](JCL%20SAMPLES/JCLCOMP.jcl)
+### [JCLCOMP.jcl](./JCLCOMP.jcl)
 Compiles a COBOL source member using the **IGYWCL** procedure (IBM COBOL compiler + Link Editor in one step).  
 Prints `COMPILATION SUCCESSFUL` if `RC <= 4`.
 
