@@ -90,7 +90,7 @@ Input and expected output files are stored in the [`DATA/`](DATA/)) folder:
 ## How to Run
 
 1. **Define VSAM cluster** — run [`JCL/DEFKSDS.jcl`](JCL/DEFKSDS.jcl)
-2. **Load initial master data** — load `ACCT.MASTER.BEFORE` into the KSDS cluster either via REPRO (see [`DATAVSAM.jcl`](../../JCL%20SAMPLES/DATAVSAM.jcl)) or manually through **File Manager** in ISPF (option 3.4 → open VSAM dataset → edit records directly)
+2. **Load initial master data** — load `ACCT.MASTER.BEFORE` into the KSDS cluster either via REPRO (see [`DATAVSAM.jcl`](../../JCL%20SAMPLES/DATAVSAM.jcl)) or manually through **File Manager** in ISPF 
 3. **Compile and run** — run [`JCL/COMPRUN.jcl`](JCL/COMPRUN.jcl)
 
 > **PROC reference:** `COMPRUN.jcl` uses the [`MYCOMPGO`](../../JCLPROC/MYCOMPGO.jcl) catalogued procedure for compilation and execution. Make sure `MYCOMPGO` is available in your system's `PROCLIB` before submitting.
