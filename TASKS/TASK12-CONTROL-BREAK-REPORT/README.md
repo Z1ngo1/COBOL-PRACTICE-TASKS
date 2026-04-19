@@ -8,7 +8,7 @@ No VSAM, no DB2 — pure sequential processing with holder variables.
 
 ---
 
-## ⚠️ Critical Prerequisite: Input Must Be Pre-Sorted
+## Critical Prerequisite: Input Must Be Pre-Sorted
 
 > **`SALES.DATA` must be sorted by `SALES-REGION` (ASC), then `SALES-SHOP` (ASC) before this program runs.**
 
@@ -166,96 +166,14 @@ Input and expected output are in the [`DATA/`](DATA/) folder:
 | [`DATA/SALES.DATA`](DATA/SALES.DATA) | 12 sorted sales records across 4 regions, 2 shops each |
 | [`DATA/SALES.REPORT`](DATA/SALES.REPORT) | Expected report output |
 
-### Input Records (`PSSDD`) — already sorted
-
-| # | REGION | SHOP | AMOUNT | Level |
-|---|---|---|---|---|
-| 1 | `NORTH` | `SHOP1` | 100.00 | detail |
-| 2 | `NORTH` | `SHOP1` | 50.00 | detail |
-| 3 | `NORTH` | `SHOP2` | 200.00 | ← shop break after rec 2 |
-| 4 | `SOUTH` | `SHOP1` | 300.00 | ← region break after rec 3 |
-| 5 | `SOUTH` | `SHOP1` | 100.00 | detail |
-| 6 | `SOUTH` | `SHOP2` | 150.00 | ← shop break after rec 5 |
-| 7 | `SOUTH` | `SHOP2` | 100.00 | detail |
-| 8 | `EAST ` | `SHOP1` | 250.00 | ← region break after rec 7 |
-| 9 | `EAST ` | `SHOP2` | 350.00 | ← shop break after rec 8 |
-| 10 | `EAST ` | `SHOP2` | 150.00 | detail |
-| 11 | `WEST ` | `SHOP1` | 200.00 | ← region break after rec 10 |
-| 12 | `WEST ` | `SHOP2` | 300.00 | ← shop break after rec 11, EOF after rec 12 |
-
-### Expected Subtotals
-
-| Region | Shop | Shop Total | Region Total |
-|---|---|---|---|
-| NORTH | SHOP1 | 150.00 | |
-| NORTH | SHOP2 | 200.00 | **350.00** |
-| SOUTH | SHOP1 | 400.00 | |
-| SOUTH | SHOP2 | 250.00 | **650.00** |
-| EAST | SHOP1 | 250.00 | |
-| EAST | SHOP2 | 500.00 | **750.00** |
-| WEST | SHOP1 | 200.00 | |
-| WEST | SHOP2 | 300.00 | **500.00** |
-| | | | **GRAND: 2250.00** |
-
----
-
-## Expected Report Output
-
-Actual output is stored in [`DATA/SALES.REPORT`](DATA/SALES.REPORT).
-
-```
-RECORD: NORTH SHOP1: 100.00
-RECORD: NORTH SHOP1: 50.00
-   --> SUM FOR SHOP: 150.00
-
-RECORD: NORTH SHOP2: 200.00
-   --> SUM FOR SHOP: 200.00
-====== TOTAL FOR NORTH: 350.00 (SHOPS: 2)
-
-
-RECORD: SOUTH SHOP1: 300.00
-RECORD: SOUTH SHOP1: 100.00
-   --> SUM FOR SHOP: 400.00
-
-RECORD: SOUTH SHOP2: 150.00
-RECORD: SOUTH SHOP2: 100.00
-   --> SUM FOR SHOP: 250.00
-====== TOTAL FOR SOUTH: 650.00 (SHOPS: 2)
-
-
-RECORD: EAST  SHOP1: 250.00
-   --> SUM FOR SHOP: 250.00
-
-RECORD: EAST  SHOP2: 350.00
-RECORD: EAST  SHOP2: 150.00
-   --> SUM FOR SHOP: 500.00
-====== TOTAL FOR EAST : 750.00 (SHOPS: 2)
-
-
-RECORD: WEST  SHOP1: 200.00
-   --> SUM FOR SHOP: 200.00
-
-RECORD: WEST  SHOP2: 300.00
-   --> SUM FOR SHOP: 300.00
-====== TOTAL FOR WEST : 500.00 (SHOPS: 2)
-
-
-********************************
-GRAND TOTAL SALES: 2250.00
-********************************
-REGIONS: 4
-TOTAL SHOPS: 8
-TOTAL RECORDS: 12
-```
-
 ---
 
 ## How to Run
 
-1. Upload [`DATA/SALES.DATA`](DATA/SALES.DATA) to your mainframe dataset
+1. Upload [`DATA/SALES.DATA`](DATA/SALES.DATA) to your mainframe dataset manually through option '3.4 and edit your dataset' or
 2. Submit [`JCL/COMPRUN.jcl`](JCL/COMPRUN.jcl) — it includes a SORT step before the program step
 
-> **PROC reference:** `COMPRUN.jcl` uses the [`MYCOMP`](../../JCLPROC/MYCOMP.jcl) catalogued procedure for compilation and execution. Make sure `MYCOMP` is available in your system’s `PROCLIB` before submitting.
+> **PROC reference:** `COMPRUN.jcl` uses the [`MYCOMPGO`](../../JCLPROC/MYCOMPGO.jcl) catalogued procedure for compilation and execution. Make sure `MYCOMPGO` is available in your system’s `PROCLIB` before submitting.
 
 ---
 
@@ -271,7 +189,6 @@ TOTAL RECORDS: 12
 - **`STRING ... DELIMITED BY SIZE ... INTO`** — builds variable-length report lines by concatenating literal text, field values, and `FUNCTION TRIM()` results into `OUTPUT-LINE`; `DELIMITED BY SIZE` copies the entire sending field including trailing spaces, `FUNCTION TRIM()` removes them
 - **`FUNCTION TRIM()`** — removes leading and trailing spaces from a field before appending to the string; used here so that edited numeric output (`DISP-AMOUNT`) does not leave gaps in the report line
 - **`Z(4)9.99` and `Z(6)9.99` edited pictures** — zero-suppress leading digits and insert the decimal point; `DISP-AMOUNT` handles shop and region totals up to 99999.99; `DISP-GRAND` handles the grand total up to 9999999.99
-- **Two FILE STATUS variables** (`SALES-DATA-STATUS`, `REPORT-STATUS`) — one per file; prevents one file’s status from overwriting the other’s within the same paragraph; each is checked immediately after every `READ`, `WRITE`, `OPEN`, and `CLOSE`
 
 ---
 
