@@ -8,7 +8,7 @@ No VSAM, no DB2 — pure sequential processing with two simultaneous read cursor
 
 ---
 
-## ⚠️ Critical Prerequisite: Both Files Must Be Pre-Sorted
+## Critical Prerequisite: Both Files Must Be Pre-Sorted
 
 > **Both `OLD.MASTER` and `TRANS.FILE` must be sorted by ID (ascending) before this program runs.**
 
@@ -197,96 +197,22 @@ CLOSE all files
 DISPLAY-SUMMARY to SYSOUT
 STOP RUN
 ```
-
----
-
-## Program Flow
-
-1. **PERFORM OPEN-ALL-FILES** — opens all 4 files; non-`'00'` status → `DISPLAY` + `STOP RUN`
-
-2. **PERFORM READ-OLD-MASTER** — reads first master record into `WS-CUR-REC`; sets `WS-OLD-ID`; sets `HIGH-VALUES` if EOF
-
-3. **PERFORM READ-TRANSACTION** — reads first transaction; sets `WS-TRNS-ID`; sets `HIGH-VALUES` if EOF
-
-4. **PERFORM PROCESS-MERGE-LOGIC UNTIL …** — main loop; `EVALUATE TRUE` dispatches to Case 1 / 2 / 3
-
-5. **WRITE-NEW-MASTER-REC** — writes `WS-CUR-REC` to `NEW.MASTER` only if `WS-DEL-FLAG = 'N'` and `WS-OLD-ID ≠ HIGH-VALUES`; always resets `WS-DEL-FLAG` to `'N'` afterwards (even if the record was skipped — ready for next master)
-
-6. **PROCESS-UNMATCHED** — Case 2 handler; `A` → write new record; others → `LOG-ERROR-TRANSACTION`
-
-7. **APPLY-TRANSACTION** — Case 3 handler; guards against post-delete transactions; `EVALUATE` on `TRNS-ACT`
-
-8. **LOG-ERROR-TRANSACTION** — `MOVE` transaction fields to `ERROR-REPORT-REC`; `WRITE`; increments `ERRORS-LOGGED`
-
-9. **PERFORM CLOSE-ALL-FILES** — close errors are warnings only (no `STOP RUN`)
-
-10. **PERFORM DISPLAY-SUMMARY** — prints run statistics to SYSOUT/JOBLOG
-
 ---
 
 ## Test Data
 
 Input and expected output files are in the [`DATA/`](DATA/) folder.
 
-### `OLD.MASTER` — 7 records (pre-sorted by ID)
-
-| ID | Name | Balance |
-|---|---|---|
-| 00100 | JOHN DOE | 100.00 |
-| 00200 | JANE SMITH | 500.50 |
-| 00300 | BOB MARLEY | 0.00 |
-| 00400 | TOM JONES | 250.00 |
-| 00500 | ALICE COOPER | 999.99 |
-| 00600 | MARY WILLIAMS | 125.00 |
-| 00800 | CHRIS BROWN | 30.00 |
-
-### `TRANS.FILE` — 15 transactions (pre-sorted by ID)
-
-| ID | Act | Data / Amount | Expected result |
-|---|---|---|---|
-| 00050 | `A` | NEW CUSTOMER / 500.00 | ✅ Add — ID not in master |
-| 00100 | `U` | — / 50.00 | ✅ Update (+50.00) |
-| 00100 | `U` | — / 25.00 | ✅ Update (+25.00) — second trans same ID |
-| 00200 | `A` | — / 0.00 | ❌ **Error** — duplicate add, ID 00200 exists |
-| 00250 | `A` | JACK ROBINSON / 200.00 | ✅ Add — ID not in master |
-| 00300 | `D` | — / 0.00 | ✅ Delete |
-| 00350 | `U` | SALLY FIELDS / 10.00 | ❌ **Error** — update on non-existent ID 00350 |
-| 00400 | `U` | — / 150.00 | ✅ Update (+150.00) |
-| 00500 | `D` | — / 0.00 | ✅ Delete |
-| 00600 | `U` | — / 75.00 | ✅ Update (+75.00) |
-| 00650 | `A` | NEW CLIENT TWO / 100.00 | ✅ Add — ID not in master |
-| 00700 | `D` | MIKE DAVIS / 0.00 | ❌ **Error** — delete on non-existent ID 00700 |
-| 00800 | `U` | — / 10.00 | ✅ Update (+10.00) |
-| 00800 | `U` | — / 20.00 | ✅ Update (+20.00) — second trans same ID |
-| 00900 | `A` | LATE CUSTOMER / 150.00 | ✅ Add — ID not in master (added after last master) |
-
-### Expected `NEW.MASTER` — 9 records
-
-| ID | Name | Balance | Change |
-|---|---|---|---|
-| 00050 | NEW CUSTOMER | 500.00 | Added (trans `A`) |
-| 00100 | JOHN DOE | 175.00 | +50.00 +25.00 (two `U`) |
-| 00200 | JANE SMITH | 500.50 | Unchanged (dup `A` was an error) |
-| 00250 | JACK ROBINSON | 200.00 | Added (trans `A`) |
-| 00400 | TOM JONES | 400.00 | +150.00 (`U`) |
-| 00600 | MARY WILLIAMS | 200.00 | +75.00 (`U`) |
-| 00650 | NEW CLIENT TWO | 100.00 | Added (trans `A`) |
-| 00800 | CHRIS BROWN | 60.00 | +10.00 +20.00 (two `U`) |
-| 00900 | LATE CUSTOMER | 150.00 | Added (trans `A`, after last master) |
-
-Records **00300** (deleted) and **00500** (deleted) are absent from NEW.MASTER.
-
-### Expected `ERROR.REPORT` — 3 records
-
-| ID | Act | Reason |
-|---|---|---|
-| 00200 | `A` | Duplicate add — ID already exists in master |
-| 00350 | `U` | Update on non-existent ID |
-| 00700 | `D` | Delete on non-existent ID |
-
 ---
 
-## Run Statistics (SYSOUT)
+| File | Description |
+|---|---|
+| [`DATA/CLIENT.MAST.VSAM`](DATA/CLIENT.MAST.VSAM) | 10 test client records loaded into VSAM |
+| [`DATA/DUPLCT.REPORT`](DATA/DUPLCT.REPORT) | Expected duplicate report output |
+
+## Expected SYSOUT
+
+Actual job output is stored in [`OUTPUT/SYSOUT.txt`](OUTPUT/SYSOUT.txt).
 
 ```
 ========================================
@@ -306,10 +232,10 @@ ERRORS LOGGED:                3
 
 ## How to Run
 
-1. Upload [`DATA/OLD.MASTER`](DATA/OLD.MASTER) and [`DATA/TRANS.FILE`](DATA/TRANS.FILE) to your mainframe datasets
-2. Submit [`JCL/COMPRUN.jcl`](JCL/COMPRUN.jcl)
+1. Upload [`DATA/OLD.MASTER`](DATA/OLD.MASTER) and [`DATA/TRANS.FILE`](DATA/TRANS.FILE) to your mainframe datasets manually through option '3.4 and edit your dataset' or
+2. **Compile and run** — run [`JCL/COMPRUN.jcl`](JCL/COMPRUN.jcl)
 
-> **PROC reference:** `COMPRUN.jcl` uses the [`MYCOMP`](../../JCLPROC/MYCOMP.jcl) catalogued procedure for compilation and execution. Make sure `MYCOMP` is available in your system's `PROCLIB` before submitting.
+> **PROC reference:** `COMPRUN.jcl` uses the [`MYCOMPGO`](../../JCLPROC/MYCOMPGO.jcl) catalogued procedure for compilation and execution. Make sure `MYCOMPGO` is available in your system's `PROCLIB` before submitting.
 
 ---
 
