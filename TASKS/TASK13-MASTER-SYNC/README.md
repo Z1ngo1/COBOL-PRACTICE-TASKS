@@ -8,7 +8,7 @@ No VSAM, no DB2 — pure sequential processing with two simultaneous read cursor
 
 ---
 
-## Critical Prerequisite: Both Files Must Be Pre-Sorted
+## ⚠️ Critical Prerequisite: Both Files Must Be Pre-Sorted
 
 > **Both `OLD.MASTER` and `TRANS.FILE` must be sorted by ID (ascending) before this program runs.**
 
@@ -197,22 +197,23 @@ CLOSE all files
 DISPLAY-SUMMARY to SYSOUT
 STOP RUN
 ```
+
 ---
 
 ## Test Data
 
-Input and expected output files are in the [`DATA/`](DATA/) folder.
-
----
+All input and expected output files are in the [`DATA/`](DATA/) folder.
 
 | File | Description |
 |---|---|
-| [`DATA/CLIENT.MAST.VSAM`](DATA/CLIENT.MAST.VSAM) | 10 test client records loaded into VSAM |
-| [`DATA/DUPLCT.REPORT`](DATA/DUPLCT.REPORT) | Expected duplicate report output |
+| [`DATA/OLD.MASTER`](DATA/OLD.MASTER) | 7 test customer records (pre-sorted by ID) |
+| [`DATA/TRANS.FILE`](DATA/TRANS.FILE) | 15 daily transactions (pre-sorted by ID) |
+| [`DATA/NEW.MASTER`](DATA/NEW.MASTER) | Expected updated master output — 9 records |
+| [`DATA/ERROR.REPORT`](DATA/ERROR.REPORT) | Expected error log — 3 failed transactions |
 
-## Expected SYSOUT
+---
 
-Actual job output is stored in [`OUTPUT/SYSOUT.txt`](OUTPUT/SYSOUT.txt).
+## Run Statistics (SYSOUT)
 
 ```
 ========================================
@@ -232,23 +233,16 @@ ERRORS LOGGED:                3
 
 ## How to Run
 
-1. Upload [`DATA/OLD.MASTER`](DATA/OLD.MASTER) and [`DATA/TRANS.FILE`](DATA/TRANS.FILE) to your mainframe datasets manually through option '3.4 and edit your dataset' or
-2. **Compile and run** — run [`JCL/COMPRUN.jcl`](JCL/COMPRUN.jcl)
+1. Upload [`DATA/OLD.MASTER`](DATA/OLD.MASTER) and [`DATA/TRANS.FILE`](DATA/TRANS.FILE) to your mainframe datasets
+2. Submit [`JCL/COMPRUN.jcl`](JCL/COMPRUN.jcl)
 
-> **PROC reference:** `COMPRUN.jcl` uses the [`MYCOMPGO`](../../JCLPROC/MYCOMPGO.jcl) catalogued procedure for compilation and execution. Make sure `MYCOMPGO` is available in your system's `PROCLIB` before submitting.
+> **PROC reference:** `COMPRUN.jcl` uses the [`MYCOMP`](../../JCLPROC/MYCOMP.jcl) catalogued procedure for compilation and execution. Make sure `MYCOMP` is available in your system's `PROCLIB` before submitting.
 
 ---
 
 ## Key COBOL Concepts Used
 
-- **Match-Merge (Balance Line) algorithm** — the standard mainframe technique for applying a transaction file to a master file; requires both files to be sorted on the same key; widely used in banking, insurance, and payroll batch processing because it scales to any file size with constant memory usage
-- **Parallel read cursors** — both files are read independently; on each iteration exactly one file advances its cursor; the other file's current record stays in its buffer until the key comparison decides it is its turn to move
-- **`HIGH-VALUES` as EOF sentinel** — when a file is exhausted, its key is set to `X'FFFF...'`; any real key is always less than `HIGH-VALUES`, so the remaining records of the other file are processed naturally without special EOF branching inside the merge loop
-- **`EVALUATE TRUE` dispatch** — `WHEN WS-TRNS-ID > WS-OLD-ID` / `WHEN WS-TRNS-ID < WS-OLD-ID` / `WHEN WS-TRNS-ID = WS-OLD-ID` — cleaner and safer than nested `IF`; each branch is mutually exclusive and exhaustive
-- **Deferred write pattern** — on a match (`=` case), the master record is **not written immediately**; it stays in `WS-CUR-REC` so that subsequent transactions for the same ID can continue to modify it; the write is triggered by the next `>` case (when the trans cursor moves past this master ID)
-- **`WS-DEL-FLAG`** — a one-character flag (`'N'`/`'Y'`) that marks the current master record for deletion; `WRITE-NEW-MASTER-REC` checks the flag and skips the write if `'Y'`; the flag is always reset to `'N'` after the write/skip so the next master record starts clean
-- **Post-delete transaction guard** — if `WS-DEL-FLAG = 'Y'` and another transaction arrives for the same ID (e.g., `U` after `D`), it is logged as an error; you cannot operate on a record that has already been deleted within the same run
-- **Multiple transactions per ID** — supported natively; because the master cursor does not advance until `TRNS-ID > OLD-ID`, any number of consecutive transactions for the same ID are applied one by one to `WS-CUR-REC` before it is written or skipped
-- **`WS-CUR-REC` working copy** — the master record is copied into a Working-Storage buffer on every `READ-OLD-MASTER`; all updates (`ADD TRNS-AMOUNT TO WS-CUR-BAL`) modify this buffer, never the file buffer directly; this separates I/O from business logic
-- **Four FILE STATUS variables** — one per file (`OLD-MASTER-STATUS`, `TRANS-STATUS`, `NEW-MASTER-STATUS`, `ERROR-REPORT-STATUS`); checked after every `READ`, `WRITE`, `OPEN`, and `CLOSE`; prevents one file's status from overwriting another's in the same paragraph
-- **`DISPLAY-SUMMARY` paragraph** — prints seven counters (records read, transactions processed, written, added, updated, deleted, errors) to SYSOUT after `CLOSE-ALL-FILES`; useful for job monitoring and reconciliation without opening any output file
+- **Match-Merge (Balance Line) algorithm** — the central pattern of this task; two sorted sequential files are processed in a single loop with two independent read cursors; on each iteration exactly one cursor advances depending on the key comparison result
+- **`HIGH-VALUES` as EOF sentinel** — when a file is exhausted its key is set to `HIGH-VALUES` (`X'FF...'`); because no real key can exceed it, the remaining records of the other file drain naturally without any extra EOF branching inside the loop
+- **Deferred write pattern** — on a match (`=` case) the master record is never written immediately; it stays in `WS-CUR-REC` so that subsequent transactions for the same ID keep accumulating; the write fires only when the trans cursor finally moves past this master ID (Case 1)
+- **`WS-DEL-FLAG` with post-delete guard** — a `'Y'`/`'N'` flag that suppresses the write for a deleted record; if another transaction arrives for the same ID while the flag is `'Y'`, it is rejected as an error — preventing updates or re-deletes on an already-removed record within the same run
