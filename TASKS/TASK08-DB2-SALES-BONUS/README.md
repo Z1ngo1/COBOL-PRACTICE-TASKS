@@ -2,7 +2,7 @@
 
 ## Overview
 
-Reads all sales employee records from DB2 table `TB_SALES_BONUS` via a cursor, calculates a new bonus based on region code and annual sales volume, applies a maximum cap of 20,000, updates each row in place using `UPDATE WHERE CURRENT OF`, and writes a bonus change report to a PS file.
+Reads all sales employee records from DB2 table [`TB_SALES_BONUS`](DATA/TB.TB_SALES_BONUS.BEFORE) via a cursor, calculates a new bonus based on region code and annual sales volume, applies a maximum cap of 20,000, updates each row in place using `UPDATE WHERE CURRENT OF`, and writes a bonus change report to a PS file.
 Commits every 50 records. Any SQL error triggers a full `ROLLBACK` and `STOP RUN`.
 
 ---
@@ -38,7 +38,7 @@ DCLGEN host variable structure is declared in [`DCLGEN/TASK8.cpy`](DCLGEN/TASK8.
 
 | DD Name | File | Org | Mode | Description |
 |---|---|---|---|---|
-| `OUTDD` | `REPORT.FILE` | PS | OUTPUT | Bonus change report, LRECL=80 |
+| `OUTDD` | [`BONUS.REPORT.FILE`](DATA/BONUS.REPORT) | PS | OUTPUT | Bonus change report, LRECL=80 |
 
 ---
 
@@ -122,7 +122,7 @@ SQL scripts and expected output are stored in [`SQL/`](SQL/) and [`DATA/`](DATA/
 
 ## Expected SYSOUT
 
-Actual job output is stored in [`OUTPUT/SYSOUT.txt`](OUTPUT/SYSOUT.txt).
+Actual job output is stored in [`SYSOUT.txt`](OUTPUT/SYSOUT.txt).
 
 ```
 BONUS UPDATE COMPLETED: 00010
@@ -132,9 +132,9 @@ BONUS UPDATE COMPLETED: 00010
 
 ## How to Run
 
-1. **Create DB2 table** - run [`SQL/CREATE.TABLE.sql`](SQL/CREATE.TABLE.sql) via SPUFI or DSNTEP2
-2. **Load test data** - run [`SQL/INSERT.DATA.sql`](SQL/INSERT.DATA.sql) via SPUFI or DSNTEP2
-3. **Compile and run** - run [`JCL/COBDB2CP.jcl`](JCL/COBDB2CP.jcl)
+1. **Create DB2 table** - run [`CREATE.TABLE.sql`](SQL/CREATE.TABLE.sql) via SPUFI or DSNTEP2
+2. **Load test data** - run [`INSERT.DATA.sql`](SQL/INSERT.DATA.sql) via SPUFI or DSNTEP2
+3. **Compile and run** - run [`COBDB2CP.jcl`](JCL/COBDB2CP.jcl)
 
 ---
 
