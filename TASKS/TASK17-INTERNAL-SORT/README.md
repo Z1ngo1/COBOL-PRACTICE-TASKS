@@ -40,7 +40,7 @@ Declared as `SD` (Sort Description). Same field layout as `EXAM.RAW`:
 
 ---
 
-## Three-Phase Processing
+## Business Logic: Three-Phase Processing
 
 The entire program is driven by a single `SORT` statement. There is no explicit `OPEN`/`CLOSE` in `MAIN-LOGIC` — files are managed inside the procedures.
 
@@ -57,7 +57,7 @@ MAIN-LOGIC.
 
 ### Phase 1 — `FILTER-INPUT-DATA` (INPUT PROCEDURE)
 
-The INPUT PROCEDURE replaces `USING` — the program manually feeds records to the sort engine.
+The INPUT PROCEDURE replaces `USING` — the program manually feeds records to the sort engine. Only passing students (score >= 50) are released into the sort.
 
 ```
 OPEN INPUT EXAM.RAW
@@ -87,7 +87,7 @@ No code needed here — the sort engine handles it entirely.
 
 ### Phase 3 — `WRITE-SORTED-REPORT` (OUTPUT PROCEDURE)
 
-The OUTPUT PROCEDURE replaces `GIVING` — the program manually consumes sorted records.
+The OUTPUT PROCEDURE replaces `GIVING` — the program manually consumes sorted records and writes them to the honor roll file.
 
 ```
 OPEN OUTPUT HONOR.ROLL
@@ -137,6 +137,27 @@ No output line is written for filtered students — they do not appear in `HONOR
 | EOF handling | `AT END` on `READ` | `AT END` on `RETURN` |
 
 The sort work file (`SD`) is **never opened or closed manually** — the sort engine controls it entirely. Attempting to `OPEN` or `CLOSE` the `SD` file directly will cause a compile error.
+
+---
+
+## Program Flow
+
+1.  **SORT statement begins** — the COBOL runtime calls `FILTER-INPUT-DATA` (INPUT PROCEDURE) automatically.
+2.  **PERFORM OPEN-EXAM-FILE** — opens `EXDD` (INPUT) inside `FILTER-INPUT-DATA`.
+3.  **PERFORM FILTER-INPUT-DATA loop** — reads `EXAM.RAW` until EOF.
+    *   **READ EXAM-FILE** — increments `RECORDS-READ`.
+    *   **IF `STUD-SCORE >= 50`** → `RELEASE SORT-REC` into sort engine; increments `RECORDS-PASSED`.
+    *   **ELSE** → record discarded; increments `RECORDS-FILTERED`.
+4.  **PERFORM CLOSE-EXAM-FILE** — closes `EXDD`; control returns to the sort engine.
+5.  **Sort engine runs** — sorts all released records by `SORT-CLASS` ASC, then `SORT-SCORE` DESC. No program code involved.
+6.  **Sort engine calls `WRITE-SORTED-REPORT`** (OUTPUT PROCEDURE) automatically.
+7.  **PERFORM OPEN-HONOR-FILE** — opens `HNRDD` (OUTPUT) inside `WRITE-SORTED-REPORT`.
+8.  **PERFORM WRITE-SORTED-REPORT loop** — `RETURN SORT-FILE` until `AT END`.
+    *   **RETURN SORT-FILE** — retrieves next sorted record from sort engine.
+    *   **MOVE** fields to output record; **WRITE HONOR-REC**; increments `RECORDS-WRITTEN`.
+9.  **PERFORM CLOSE-HONOR-FILE** — closes `HNRDD`; control returns to `MAIN-LOGIC`.
+10. **PERFORM DISPLAY-SUMMARY** — prints final statistics to SYSOUT (read, filtered, passed, written).
+11. **STOP RUN**.
 
 ---
 
