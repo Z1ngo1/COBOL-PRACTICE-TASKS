@@ -14,10 +14,10 @@ The core technique is **batch commit strategy with embedded SQL validation**: va
 
 ```sql
 CREATE TABLE TB_CUSTOMERS (
-  CUST_ID     CHAR(6)       NOT NULL PRIMARY KEY,
-  CUST_NAME   VARCHAR(30)   NOT NULL,
-  EMAIL       VARCHAR(40),
-  PHONE       CHAR(10),
+  CUST_ID      CHAR(6)       NOT NULL PRIMARY KEY,
+  CUST_NAME    VARCHAR(30)   NOT NULL,
+  EMAIL        VARCHAR(40),
+  PHONE        CHAR(10),
   CREDIT_LIMIT DECIMAL(7,2)
 ) IN DATABASE Z73460;
 ```
@@ -63,11 +63,13 @@ Status messages:
 - `VALIDATION ERROR: INVALID EMAIL` — `INP-EMAIL` does not contain exactly one `@`
 - `VALIDATION ERROR: INVALID PHONE` — `INP-PHONE` length ≠ 10 or not numeric
 - `DB2 ERROR: DUPLICATE PRIMARY KEY` — SQLCODE = -803
-- `DB2 ERROR SQLCODE: <nnn>` — other non-critical DB2 errors
+- `DB2 ERROR SQLCODE: <value>` — other non-critical DB2 errors
 
 ---
 
 ## Business Logic: Four-Phase Processing
+
+The program implements a robust four-phase data import pipeline, featuring a multi-stage validation cascade and high-performance batch commit management.
 
 The program is driven by `MAIN-PARA` which calls four paragraphs in sequence. Each phase has a distinct responsibility: open files, validate and insert records with batch commits, perform the final commit and close files, then display the summary.
 
@@ -90,16 +92,16 @@ Reads `INPUT-FILE` until EOF and applies a validation cascade before each INSERT
 
 ```
 PROCESS-ALL-RECORDS:
-  PERFORM UNTIL EOF
-    READ INPUT-FILE
-      ADD 1 TO RECORDS-PROCESSED
-      IF INP-ID = SPACES
-        PERFORM REPORT-ID-ERROR
-      ELSE
-        PERFORM VALIDATE-EMAIL
-      END-IF
+    PERFORM UNTIL EOF
+        READ INPUT-FILE
+        ADD 1 TO RECORDS-PROCESSED
+        IF INP-ID = SPACES
+            PERFORM REPORT-ID-ERROR
+        ELSE
+            PERFORM VALIDATE-EMAIL
+        END-IF
     END-READ
-  END-PERFORM
+END-PERFORM
 ```
 
 **Validation cascade**:
@@ -114,26 +116,25 @@ Moves input fields to host variables (VARCHAR length calculated via `FUNCTION RE
 
 ```
 INSERT-CUSTOMER:
-  MOVE fields to HV-CUST-ID, HV-CUST-NAME, HV-EMAIL, HV-PHONE, HV-CREDIT
-  EXEC SQL
-    INSERT INTO TB_CUSTOMERS
-    (CUST_ID, CUST_NAME, EMAIL, PHONE, CREDIT_LIMIT)
-    VALUES (:HV-CUST-ID, :HV-CUST-NAME, :HV-EMAIL, :HV-PHONE, :HV-CREDIT)
-  END-EXEC
-  EVALUATE SQLCODE
-    WHEN 0
-      PERFORM REPORT-SUCCESS
-      ADD 1 TO COMMIT-COUNTER
-      IF COMMIT-COUNTER >= 100
-        EXEC SQL COMMIT WORK END-EXEC
-        ADD 1 TO COMMIT-BATCHES
-        MOVE 0 TO COMMIT-COUNTER
-      END-IF
-    WHEN -803
-      PERFORM REPORT-DUPLICATE-KEY
-    WHEN OTHER
-      PERFORM REPORT-DB2-ERROR
-  END-EVALUATE
+    MOVE fields to HV-CUST-ID, HV-CUST-NAME, HV-EMAIL, HV-PHONE, HV-CREDIT
+    EXEC SQL
+        INSERT INTO TB_CUSTOMERS (CUST_ID, CUST_NAME, EMAIL, PHONE, CREDIT_LIMIT)
+        VALUES (:HV-CUST-ID, :HV-CUST-NAME, :HV-EMAIL, :HV-PHONE, :HV-CREDIT)
+    END-EXEC
+    EVALUATE SQLCODE
+        WHEN 0
+            PERFORM REPORT-SUCCESS
+            ADD 1 TO COMMIT-COUNTER
+            IF COMMIT-COUNTER >= 100
+                EXEC SQL COMMIT WORK END-EXEC
+                ADD 1 TO COMMIT-BATCHES
+                MOVE 0 TO COMMIT-COUNTER
+            END-IF
+        WHEN -803
+            PERFORM REPORT-DUPLICATE-KEY
+        WHEN OTHER
+            PERFORM REPORT-DB2-ERROR
+    END-EVALUATE
 ```
 
 **Batch commit logic**: `COMMIT-COUNTER` tracks successful inserts. When it reaches 100, executes `COMMIT WORK`, increments `COMMIT-BATCHES`, resets `COMMIT-COUNTER` to 0. Final commit is performed in `CLOSE-ALL-FILES` for any remaining uncommitted inserts.
@@ -144,13 +145,13 @@ If `COMMIT-COUNTER > 0`, commits remaining uncommitted inserts before closing fi
 
 ```
 CLOSE-ALL-FILES:
-  IF COMMIT-COUNTER > 0
-    EXEC SQL COMMIT WORK END-EXEC
-    ADD 1 TO COMMIT-BATCHES
-    MOVE 0 TO COMMIT-COUNTER
-  END-IF
-  CLOSE INPUT-FILE
-  CLOSE OUTPUT-FILE
+    IF COMMIT-COUNTER > 0
+        EXEC SQL COMMIT WORK END-EXEC
+        ADD 1 TO COMMIT-BATCHES
+        MOVE 0 TO COMMIT-COUNTER
+    END-IF
+    CLOSE INPUT-FILE
+    CLOSE OUTPUT-FILE
 ```
 
 ---
@@ -172,7 +173,7 @@ CLOSE-ALL-FILES:
 | `0` | Success | Write `INSERTED OK` to log, increment `COMMIT-COUNTER`, check if >= 100 for batch commit |
 | `-803` | Duplicate primary key | Write `DB2 ERROR: DUPLICATE PRIMARY KEY` to log, increment `RECORDS-ERRORS`, continue |
 | `< -900` | **Critical DB2 error** (deadlock, timeout, system error) | DISPLAY error message, `EXEC SQL ROLLBACK WORK`, `STOP RUN` |
-| Other negative | Non-critical DB2 error | Write `DB2 ERROR SQLCODE: <nnn>` to log, increment `RECORDS-ERRORS`, continue |
+| Other negative | Non-critical DB2 error | Write `DB2 ERROR SQLCODE: <value>` to log, increment `RECORDS-ERRORS`, continue |
 
 **Critical SQLCODE threshold**: `-900` is the boundary — errors more severe than `-900` (e.g., `-911`, `-913`) are considered unrecoverable and trigger immediate ROLLBACK + STOP RUN.
 
@@ -180,24 +181,45 @@ CLOSE-ALL-FILES:
 
 ## Program Flow
 
-1.  **PERFORM OPEN-ALL-FILES** — opens `INDD` (INPUT) and `OUTDD` (OUTPUT); stops on non-zero FILE STATUS.
-2.  **PERFORM PROCESS-ALL-RECORDS** — main loop `UNTIL EOF` on `NEW.CUSTOMER`.
-    *   **READ INPUT-FILE** — increments `RECORDS-PROCESSED`.
-    *   **IF `INP-ID = SPACES`** → **PERFORM REPORT-ID-ERROR** — writes validation error to `SUCCESS.LOG`; skips INSERT.
-    *   **ELSE** → **PERFORM VALIDATE-EMAIL**.
-        *   **IF email invalid** → write `VALIDATION ERROR: INVALID EMAIL`; skip INSERT.
-        *   **ELSE** → **PERFORM VALIDATE-PHONE**.
-            *   **IF phone invalid** → write `VALIDATION ERROR: INVALID PHONE`; skip INSERT.
-            *   **ELSE** → **PERFORM INSERT-CUSTOMER**.
-                *   **`EXEC SQL INSERT`** — inserts record into `TB_CUSTOMERS`.
-                *   **SQLCODE = 0** → write `INSERTED OK`; increment `COMMIT-COUNTER`.
-                    *   **IF `COMMIT-COUNTER >= 100`** → `EXEC SQL COMMIT WORK`; increment `COMMIT-BATCHES`; reset counter.
-                *   **SQLCODE = -803** → write `DB2 ERROR: DUPLICATE PRIMARY KEY`; continue.
-                *   **SQLCODE < -900** → DISPLAY error; `EXEC SQL ROLLBACK WORK`; `STOP RUN`.
-                *   **Other SQLCODE** → write `DB2 ERROR SQLCODE: <nnn>`; continue.
-3.  **PERFORM CLOSE-ALL-FILES** — if `COMMIT-COUNTER > 0`, executes final `EXEC SQL COMMIT WORK`; closes `INDD` and `OUTDD`.
-4.  **PERFORM DISPLAY-SUMMARY** — prints final statistics to SYSOUT (processed, inserted, errors, commit batches).
-5.  **STOP RUN**.
+1. **PERFORM OPEN-ALL-FILES** — opens `INDD` (INPUT) and `OUTDD` (OUTPUT); stops on non-zero FILE STATUS.
+2. **PERFORM PROCESS-ALL-RECORDS** — main loop `UNTIL EOF` on `NEW.CUSTOMER`.
+   * **READ INPUT-FILE** — increments `RECORDS-PROCESSED`.
+   * **IF `INP-ID = SPACES`** → **PERFORM REPORT-ID-ERROR** — writes validation error to `SUCCESS.LOG`; skips INSERT.
+   * **ELSE** → **PERFORM VALIDATE-EMAIL**.
+   * **IF email invalid** → write `VALIDATION ERROR: INVALID EMAIL`; skip INSERT.
+   * **ELSE** → **PERFORM VALIDATE-PHONE**.
+   * **IF phone invalid** → write `VALIDATION ERROR: INVALID PHONE`; skip INSERT.
+   * **ELSE** → **PERFORM INSERT-CUSTOMER**.
+   * **`EXEC SQL INSERT`** — inserts record into `TB_CUSTOMERS`.
+   * **SQLCODE = 0** → write `INSERTED OK`; increment `COMMIT-COUNTER`.
+   * **IF `COMMIT-COUNTER >= 100`** → `EXEC SQL COMMIT WORK`; increment `COMMIT-BATCHES`; reset counter.
+   * **SQLCODE = -803** → write `DB2 ERROR: DUPLICATE PRIMARY KEY`; continue.
+   * **SQLCODE < -900** → DISPLAY error; `EXEC SQL ROLLBACK WORK`; `STOP RUN`.
+   * **Other SQLCODE** → write `DB2 ERROR SQLCODE: <value>`; continue.
+3. **PERFORM CLOSE-ALL-FILES** — if `COMMIT-COUNTER > 0`, executes final `EXEC SQL COMMIT WORK`; closes `INDD` and `OUTDD`.
+4. **PERFORM DISPLAY-SUMMARY** — prints final statistics to SYSOUT (processed, inserted, errors, commit batches).
+5. **STOP RUN**.
+
+---
+
+## JCL Steps (`COBDB2CP.jcl`)
+
+| Step | Program | COND | Description |
+|---|---|---|---|
+| COMPIL | DB2CBL | — | DB2 precompile + COBOL compile for `DB2JOB19` |
+| RUNPROG | IKJEFT01 | (4,LT) | Execute under DB2 control (Subsystem `DBDG`, Plan `Z73460`) |
+
+---
+
+## Test Data
+
+All input and expected output files are in the [`DATA/`](DATA/) folder.
+
+| File | Description |
+|---|---|
+| [`DATA/NEW.CUSTOMER`](DATA/NEW.CUSTOMER) | 20 test customer records (including valid and invalid ones) |
+| [`DATA/SUCCESS.LOG`](DATA/SUCCESS.LOG) | Log file containing validation and DB2 results |
+| [`DATA/TB.TB_CUSTOMERS.AFTER`](DATA/TB.TB_CUSTOMERS.AFTER) | State of DB2 table after successful import |
 
 ---
 
@@ -207,12 +229,12 @@ Actual job output is stored in [`OUTPUT/SYSOUT.txt`](OUTPUT/SYSOUT.txt).
 
 ```
 ========================================
-CUSTOMER IMPORT SUMMARY
+       CUSTOMER IMPORT SUMMARY
 ========================================
-RECORDS PROCESSED:    20
-RECORDS INSERTED:     10
-RECORDS ERRORS:       10
-COMMIT BATCHES:        1
+RECORDS PROCESSED:  20
+RECORDS INSERTED:   10
+RECORDS ERRORS:     10
+COMMIT BATCHES:     1
 ========================================
 ```
 
@@ -221,12 +243,8 @@ COMMIT BATCHES:        1
 ## How to Run
 
 1. Create the DB2 table by executing the SQL in [`SQL/CREATE.TABLE.sql`](SQL/CREATE.TABLE.sql) (if not already created)
-2. Upload customer data [`DATA/NEW.CUSTOMER`](DATA/NEW.CUSTOMER) to `Z73460.TASK19.NEW.CUSTOMER` dataset or use pre-prepared test data 
+2. Upload customer data [`DATA/NEW.CUSTOMER`](DATA/NEW.CUSTOMER) to `Z73460.TASK19.NEW.CUSTOMER` dataset or use pre-prepared test data
 3. Submit [`JCL/COBDB2CP.jcl`](JCL/COBDB2CP.jcl) — it handles DB2 precompile, COBOL compile, and program execution
-
-> **Note:** The JCL uses `DB2CBL` catalogued procedure which performs DB2 precompile followed by COBOL compile and link-edit. Make sure this procedure is available in your system's `PROCLIB`.
-
-> **Note:** The DB2 subsystem name `DBDG` and PLAN `Z73460` are hardcoded in the JCL. Adjust these values to match your DB2 environment before submitting.
 
 ---
 
