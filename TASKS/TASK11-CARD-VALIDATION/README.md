@@ -13,10 +13,10 @@ The program obtains the current date from the operating system at startup — no
 
 | DD Name | File | Org | Mode | Description |
 |---|---|---|---|---|
-| `VSAMDD` | `CARD.MASTER` | VSAM KSDS | INPUT / RANDOM | Card master — owner name, expiry date (MMYY), status; key = `CARD-NUMBER` |
-| `TRNSDD` | `TRANS.DAILY` | PS | INPUT | Daily transactions — trans ID, card number, amount; LRECL=80, RECFM=F |
-| `APRVDD` | `APPROVED.FILE` | PS | OUTPUT | Approved transactions — trans ID, card number, amount; LRECL=80, RECFM=F |
-| `DECLDD` | `DECLINED.FILE` | PS | OUTPUT | Declined transactions — trans ID, card number, amount, reason; LRECL=80, RECFM=F |
+| `VSAMDD` | [`CARD.MASTER`](DATA/CARD.MASTER) | VSAM KSDS | INPUT / RANDOM | Card master — owner name, expiry date (MMYY), status; key = `CARD-NUMBER` |
+| `TRNSDD` | [`TRANS.DAILY`](DATA/TRANS.DAILY) | PS | INPUT | Daily transactions — trans ID, card number, amount; LRECL=80, RECFM=F |
+| `APRVDD` | [`APPROVED.FILE`](DATA/APPROVED.FILE) | PS | OUTPUT | Approved transactions — trans ID, card number, amount; LRECL=80, RECFM=F |
+| `DECLDD` | [`DECLINED.FILE`](DATA/DECLINED.FILE) | PS | OUTPUT | Declined transactions — trans ID, card number, amount, reason; LRECL=80, RECFM=F |
 
 ### VSAM Record Layout (`VSAMDD`) — LRECL=41
 
@@ -158,7 +158,7 @@ Input data and expected output are stored in the [`DATA/`](DATA/) folder:
 
 ## Expected SYSOUT
 
-Actual job output is stored in [`OUTPUT/SYSOUT.txt`](OUTPUT/SYSOUT.txt).
+Actual job output is stored in [`SYSOUT.txt`](OUTPUT/SYSOUT.txt).
 
 ```
 CURRENT DATE: 2026/02/23
@@ -179,11 +179,11 @@ DECLINED:               7
 
 ## How to Run
 
-1. **Define VSAM cluster** — run [`JCL/DEFKSDS.jcl`](JCL/DEFKSDS.jcl)
-2. **Load initial master data** — load [`DATA/CARD.MASTER`](DATA/CARD.MASTER) into the KSDS cluster either via REPRO (see [`DATAVSAM.jcl`](../../JCL%20SAMPLES/DATAVSAM.jcl)) or manually through **File Manager** in ISPF
-3. **Compile and run** — run [`JCL/COMPRUN.jcl`](JCL/COMPRUN.jcl)
+1. **Define VSAM cluster** — run [`DEFKSDS.jcl`](JCL/DEFKSDS.jcl)
+2. **Load initial master data** — load [`CARD.MASTER`](DATA/CARD.MASTER) into the KSDS cluster either via REPRO (see [`DATAVSAM.jcl`](../../JCL%20SAMPLES/DATAVSAM.jcl)) or manually through **File Manager** in ISPF
+3. **Compile and run** — run [`COMPRUN.jcl`](JCL/COMPRUN.jcl)
 
-> **PROC reference:** [`JCL/COMPRUN.jcl`](JCL/COMPRUN.jcl) uses the [`MYCOMPGO`](../../JCLPROC/MYCOMPGO.jcl) catalogued procedure for compilation and execution. Make sure [`MYCOMPGO`](../../JCLPROC/MYCOMPGO.jcl) is available in your system's `PROCLIB` before submitting.
+> **PROC reference:** [`COMPRUN.jcl`](JCL/COMPRUN.jcl) uses the [`MYCOMPGO`](../../JCLPROC/MYCOMPGO.jcl) catalogued procedure for compilation and execution. Make sure [`MYCOMPGO`](../../JCLPROC/MYCOMPGO.jcl) is available in your system's `PROCLIB` before submitting.
 
 ---
 
