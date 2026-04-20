@@ -202,15 +202,6 @@ CLOSE-ALL-FILES:
 
 ---
 
-## JCL Steps (`COBDB2CP.jcl`)
-
-| Step | Program | COND | Description |
-|---|---|---|---|
-| COMPIL | DB2CBL | — | DB2 precompile + COBOL compile for `DB2JOB19` |
-| RUNPROG | IKJEFT01 | (4,LT) | Execute under DB2 control (Subsystem `DBDG`, Plan `Z73460`) |
-
----
-
 ## Test Data
 
 All input and expected output files are in the [`DATA/`](DATA/) folder.
