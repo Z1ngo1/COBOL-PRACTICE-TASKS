@@ -2,7 +2,7 @@
 
 ## Overview
 
-Reads a commission tiers reference file (`COMM.TIERS`) into an in-memory array (`TIER-TABLE`), then processes an employee salary file (`SALES.WEEKLY`) and writes a commission output (`PAYOUT.RPT`) with the calculated commission for each employee.
+Reads a commission tiers reference file [`COMM.TIERS`](./DATA/COMM.TIERS) into an in-memory array (`TIER-TABLE`), then processes an employee salary file [`SALES.WEEKLY`](./DATA/SALES.WEEKLY) and writes a commission output [`PAYOUT.RPT`](./DATA/PAYOUT.RPT) with the calculated commission for each employee.
 The core technique is a **Tiered Table Lookup**: instead of a simple key match, the program finds the first tier where `WS-LIMIT >= SAL-AMT` — the salary bracket determines the commission rate.
 The tier table is loaded once into memory before any salary record is processed.
 
@@ -122,9 +122,9 @@ All input and expected output files are in the [`DATA/`](./DATA) folder.
 
 | File | Description |
 |---|---|
-| [`DATA/COMM.TIERS`](./DATA/COMM.TIERS) | 5 commission tier entries |
-| [`DATA/SALES.WEEKLY`](./DATA/SALES.WEEKLY) | 12 employee salary records |
-| [`DATA/PAYOUT.RPT`](./DATA/PAYOUT.RPT) | Expected commission output |
+| [`COMM.TIERS`](./DATA/COMM.TIERS) | 5 commission tier entries |
+| [`SALES.WEEKLY`](./DATA/SALES.WEEKLY) | 12 employee salary records |
+| [`PAYOUT.RPT`](./DATA/PAYOUT.RPT) | Expected commission output |
 
 ---
 
