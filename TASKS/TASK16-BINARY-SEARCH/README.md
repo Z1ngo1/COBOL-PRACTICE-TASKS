@@ -47,9 +47,11 @@ The core technique is **`SEARCH ALL`** (binary search): unlike `SEARCH` which wa
 
 ---
 
-## Two-Phase Processing
+## Business Logic: Two-Phase Processing
 
 ### Phase 1 — Load Catalog Table (Initialization)
+
+The program loads the entire parts catalog into a Working-Storage table before any order is processed.
 
 ```
 OPEN PARTS.CATALOG
@@ -65,6 +67,8 @@ CLOSE PARTS.CATALOG
 After this phase the entire catalog lives in `CATALOG-TABLE` in memory. `PARTS-LOADED` serves as the `DEPENDING ON` value — `SEARCH ALL` will only scan entries 1 through `PARTS-LOADED`, so no dummy entries are touched. Table size is bounded by `OCCURS 1 TO 100` — overflow records are ignored with a warning.
 
 ### Phase 2 — Process Orders
+
+For each order record the program performs a binary search against the in-memory catalog and writes exactly one invoice line.
 
 ```
 OPEN ORDERS.FILE, INVOICE.TXT
@@ -121,6 +125,23 @@ WS-TOTAL-COST = WS-PRICE(IDX) * ORDR-QUANT   (when part found)
 ```
 
 `COMPUTE` is used to avoid truncation on the implied decimal position of `WS-PRICE`.
+
+---
+
+## Program Flow
+
+1.  **PERFORM OPEN-CATALOG-FILE** — opens `PARTDD` (INPUT) for initialization.
+2.  **PERFORM LOAD-CATALOG-TABLE** — reads `PARTS.CATALOG` into `CATALOG-TABLE` until EOF. Increments `PARTS-LOADED` for each record; records beyond 100 are skipped with a warning.
+3.  **PERFORM CLOSE-CATALOG-FILE** — closes `PARTDD`; the catalog is never reopened.
+4.  **PERFORM OPEN-ORDER-FILES** — opens `ORDRDD` (INPUT) and `INVODD` (OUTPUT).
+5.  **PERFORM PROCESS-ORDERS** — main loop `UNTIL EOF` on `ORDERS.FILE`.
+    *   **READ ORDERS-FILE**.
+    *   **PERFORM SEARCH-PART-PRICE** — executes `SEARCH ALL CATALOG-ENTRY` using `ORDR-ID` as the lookup key.
+    *   **IF FOUND** → `COMPUTE WS-TOTAL-COST`, format invoice line, and **WRITE INVOICE-REC**.
+    *   **IF NOT FOUND** → write `NOT FOUND` line; increment `PARTS-NOT-FOUND`.
+6.  **DISPLAY-SUMMARY** — prints final statistics to SYSOUT (parts loaded, orders processed, invoices written, found vs. not-found counts).
+7.  **PERFORM CLOSE-ORDER-FILES** — closes `ORDRDD` and `INVODD`.
+8.  **STOP RUN**.
 
 ---
 
