@@ -137,7 +137,7 @@ Actual job output is stored in [`OUTPUT/SYSOUT.txt`](./OUTPUT/SYSOUT.txt).
 1.  Upload [`DATA/TAX.RATES`](./DATA/TAX.RATES) and [`DATA/EMP.SALARY`](./DATA/EMP.SALARY) to your mainframe datasets.
 2.  Submit [`JCL/COMPRUN.jcl`](./JCL/COMPRUN.jcl).
 
-> **PROC reference:** `COMPRUN.jcl` uses the [`MYCOMPGO`](../../JCLPROC/MYCOMPGO.jcl) catalogued procedure.
+> **PROC reference:** [`JCL/COMPRUN.jcl`](./JCL/COMPRUN.jcl) uses the [`MYCOMPGO`](../../JCLPROC/MYCOMPGO.jcl) catalogued procedure.
 
 ---
 
