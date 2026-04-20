@@ -125,6 +125,7 @@ SALARY INDEXING COMPLETED:  10
 1. **Create DB2 table** — run [`CREATE.TABLE.sql`](SQL/CREATE.TABLE.sql) via SPUFI or DSNTEP2
 2. **Load test data** — run [`INSERT.DATA.sql`](SQL/INSERT.DATA.sql) via SPUFI or DSNTEP2
 3. **Compile and run** — run [`COBDB2CP.jcl`](JCL/COBDB2CP.jcl)
+4. **Compare output files and sysout** - see [`TB.TB_EMP_SALARY.AFTER`](DATA/TB.TB_EMP_SALARY.AFTER), [`SALARY.REPORT`](DATA/SALARY.REPORT) and [`SYSOUT.txt`](OUTPUT/SYSOUT.txt)
 
 ---
 
