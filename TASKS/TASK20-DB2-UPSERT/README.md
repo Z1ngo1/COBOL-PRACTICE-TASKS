@@ -192,7 +192,7 @@ COMMIT BATCHES:     1
 ## How to Run
 
 1. Execute SQL in [`SQL/CREATE.TABLE.sql`](SQL/CREATE.TABLE.sql) to prepare the DB2 table
-2. Upload input data to `Z73460.TASK20.EMP.UPDATE`
+2. Upload input data [`EMP.UPDATE`](DATA/EMP.UPDATE) to dataset or use pre-prepared test data in jcl
 3. Submit [`JCL/COBDB2CP.jcl`](JCL/COBDB2CP.jcl) to run the sync process
 
 ---
