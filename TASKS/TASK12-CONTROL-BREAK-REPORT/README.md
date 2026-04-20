@@ -12,7 +12,7 @@ No VSAM, no DB2 — pure sequential processing with holder variables.
 
 > **[`SALES.DATA`](DATA/SALES.DATA) must be sorted by `SALES-REGION` (ASC), then `SALES-SHOP` (ASC) before this program runs.**
 
-The program does **not** validate sort order. Unsorted input will silently produce wrong subtotals and a wrong grand total — no error message, no ABEND. Use a `SORT` step in the JCL **before** the program step ([`JCL/COMPRUN.jcl`](JCL/COMPRUN.jcl) already includes this step).
+The program does **not** validate sort order. Unsorted input will silently produce wrong subtotals and a wrong grand total — no error message, no ABEND. Use a `SORT` step in the JCL **before** the program step ([`COMPRUN.jcl`](JCL/COMPRUN.jcl) already includes this step).
 
 ---
 
@@ -20,8 +20,8 @@ The program does **not** validate sort order. Unsorted input will silently produ
 
 | DD Name | File | Org | Mode | Description |
 |---|---|---|---|---|
-| `PSSDD` | `SALES.DATA` | PS | INPUT | Pre-sorted sales records — region, shop, amount; LRECL=80, RECFM=F |
-| `REPDD` | `SALES.REPORT` | PS | OUTPUT | Formatted report with detail lines, shop/region subtotals, grand total; LRECL=80, RECFM=F |
+| `PSSDD` | [`SALES.DATA`](DATA/SALES.DATA) | PS | INPUT | Pre-sorted sales records — region, shop, amount; LRECL=80, RECFM=F |
+| `REPDD` | [`SALES.REPORT`](DATA/SALES.REPORT) | PS | OUTPUT | Formatted report with detail lines, shop/region subtotals, grand total; LRECL=80, RECFM=F |
 
 ### Input Record Layout (`PSSDD`) — LRECL=80, RECFM=F
 
@@ -170,8 +170,9 @@ Input and expected output are in the [`DATA/`](DATA/) folder:
 
 ## How to Run
 
-1. Upload [`DATA/SALES.DATA`](DATA/SALES.DATA) to your mainframe dataset manually through option '3.4 and edit your dataset' or
-2. Submit [`JCL/COMPRUN.jcl`](JCL/COMPRUN.jcl) — it includes a SORT step before the program step
+1. Upload [`SALES.DATA`](DATA/SALES.DATA) to your mainframe dataset manually through option '3.4 and edit your dataset' or
+2. Submit [`COMPRUN.jcl`](JCL/COMPRUN.jcl) — it includes a SORT step before the program step
+3. Compare output files - see [`SALES.REPORT`](DATA/SALES.REPORT)
 
 > **PROC reference:** [`JCL/COMPRUN.jcl`](JCL/COMPRUN.jcl) uses the [`MYCOMPGO`](../../JCLPROC/MYCOMPGO.jcl) catalogued procedure for compilation and execution. Make sure [`MYCOMPGO`](../../JCLPROC/MYCOMPGO.jcl) is available in your system’s `PROCLIB` before submitting.
 
