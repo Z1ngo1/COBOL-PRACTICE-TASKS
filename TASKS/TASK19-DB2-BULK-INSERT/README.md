@@ -2,7 +2,7 @@
 
 ## Overview
 
-Reads new customer data from a sequential file (`NEW.CUSTOMER`), validates each record against business rules (ID not empty, EMAIL contains `@`, PHONE is 10 digits), and inserts valid records into DB2 table `TB_CUSTOMERS`. Invalid records are logged to an error file (`SUCCESS.LOG`). Commits are performed in batches of 100 successful inserts to optimize transaction performance. Critical DB2 errors (SQLCODE < -900) trigger an immediate ROLLBACK and STOP RUN.
+Reads new customer data from a sequential file [`NEW.CUSTOMER`](DATA/NEW.CUSTOMER), validates each record against business rules (ID not empty, EMAIL contains `@`, PHONE is 10 digits), and inserts valid records into DB2 table `TB_CUSTOMERS`. Invalid records are logged to an error file [`SUCCESS.LOG`](DATA/SUCCESS.LOG). Commits are performed in batches of 100 successful inserts to optimize transaction performance. Critical DB2 errors (SQLCODE < -900) trigger an immediate ROLLBACK and STOP RUN.
 
 The core technique is **batch commit strategy with embedded SQL validation**: validate-then-insert per record, COMMIT every 100 successful inserts, and handle duplicate keys (-803) gracefully without stopping the job.
 
@@ -208,9 +208,9 @@ All input and expected output files are in the [`DATA/`](DATA/) folder.
 
 | File | Description |
 |---|---|
-| [`DATA/NEW.CUSTOMER`](DATA/NEW.CUSTOMER) | 20 test customer records (including valid and invalid ones) |
-| [`DATA/SUCCESS.LOG`](DATA/SUCCESS.LOG) | Log file containing validation and DB2 results |
-| [`DATA/TB.TB_CUSTOMERS.AFTER`](DATA/TB.TB_CUSTOMERS.AFTER) | State of DB2 table after successful import |
+| [`NEW.CUSTOMER`](DATA/NEW.CUSTOMER) | 20 test customer records (including valid and invalid ones) |
+| [`SUCCESS.LOG`](DATA/SUCCESS.LOG) | Log file containing validation and DB2 results |
+| [`TB.TB_CUSTOMERS.AFTER`](DATA/TB.TB_CUSTOMERS.AFTER) | State of DB2 table after successful import |
 
 ---
 
