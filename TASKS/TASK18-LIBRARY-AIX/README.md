@@ -2,7 +2,7 @@
 
 ## Overview
 
-Reads author names from a search request file (`SEARCH.REQ`), and for each author performs a VSAM `START` on the Alternate Index (`VSAM-AUTHOR`) to position on the first matching book. Then uses `READ NEXT` to browse all books by that author in AIX order. Found books are written to a result report file (`RESULT.RPT`). Authors not found in the catalog trigger a NOT FOUND line. A summary of statistics is printed to SYSOUT at the end.
+Reads author names from a search request file [`SEARCH.REQ`](DATA/SEARCH.REQ), and for each author performs a VSAM `START` on the Alternate Index (`VSAM-AUTHOR`) to position on the first matching book. Then uses `READ NEXT` to browse all books by that author in AIX order. Found books are written to a result report file [`RESULT.RPT`](DATA/RESULT.RPT). Authors not found in the catalog trigger a NOT FOUND line. A summary of statistics is printed to SYSOUT at the end.
 
 The core technique is **VSAM Dynamic Access with an Alternate Index (AIX)**: `START` positions on the AIX key, and `READ NEXT` browses records in AIX order until the author field changes — allowing retrieval of all books by a given author without knowing their ISBNs.
 
@@ -190,9 +190,9 @@ All input and expected output files are in the [`DATA/`](DATA/) folder.
 
 | File | Description |
 |---|---|
-| [`DATA/LIBRARY.MASTER`](DATA/LIBRARY.MASTER) | 14 book records loaded into VSAM base cluster |
-| [`DATA/SEARCH.REQ`](DATA/SEARCH.REQ) | 7 author search requests (created by STEP035) |
-| [`DATA/RESULT.RPT`](DATA/RESULT.RPT) | Expected output |
+| [`LIBRARY.MASTER`](DATA/LIBRARY.MASTER) | 14 book records loaded into VSAM base cluster |
+| [`SEARCH.REQ`](DATA/SEARCH.REQ) | 7 author search requests (created by STEP035) |
+| [`RESULT.RPT`](DATA/RESULT.RPT) | Expected output |
 
 ---
 
