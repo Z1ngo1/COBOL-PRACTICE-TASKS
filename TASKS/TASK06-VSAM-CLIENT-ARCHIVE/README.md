@@ -113,7 +113,7 @@ RECORDS KEPT:       5
 1. **Define VSAM cluster** — run [`DEFKSDS.jcl`](JCL/DEFKSDS.jcl)
 2. **Load initial master data** — load [`CLIENT.MASTER.BEFORE`](DATA/CLIENT.MASTER.BEFORE) into the KSDS cluster
 3. **Compile and run** — run [`COMPRUN.jcl`](JCL/COMPRUN.jcl)
-4. **Compare output files and sysout** - see [`CLIENT.MASTER.AFTER`](DATA/CLIENT.MASTER.AFTER) AND [`SYSOUT.txt`](OUTPUT/SYSOUT.txt)
+4. **Compare output files and sysout** - see [`CLIENT.MASTER.AFTER`](DATA/CLIENT.MASTER.AFTER), [`ARCHIVE.OLD`](DATA/ARCHIVE.OLD) AND [`SYSOUT.txt`](OUTPUT/SYSOUT.txt)
 
 ---
 
