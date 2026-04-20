@@ -12,19 +12,19 @@ The core technique is **VSAM Dynamic Access with an Alternate Index (AIX)**: `ST
 
 | DD Name | File | Org | Mode | Description |
 |---|---|---|---|---|
-| `VSAMDD` | `LIBRARY.MASTER.VSAM` | VSAM KSDS | INPUT | Base cluster — accessed via PATH (AIX) |
+| `VSAMDD` | [`LIBRARY.MASTER.VSAM`](DATA/LIBRARY.MASTER) | VSAM KSDS | INPUT | Base cluster — accessed via PATH (AIX) |
 | `VSAMDD1` | `LIBRARY.MASTER.VSAM.PATH` | VSAM PATH | INPUT | PATH over AIX — used for AIX-based START/READ NEXT |
-| `SRCHDD` | `SEARCH.REQ` | PS | INPUT | Author search requests, RECFM=FB, LRECL=80 |
-| `RSLTDD` | `RESULT.RPT` | PS | OUTPUT | Search results report, RECFM=VB, LRECL=84 |
+| `SRCHDD` | [`SEARCH.REQ`](DATA/SEARCH.REQ) | PS | INPUT | Author search requests, RECFM=FB, LRECL=80 |
+| `RSLTDD` | [`RESULT.RPT`](DATA/RESULT.RPT) | PS | OUTPUT | Search results report, RECFM=VB, LRECL=84 |
 
-### Input Record Layout — `SEARCH.REQ` (`SRCHDD`), LRECL=80, RECFM=FB
+### Input Record Layout — (`SRCHDD`), LRECL=80, RECFM=FB
 
 | Field | Picture | Offset | Description |
 |---|---|---|---|
 | `SEARCH-AUTHOR` | `X(20)` | 1 | Author name to search |
 | FILLER | `X(60)` | 21 | Unused |
 
-### VSAM Record Layout — `LIBRARY.MASTER.VSAM` (`VSAMDD`), LRECL=64
+### VSAM Record Layout — (`VSAMDD`), LRECL=64
 
 | Field | Picture | Offset | Description |
 |---|---|---|---|
@@ -34,7 +34,7 @@ The core technique is **VSAM Dynamic Access with an Alternate Index (AIX)**: `ST
 | `VSAM-YEAR` | `X(4)` | 61 | Publication year |
 | FILLER | `X(16)` | 65 | Unused (padded to RECORDSIZE 64,64) |
 
-### Output Record Layout — `RESULT.RPT` (`RSLTDD`), RECFM=VB, LRECL=84
+### Output Record Layout — (`RSLTDD`), RECFM=VB, LRECL=84
 
 | Field | Picture | Description |
 |---|---|---|
@@ -198,7 +198,7 @@ All input and expected output files are in the [`DATA/`](DATA/) folder.
 
 ## Expected SYSOUT
 
-Actual job output is stored in [`OUTPUT/SYSOUT.txt`](OUTPUT/SYSOUT.txt).
+Actual job output is stored in [`SYSOUT.txt`](OUTPUT/SYSOUT.txt).
 
 ```
 ========================================
@@ -216,20 +216,20 @@ BOOKS FOUND (TOTAL):   14
 
 ## How to Run
 
-1. Submit [`JCL/ALLSTEPS.jcl`](JCL/ALLSTEPS.jcl) — it handles everything end-to-end: defines VSAM, loads data, builds AIX, creates search file, compiles and runs the program
+1. Submit [`ALLSTEPS.jcl`](JCL/ALLSTEPS.jcl) — it handles everything end-to-end: defines VSAM, loads data, builds AIX, creates search file, compiles and runs the program
 
 > **Note:** The JCL compiles source from `Z73460.COB.PRAC(VSAM18)` using the `IGYWCL` procedure and loads the compiled module into `Z73460.LOAD(VSAM18)`. Make sure your source PDS and load library names match your system before submitting.
 
-> **Note:** `RESULT.RPT` (`RSLTDD`) is defined as `RECFM=VB, LRECL=84` — variable-blocked format with 4-byte RDW prefix. The COBOL program writes 80-byte logical records via `RESULT-REC PIC X(80)`.
+> **Note:** [`RESULT.RPT`](DATA/RESULT.RPT) (`RSLTDD`) is defined as `RECFM=VB, LRECL=84` — variable-blocked format with 4-byte RDW prefix. The COBOL program writes 80-byte logical records via `RESULT-REC PIC X(80)`.
 >
 > **Alternative:** To run individual steps separately:
 
-2. [`JCL/DEFKSDS.jcl`](JCL/DEFKSDS.jcl) — Define VSAM cluster (STEP005)
+2. [`DEFKSDS.jcl`](JCL/DEFKSDS.jcl) — Define VSAM cluster (STEP005)
 3. [`DATAVSAM.jcl`](../../JCL%20SAMPLES/DATAVSAM.jcl) — Load data into base cluster (STEP010)
-4. [`JCL/DEFAIX.jcl`](JCL/DEFAIX.jcl) — Define Alternate Index (STEP015)
-5. [`JCL/DEFPATH.jcl`](JCL/DEFPATH.jcl) — Define PATH (STEP020)
-6. [`JCL/BLDINDX.jcl`](JCL/BLDINDX.jcl) — Build the AIX (STEP025)
-7. [`JCL/COMPRUN.jcl`](JCL/COMPRUN.jcl) — Compile and run VSAM18 program (STEP030-STEP050)
+4. [`DEFAIX.jcl`](JCL/DEFAIX.jcl) — Define Alternate Index (STEP015)
+5. [`DEFPATH.jcl`](JCL/DEFPATH.jcl) — Define PATH (STEP020)
+6. [`BLDINDX.jcl`](JCL/BLDINDX.jcl) — Build the AIX (STEP025)
+7. [`COMPRUN.jcl`](JCL/COMPRUN.jcl) — Compile and run VSAM18 program (STEP030-STEP050)
 
 ---
 
