@@ -83,10 +83,10 @@ Input and expected output files are stored in the [`DATA/`](DATA/) folder:
 
 | File | Description |
 |---|---|
-| [`DATA/TRANS.FILE.INPUT`](DATA/TRANS.FILE.INPUT) | Input transactions — format: `ACCT-ID(5) + TYPE(1) + AMOUNT(7)` |
-| [`DATA/ACCT.MASTER.BEFORE`](DATA/ACCT.MASTER.BEFORE) | Initial state of VSAM master — format: `ID(5) + NAME(20) + BAL(7)` |
-| [`DATA/ACCT.MASTER.AFTER`](DATA/ACCT.MASTER.AFTER) | Expected VSAM state after all transactions are applied |
-| [`DATA/ERROR.REPORT.OUTPUT`](DATA/ERROR.REPORT.OUTPUT) | Expected error report — rejected transactions with reason |
+| [`TRANS.FILE.INPUT`](DATA/TRANS.FILE.INPUT) | Input transactions — format: `ACCT-ID(5) + TYPE(1) + AMOUNT(7)` |
+| [`ACCT.MASTER.BEFORE`](DATA/ACCT.MASTER.BEFORE) | Initial state of VSAM master — format: `ID(5) + NAME(20) + BAL(7)` |
+| [`ACCT.MASTER.AFTER`](DATA/ACCT.MASTER.AFTER) | Expected VSAM state after all transactions are applied |
+| [`ERROR.REPORT.OUTPUT`](DATA/ERROR.REPORT.OUTPUT) | Expected error report — rejected transactions with reason |
 
 ---
 
