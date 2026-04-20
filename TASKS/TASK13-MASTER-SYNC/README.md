@@ -25,7 +25,7 @@ The match-merge algorithm assumes sorted input. Unsorted files will produce **in
 | `NEWDD` | [`NEW.MASTER`](./DATA/NEW.MASTER) | PS | OUTPUT | Updated master file after all transactions applied; LRECL=80, RECFM=F |
 | `REPDD` | [`ERROR.REPORT`](./DATA/ERROR.REPORT) | PS | OUTPUT | Failed transactions logged for review; LRECL=80, RECFM=F |
 
-### Input Record Layout — `OLD.MASTER` (`OLDDD`), LRECL=80, RECFM=F
+### Input Record Layout — (`OLDDD`), LRECL=80, RECFM=F
 
 | Field | Picture | Offset | Description |
 |---|---|---|---|
@@ -34,7 +34,7 @@ The match-merge algorithm assumes sorted input. Unsorted files will produce **in
 | `OLD-BAL` | `9(5)V99` | 26 | Account balance — implicit 2 decimal places |
 | FILLER | `X(48)` | 33 | Padding to 80 bytes |
 
-### Input Record Layout — `TRANS.FILE` (`TRNSDD`), LRECL=80, RECFM=F
+### Input Record Layout — (`TRNSDD`), LRECL=80, RECFM=F
 
 | Field | Picture | Offset | Description |
 |---|---|---|---|
