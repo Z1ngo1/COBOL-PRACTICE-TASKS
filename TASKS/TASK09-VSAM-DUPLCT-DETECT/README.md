@@ -121,10 +121,10 @@ SUSPICIOUS RECORDS FOUND:      8
 ## How to Run
 
 1. **Define VSAM cluster** — run [`JCL/DEFKSDS.jcl`](JCL/DEFKSDS.jcl)
-2. **Load initial master data** — load `CLIENT.MAST.VSAM` into the KSDS cluster either via REPRO (see [`DATAVSAM.jcl`](../../JCL%20SAMPLES/DATAVSAM.jcl)) or manually through **File Manager** in ISPF 
+2. **Load initial master data** — load [`DATA/CLIENT.MAST.VSAM`](DATA/CLIENT.MAST.VSAM) into the KSDS cluster either via REPRO (see [`DATAVSAM.jcl`](../../JCL%20SAMPLES/DATAVSAM.jcl)) or manually through **File Manager** in ISPF 
 3. **Compile and run** — run [`JCL/COMPRUN.jcl`](JCL/COMPRUN.jcl)
 
-> **PROC reference:** `COMPRUN.jcl` uses the [`MYCOMPGO`](../../JCLPROC/MYCOMPGO.jcl) catalogued procedure for compilation and execution. Make sure `MYCOMPGO` is available in your system's `PROCLIB` before submitting.
+> **PROC reference:** [`JCL/COMPRUN.jcl`](JCL/COMPRUN.jcl) uses the [`MYCOMPGO`](../../JCLPROC/MYCOMPGO.jcl) catalogued procedure for compilation and execution. Make sure [`MYCOMPGO`](../../JCLPROC/MYCOMPGO.jcl) is available in your system's `PROCLIB` before submitting.
 
 ---
 
