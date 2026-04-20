@@ -5,8 +5,8 @@
 Implements a two-program COBOL batch system that evaluates loan requests by performing random-access lookups against a VSAM KSDS customer master file and delegating credit scoring rules to a subprogram. Approved and rejected decisions are written to a sequential approval log.
 
 The two programs work together:
-- **`JOBSUB23`** (Main) — reads `LOAN.REQUESTS`, performs a VSAM random read on `CREDIT.MASTER` for each request, calls `SUB1JB23`, and writes the decision to `APPROVAL.LOG`.
-- **`SUB1JB23`** (Credit Checker) — receives credit score, late payments, current debt, and loan amount; returns APPROVED or REJECTED with a reason code.
+- **`JOBSUB23`** (Main) — reads [`DATA/LOAN.REQUESTS`](DATA/LOAN.REQUESTS), performs a VSAM random read on [`DATA/CREDIT.MASTER`](DATA/CREDIT.MASTER) for each request, calls [`COBOL/SUB1JB23.cbl`](COBOL/SUB1JB23.cbl) and writes the decision to [`DATA/APPROVAL.LOG`](DATA/APPROVAL.LOG).
+- **[`SUB1JB23`](COBOL/SUB1JB23.cbl)** (Credit Checker) — receives credit score, late payments, current debt, and loan amount; returns APPROVED or REJECTED with a reason code.
 
 ---
 
@@ -108,29 +108,17 @@ All input, master, and output files are in the [`DATA/`](DATA/) folder.
 Actual job output is stored in [`OUTPUT/SYSOUT.txt`](OUTPUT/SYSOUT.txt).
 
 ```
-RECORDS PROCESSED: 7
-RECORDS APPROVED:  2
-RECORDS REJECTED:  5
-```
-
-Expected content of `APPROVAL.LOG`:
-
-```
-100001 APPROVED CLIENT QUALIFIES
-100002 REJECTED TOO MANY LATE PAYMENTS
-100003 REJECTED CUSTOMER NOT FOUND
-100004 REJECTED CUSTOMER NOT FOUND
-100005 REJECTED POOR CREDIT SCORE
-100006 APPROVED CLIENT QUALIFIES
-100007 REJECTED TOO MANY LATE PAYMENTS
+TOTAL: 7
+ERROR: 5
+SUCCESS: 2
 ```
 
 ---
 
 ## How to Run
 
-1. **Define the VSAM cluster** — submit [`JCL/DEFKSDS.jcl`](JCL/DEFKSDS.jcl) to create the `CREDIT.MASTER` KSDS cluster via IDCAMS.
-2. **Load customer data** — use IDCAMS REPRO or a separate load step to populate `CREDIT.MASTER` with initial records.
+1. **Define the VSAM cluster** — submit [`JCL/DEFKSDS.jcl`](JCL/DEFKSDS.jcl) to create the [`DATA/CREDIT.MASTER`](DATA/CREDIT.MASTER) KSDS cluster via IDCAMS.
+2. **Load customer data** — use IDCAMS REPRO or a separate load step to populate [`DATA/CREDIT.MASTER`](DATA/CREDIT.MASTER) with initial records.
 3. **Compile and run** — submit [`JCL/COMPRUN.jcl`](JCL/COMPRUN.jcl). The job will:
    - Delete previous datasets (`STEP005`).
    - Populate `LOAN.REQUESTS` via `IEBGENER` (`STEP010`).
