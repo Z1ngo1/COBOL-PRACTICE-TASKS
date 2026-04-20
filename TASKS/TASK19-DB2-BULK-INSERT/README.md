@@ -10,7 +10,7 @@ The core technique is **batch commit strategy with embedded SQL validation**: va
 
 ## DB2 Table
 
-### `TB_CUSTOMERS`
+### [`TB_CUSTOMERS`](SQL/CREATE.TABLE.sql)
 
 ```sql
 CREATE TABLE TB_CUSTOMERS (
