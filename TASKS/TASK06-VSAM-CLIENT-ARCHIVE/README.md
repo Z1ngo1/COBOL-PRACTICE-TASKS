@@ -79,10 +79,10 @@ Input and expected output files are stored in the [`DATA/`](DATA/) folder:
 
 | File | Description |
 |---|---|
-| [`PARAM.FILE.INPUT`](DATA/PARAM.FILE.INPUT) | 1 record: `20231231` (Cutoff date) |
+| [`PARAM.FILE`](DATA/PARAM.FILE) | 1 record: `20231231` (Cutoff date) |
 | [`CLIENT.MASTER.BEFORE`](DATA/CLIENT.MASTER.BEFORE) | 10 client records with various dates |
 | [`CLIENT.MASTER.AFTER`](DATA/CLIENT.MASTER.AFTER) | VSAM state after cleanup (only active clients) |
-| [`ARCHIVE.OLD.OUTPUT`](DATA/ARCHIVE.OLD.OUTPUT) | Expected archive file (deleted clients) |
+| [`ARCHIVE.OLD`](DATA/ARCHIVE.OLD) | Expected archive file (deleted clients) |
 
 ---
 
