@@ -12,7 +12,7 @@ The core technique is the **COBOL `SORT` statement with `INPUT PROCEDURE` and `O
 | DD Name | File | Org | Mode | Description |
 |---|---|---|---|---|
 | `EXDD` | [`EXAM.RAW`](DATA/EXAM.RAW) | PS | INPUT | Raw exam results — unsorted, may contain failing scores |
-| `SRTDD` | [`WORK.SORT`] | SD | TEMP | Sort work file — temporary, deleted after job |
+| `SRTDD` | `WORK.SORT` | SD | TEMP | Sort work file — temporary, deleted after job |
 | `HNRDD` | [`HONOR.ROLL`](DATA/HONOR.ROLL) | PS | OUTPUT | Sorted honor roll — passing students only, sorted by class and score |
 
 ### Input Record Layout — (`EXDD`), LRECL=31, RECFM=F
