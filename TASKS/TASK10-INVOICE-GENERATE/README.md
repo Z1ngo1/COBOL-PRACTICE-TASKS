@@ -111,9 +111,9 @@ Input data and expected output are stored in the [`DATA/`](DATA/) folder:
 
 | File | Description |
 |---|---|
-| [`DATA/PROD.MASTER.VSAM`](DATA/PROD.MASTER.VSAM) | 10 product records loaded into VSAM KSDS |
-| [`DATA/ORDERS.DAILY`](DATA/ORDERS.DAILY) | 12 order records (10 valid, 2 with unknown product IDs) |
-| [`DATA/INVOICE.FILE`](DATA/INVOICE.FILE) | Expected invoice output — 10 enriched lines |
+| [`PROD.MASTER.VSAM`](DATA/PROD.MASTER.VSAM) | 10 product records loaded into VSAM KSDS |
+| [`ORDERS.DAILY`](DATA/ORDERS.DAILY) | 12 order records (10 valid, 2 with unknown product IDs) |
+| [`INVOICE.FILE`](DATA/INVOICE.FILE) | Expected invoice output — 10 enriched lines |
 
 ---
 
