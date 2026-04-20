@@ -11,9 +11,9 @@ The core technique is the **Table Lookup** pattern: instead of reading two files
 
 | DD Name | File | Org | Mode | Description |
 |---|---|---|---|---|
-| `TAXDD` | `TAX.RATES` | PS | INPUT | Tax rate table — region code + rate; loaded into memory at startup |
-| `EMPDD` | `EMP.SALARY` | PS | INPUT | Employee salary records — ID, name, region code, salary |
-| `OUTDD` | `PAYROLL.TXT` | PS | OUTPUT | Payroll results — one line per employee with tax amount |
+| `TAXDD` | [`TAX.RATES`](./DATA/TAX.RATES) | PS | INPUT | Tax rate table — region code + rate; loaded into memory at startup |
+| `EMPDD` | [`EMP.SALARY`](./DATA/EMP.SALARY) | PS | INPUT | Employee salary records — ID, name, region code, salary |
+| `OUTDD` | [`PAYROLL.TXT`](./DATA/PAYROLL.TXT) | PS | OUTPUT | Payroll results — one line per employee with tax amount |
 
 ### Input Record Layout — `TAX.RATES` (`TAXDD`), LRECL=80, RECFM=F
 
@@ -116,7 +116,7 @@ All input and expected output files are in the [`DATA/`](./DATA) folder.
 
 ## Expected SYSOUT
 
-Actual job output is stored in [`OUTPUT/SYSOUT.txt`](./OUTPUT/SYSOUT.txt).
+Actual job output is stored in [`SYSOUT.txt`](./OUTPUT/SYSOUT.txt).
 
 ```text
 ========================================
@@ -134,10 +134,11 @@ Actual job output is stored in [`OUTPUT/SYSOUT.txt`](./OUTPUT/SYSOUT.txt).
 
 ## How to Run
 
-1.  Upload [`DATA/TAX.RATES`](./DATA/TAX.RATES) and [`DATA/EMP.SALARY`](./DATA/EMP.SALARY) to your mainframe datasets.
-2.  Submit [`JCL/COMPRUN.jcl`](./JCL/COMPRUN.jcl).
+1.  Upload [`TAX.RATES`](./DATA/TAX.RATES) and [`EMP.SALARY`](./DATA/EMP.SALARY) to your mainframe datasets.
+2.  Submit [`COMPRUN.jcl`](./JCL/COMPRUN.jcl).
+3.  Compare output files and sysout - see [`PAYROLL.TXT`](./DATA/PAYROLL.TXT) and [`SYSOUT.txt`](OUTPUT/SYSOUT.txt)
 
-> **PROC reference:** [`JCL/COMPRUN.jcl`](./JCL/COMPRUN.jcl) uses the [`MYCOMPGO`](../../JCLPROC/MYCOMPGO.jcl) catalogued procedure.
+> **PROC reference:** [`COMPRUN.jcl`](./JCL/COMPRUN.jcl) uses the [`MYCOMPGO`](../../JCLPROC/MYCOMPGO.jcl) catalogued procedure.
 
 ---
 
