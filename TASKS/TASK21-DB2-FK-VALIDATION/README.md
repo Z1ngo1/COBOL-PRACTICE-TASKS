@@ -169,9 +169,9 @@ Actual job output is stored in [`OUTPUT/SYSOUT.txt`](OUTPUT/SYSOUT.txt).
 ORDER LOAD SUMMARY
 ----------------------------------------
 RECORDS PROCESSED: 10
-RECORDS INSERTED:  4
-RECORDS ERRORS:    6
-COMMIT BATCHES:    1
+RECORDS INSERTED: 4
+RECORDS ERRORS: 6
+COMMIT BATCHES: 1
 ----------------------------------------
 ```
 
