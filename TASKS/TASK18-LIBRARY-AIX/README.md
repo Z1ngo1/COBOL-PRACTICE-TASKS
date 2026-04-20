@@ -188,6 +188,7 @@ All input and expected output files are in the [`DATA/`](DATA/) folder.
 |---|---|
 | [`DATA/LIBRARY.MASTER`](DATA/LIBRARY.MASTER) | 14 book records loaded into VSAM base cluster |
 | [`DATA/SEARCH.REQ`](DATA/SEARCH.REQ) | 7 author search requests (created by STEP035) |
+| [`OUTPUT/SYSOUT.txt`](OUTPUT/SYSOUT.txt) | Actual program output from STEP050 execution |
 
 ---
 
@@ -216,6 +217,15 @@ BOOKS FOUND (TOTAL):   14
 > **Note:** The JCL compiles source from `Z73460.COB.PRAC(VSAM18)` using the `IGYWCL` procedure and loads the compiled module into `Z73460.LOAD(VSAM18)`. Make sure your source PDS and load library names match your system before submitting.
 
 > **Note:** `RESULT.RPT` (`RSLTDD`) is defined as `RECFM=VB, LRECL=84` — variable-blocked format with 4-byte RDW prefix. The COBOL program writes 80-byte logical records via `RESULT-REC PIC X(80)`.
+>
+> **Alternative:** To run individual steps separately:
+
+2. [`JCL/DEFVSAM.jcl`](JCL/DEFVSAM.jcl) — Define VSAM cluster (STEP005)
+3. [`JCL/LOADVSAM.jcl`](JCL/LOADVSAM.jcl) — Load data into base cluster (STEP010)
+4. [`JCL/DEFAIX.jcl`](JCL/DEFAIX.jcl) — Define Alternate Index (STEP015)
+5. [`JCL/DEFPATH.jcl`](JCL/DEFPATH.jcl) — Define PATH (STEP020)
+6. [`JCL/BLDAIX.jcl`](JCL/BLDAIX.jcl) — Build the AIX (STEP025)
+7. [`JCL/COMPRUN.jcl`](JCL/COMPRUN.jcl) — Compile and run VSAM18 program (STEP030-STEP050)
 
 ---
 
