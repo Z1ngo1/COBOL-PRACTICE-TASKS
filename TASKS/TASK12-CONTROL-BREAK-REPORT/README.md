@@ -2,7 +2,7 @@
 
 ## Overview
 
-Reads a pre-sorted sequential PS sales file (`SALES.DATA`) and generates a formatted report (`SALES.REPORT`) with **three levels of totals**: shop subtotal → region subtotal → grand total.
+Reads a pre-sorted sequential PS sales file [`SALES.DATA`](DATA/SALES.DATA) and generates a formatted report [`SALES.REPORT`](DATA/SALES.REPORT) with **three levels of totals**: shop subtotal → region subtotal → grand total.
 The core technique is the **Control Break algorithm**: the program detects when the sort key changes (region or shop), flushes the current subtotal to the report, resets the accumulator, and continues.
 No VSAM, no DB2 — pure sequential processing with holder variables.
 
