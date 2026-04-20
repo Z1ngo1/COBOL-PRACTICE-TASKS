@@ -42,9 +42,9 @@ The core technique is **VSAM Dynamic Access with an Alternate Index (AIX)**: `ST
 
 ---
 
-## Four-Phase Processing
+## Business Logic: Four-Phase Processing
 
-The program is driven by `MAIN-LOGIC` which calls four paragraphs in sequence:
+The program is driven by `MAIN-LOGIC` which calls four paragraphs in sequence. Each phase has a distinct responsibility: open files, iterate over search requests, perform AIX browse per author, and close files.
 
 ```cobol
 MAIN-LOGIC.
@@ -62,7 +62,7 @@ Opens `VSAM-FILE` (INPUT), `SEARCH-FILE` (INPUT), and `RESULT-FILE` (OUTPUT). Ch
 
 ### Phase 2 — `PROCESS-ALL-SEARCHES` (main loop)
 
-Loops over all author names from `SEARCH-FILE`. Blank lines (`SEARCH-AUTHOR = SPACES`) are skipped silently. For each valid author:
+Loops over all author names from `SEARCH-FILE`. Blank lines (`SEARCH-AUTHOR = SPACES`) are skipped silently. For each valid author the program delegates to `SEARCH-AUTHOR-BOOKS`.
 
 ```
 PROCESS-ALL-SEARCHES:
@@ -79,7 +79,7 @@ PROCESS-ALL-SEARCHES:
 
 ### Phase 3 — `SEARCH-AUTHOR-BOOKS` (AIX search per author)
 
-For each author writes a HEADER-LINE to `RESULT-FILE`, then performs a VSAM `START` on the Alternate Index:
+For each author writes a HEADER-LINE to `RESULT-FILE`, then performs a VSAM `START` on the Alternate Index to position on the first matching book.
 
 ```
 SEARCH-AUTHOR-BOOKS:
@@ -97,7 +97,7 @@ SEARCH-AUTHOR-BOOKS:
 
 ### Phase 4 — `READ-MATCHING-BOOKS` (AIX browse)
 
-Reads records sequentially via `READ NEXT` in AIX order while `VSAM-AUTHOR` matches `SEARCH-AUTHOR`. Stops when author changes or end-of-file is reached:
+Reads records sequentially via `READ NEXT` in AIX order while `VSAM-AUTHOR` matches `SEARCH-AUTHOR`. Stops when the author field changes or end-of-file is reached.
 
 ```
 READ-MATCHING-BOOKS:
@@ -140,6 +140,28 @@ READ-MATCHING-BOOKS:
 | Access mode required | RANDOM | DYNAMIC |
 
 `ACCESS MODE IS DYNAMIC` in FILE-CONTROL is mandatory — it enables both random (`START`) and sequential (`READ NEXT`) access in the same program.
+
+---
+
+## Program Flow
+
+1.  **PERFORM OPEN-ALL-FILES** — opens `VSAMDD` (INPUT), `SRCHDD` (INPUT), and `RSLTDD` (OUTPUT); checks FILE STATUS after each open.
+2.  **PERFORM READ-SEARCH-AUTHOR** — reads first record from `SEARCH-FILE`; sets EOF flag if file is empty.
+3.  **PERFORM PROCESS-ALL-SEARCHES** — main loop `UNTIL EOF` on `SEARCH-FILE`.
+    *   **IF `SEARCH-AUTHOR = SPACES`** → skip silently; increment `READ-COUNTER` only.
+    *   **ELSE** → increment `SEARCHES-PROCESSED`; **PERFORM SEARCH-AUTHOR-BOOKS**.
+        *   **WRITE HEADER-LINE** — writes `"SEARCH FOR: <author>"` to `RESULT-FILE`.
+        *   **START VSAM-FILE KEY IS EQUAL TO VSAM-AUTHOR**.
+            *   **INVALID KEY** → increment `AUTHORS-NOT-FOUND`; write NOT-FOUND-LINE.
+            *   **NOT INVALID KEY** → increment `AUTHORS-FOUND`; **PERFORM READ-MATCHING-BOOKS**.
+                *   **READ VSAM-FILE NEXT RECORD** in a loop until author changes or AT END.
+                *   **IF author matches** → increment `BOOKS-FOUND`; write DETAIL-LINE.
+                *   **IF author changes** → set EOF-AUTHOR flag; exit browse loop.
+        *   **WRITE SEPARATOR-LINE** — writes 40 dashes after each author block.
+    *   **PERFORM READ-SEARCH-AUTHOR** — reads next record from `SEARCH-FILE`.
+4.  **PERFORM CLOSE-ALL-FILES** — closes `VSAMDD`, `SRCHDD`, and `RSLTDD`.
+5.  **PERFORM DISPLAY-SUMMARY** — prints final statistics to SYSOUT (searches read, processed, authors found/not found, books found).
+6.  **STOP RUN**.
 
 ---
 
