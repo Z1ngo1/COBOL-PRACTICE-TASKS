@@ -234,7 +234,7 @@ COMMIT BATCHES:     1
 ## How to Run
 
 1. Create the DB2 table by executing the SQL in [`SQL/CREATE.TABLE.sql`](SQL/CREATE.TABLE.sql) (if not already created)
-2. Upload customer data [`DATA/NEW.CUSTOMER`](DATA/NEW.CUSTOMER) to `Z73460.TASK19.NEW.CUSTOMER` dataset or use pre-prepared test data
+2. Upload customer data [`DATA/NEW.CUSTOMER`](DATA/NEW.CUSTOMER) to dataset or use pre-prepared test data in jcl
 3. Submit [`JCL/COBDB2CP.jcl`](JCL/COBDB2CP.jcl) — it handles DB2 precompile, COBOL compile, and program execution
 
 ---
