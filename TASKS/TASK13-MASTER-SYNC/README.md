@@ -20,10 +20,10 @@ The match-merge algorithm assumes sorted input. Unsorted files will produce **in
 
 | DD Name | File | Org | Mode | Description |
 |---|---|---|---|---|
-| `OLDDD` | `OLD.MASTER` | PS | INPUT | Current customer master — ID, name, balance; LRECL=80, RECFM=F |
-| `TRNSDD` | `TRANS.FILE` | PS | INPUT | Daily transactions — ID, action code, data, amount; LRECL=80, RECFM=F |
-| `NEWDD` | `NEW.MASTER` | PS | OUTPUT | Updated master file after all transactions applied; LRECL=80, RECFM=F |
-| `REPDD` | `ERROR.REPORT` | PS | OUTPUT | Failed transactions logged for review; LRECL=80, RECFM=F |
+| `OLDDD` | [`OLD.MASTER`](./DATA/OLD.MASTER) | PS | INPUT | Current customer master — ID, name, balance; LRECL=80, RECFM=F |
+| `TRNSDD` | [`TRANS.FILE`](./DATA/TRANS.FILE) | PS | INPUT | Daily transactions — ID, action code, data, amount; LRECL=80, RECFM=F |
+| `NEWDD` | [`NEW.MASTER`](./DATA/NEW.MASTER) | PS | OUTPUT | Updated master file after all transactions applied; LRECL=80, RECFM=F |
+| `REPDD` | [`ERROR.REPORT`](./DATA/ERROR.REPORT) | PS | OUTPUT | Failed transactions logged for review; LRECL=80, RECFM=F |
 
 ### Input Record Layout — `OLD.MASTER` (`OLDDD`), LRECL=80, RECFM=F
 
@@ -152,7 +152,7 @@ All input and expected output files are in the [`DATA/`](./DATA) folder.
 
 ## Expected SYSOUT
 
-Actual job output is stored in [`OUTPUT/SYSOUT.txt`](./OUTPUT/SYSOUT.txt).
+Actual job output is stored in [`SYSOUT.txt`](./OUTPUT/SYSOUT.txt).
 
 ```text
 ========================================
@@ -172,10 +172,11 @@ Actual job output is stored in [`OUTPUT/SYSOUT.txt`](./OUTPUT/SYSOUT.txt).
 
 ## How to Run
 
-1.  Upload [`DATA/OLD.MASTER`](./DATA/OLD.MASTER) and [`DATA/TRANS.FILE`](./DATA/TRANS.FILE) to your mainframe datasets.
-2.  Submit [`JCL/COMPRUN.jcl`](./JCL/COMPRUN.jcl).
+1.  Upload [`OLD.MASTER`](./DATA/OLD.MASTER) and [`TRANS.FILE`](./DATA/TRANS.FILE) to your mainframe datasets.
+2.  Submit [`COMPRUN.jcl`](./JCL/COMPRUN.jcl).
+3.  Compare output files and sysout - see [`NEW.MASTER`](./DATA/NEW.MASTER), [`ERROR.REPORT`](./DATA/ERROR.REPORT)  and [`SYSOUT.txt`](OUTPUT/SYSOUT.txt)
 
-> **PROC reference:** [`JCL/COMPRUN.jcl`](./JCL/COMPRUN.jcl) uses the [`MYCOMPGO`](../../JCLPROC/MYCOMPGO.jcl) catalogued procedure.
+> **PROC reference:** [`COMPRUN.jcl`](./JCL/COMPRUN.jcl) uses the [`MYCOMPGO`](../../JCLPROC/MYCOMPGO.jcl) catalogued procedure.
 
 ---
 
