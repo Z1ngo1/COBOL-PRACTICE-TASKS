@@ -285,4 +285,3 @@
            DISPLAY 'RATE FOUND:              ' RATE-FOUND-COUNT-DISP.
            DISPLAY 'DEFAULT RATE USED:       ' DEFAULT-RATE-COUNT-DISP.
            DISPLAY '========================================'.
-
