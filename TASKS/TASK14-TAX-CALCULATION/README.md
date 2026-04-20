@@ -44,116 +44,89 @@ The core technique is the **Table Lookup** pattern: instead of reading two files
 
 ---
 
-## Two-Phase Processing
+## Business Logic: Two-Phase Processing
 
 ### Phase 1 — Load Tax Table (Initialization)
 
-```
+The program starts by loading the entire tax rate reference file into a Working-Storage table.
+
+```cobol
 OPEN TAX.RATES
 PERFORM UNTIL EOF
-    READ TAX.RATES
-    ADD 1 TO TAX-RATES-LOADED
-    MOVE TAX-REGION-CODE TO WS-REGION(IDX)
-    MOVE RATE            TO WS-RATE(IDX)
+  READ TAX.RATES
+  ADD 1 TO TAX-RATES-LOADED
+  MOVE TAX-REGION-CODE TO WS-REGION(IDX)
+  MOVE RATE TO WS-RATE(IDX)
 END-PERFORM
 CLOSE TAX.RATES
 ```
 
-After this phase the entire rate table lives in `TAX-TABLE` in memory. `TAX-RATES-LOADED` holds the number of loaded entries and is used as the upper bound for all subsequent searches. Table size is bounded by `OCCURS 50 TIMES` — if `TAX.RATES` has more than 50 records the program displays a warning and ignores the excess.
+After this phase, the `TAX-TABLE` lives in memory. `TAX-RATES-LOADED` holds the count of entries and is used as the upper bound for all subsequent searches. The table size is limited by `OCCURS 50 TIMES`.
 
 ### Phase 2 — Process Salary File
 
-```
+For each employee record, the program performs a linear search in the in-memory table.
+
+```cobol
 OPEN EMP.SALARY, PAYROLL.TXT
 PERFORM UNTIL EOF
-    READ EMP.SALARY
-    ADD 1 TO EMPLOYEES-PROCESSED
-    PERFORM LOOKUP-TAX-RATE
-    IF WS-FOUND = 'Y'
-        COMPUTE OUT-TAX = EMP-SALARY * WS-RATE(IDX)
-    ELSE
-        PERFORM APPLY-DEFAULT-RATE
-    WRITE PAYROLL-REC
+  READ EMP.SALARY
+  PERFORM LOOKUP-TAX-RATE
+  IF WS-FOUND = 'Y'
+    COMPUTE OUT-TAX = EMP-SALARY * WS-RATE(IDX)
+  ELSE
+    PERFORM APPLY-DEFAULT-RATE
+  END-IF
+  WRITE PAYROLL-REC
 END-PERFORM
 CLOSE EMP.SALARY, PAYROLL.TXT
 ```
 
 ---
 
-## Table Lookup Logic
+## Program Flow
 
-The lookup searches `TAX-TABLE` from index 1 to `TAX-RATES-LOADED` comparing `EMP-REGION-CODE` against each `WS-REGION` entry.
-
-### Using `PERFORM VARYING`
-
-```cobol
-MOVE 'N' TO WS-FOUND
-PERFORM VARYING IDX FROM 1 BY 1
-        UNTIL IDX > TAX-RATES-LOADED OR WS-FOUND = 'Y'
-    IF EMP-REGION-CODE = WS-REGION(IDX)
-        MOVE 'Y' TO WS-FOUND
-        COMPUTE OUT-TAX = EMP-SALARY * WS-RATE(IDX)
-        MOVE EMP-ID          TO OUT-ID
-        MOVE WS-REGION(IDX)  TO OUT-REGION
-        ADD 1 TO RATE-FOUND-COUNT
-    END-IF
-END-PERFORM
-```
-
-### Using `SEARCH` (alternative)
-
-```cobol
-SEARCH TAX-ENTRY
-    AT END
-        MOVE WS-FOUND TO WS-FOUND  *> falls through to APPLY-DEFAULT-RATE
-    WHEN WS-REGION(IDX) = EMP-REGION-CODE
-        COMPUTE OUT-TAX = EMP-SALARY * WS-RATE(IDX)
-END-SEARCH
-```
-
-> `SEARCH` requires the table index to be defined with `INDEXED BY` and reset to 1 before each call. `PERFORM VARYING` is simpler when the table is small and not sorted.
-
-### Default Rate (Region Not Found)
-
-If no matching `EMP-REGION-CODE` is found in `TAX-TABLE`, the program applies `DEF-TAX-RATE = 0.200` (20%) via `APPLY-DEFAULT-RATE`. The output record is written normally — `OUT-REGION` will show the unmatched code so it can be spotted during review.
-
----
-
-## Tax Calculation
-
-```
-OUT-TAX = EMP-SALARY x WS-RATE(IDX)   (or DEF-TAX-RATE if region not found)
-```
-
-`COMPUTE` is used to avoid truncation on the implied decimal positions.
+1.  **PERFORM OPEN-TAX-FILE** — opens `TAXDD` (INPUT) for initialization.
+2.  **PERFORM LOAD-TAX-TABLE** — reads `TAX.RATES` record-by-record into `WS-TAX-TABLE` until EOF or table capacity is reached.
+3.  **PERFORM CLOSE-TAX-FILE** — closes `TAXDD` once loading is complete.
+4.  **PERFORM OPEN-PAYROLL-FILES** — opens `EMPDD` (INPUT) and `OUTDD` (OUTPUT).
+5.  **PERFORM PROCESS-SALARY-RECORDS** — main processing loop `UNTIL EOF` on `EMP.SALARY`.
+    *   **READ EMP-SALARY-FILE**.
+    *   **PERFORM LOOKUP-TAX-RATE** — searches `WS-TAX-TABLE` for a matching `EMP-REGION-CODE`.
+    *   **IF FOUND** --> `COMPUTE OUT-TAX` using the specific rate from the table.
+    *   **ELSE** --> `PERFORM APPLY-DEFAULT-RATE` (uses a hardcoded 20% rate).
+    *   **WRITE PAYROLL-REC** — formats and writes the result line to `OUTDD`.
+6.  **DISPLAY-SUMMARY** — prints final statistics to SYSOUT (rates loaded, employees processed, default rates applied).
+7.  **PERFORM CLOSE-PAYROLL-FILES** — closes `EMPDD` and `OUTDD`.
+8.  **STOP RUN**.
 
 ---
 
 ## Test Data
 
-All input and expected output files are in the [`DATA/`](DATA/) folder.
+All input and expected output files are in the [`DATA/`](./DATA) folder.
 
 | File | Description |
 |---|---|
-| [`DATA/TAX.RATES`](DATA/TAX.RATES) | 7 region tax rate entries |
-| [`DATA/EMP.SALARY`](DATA/EMP.SALARY) | 10 employee salary records |
-| [`DATA/PAYROLL.TXT`](DATA/PAYROLL.TXT) | Expected payroll output with tax amounts |
+| [`DATA/TAX.RATES`](./DATA/TAX.RATES) | 7 region tax rate entries |
+| [`DATA/EMP.SALARY`](./DATA/EMP.SALARY) | 10 employee salary records |
+| [`DATA/PAYROLL.TXT`](./DATA/PAYROLL.TXT) | Expected payroll output with tax amounts |
 
 ---
 
 ## Expected SYSOUT
 
-Actual job output is stored in [`OUTPUT/SYSOUT.txt`](OUTPUT/SYSOUT.txt).
+Actual job output is stored in [`OUTPUT/SYSOUT.txt`](./OUTPUT/SYSOUT.txt).
 
-```
+```text
 ========================================
-TAX CALCULATION SUMMARY
+ TAX CALCULATION SUMMARY
 ========================================
-TAX RATES LOADED:          7
-EMPLOYEES PROCESSED:      10
-PAYROLL RECORDS WRITTEN:  10
-RATE FOUND:                8
-DEFAULT RATE USED:         2
+ TAX RATES LOADED:              7
+ EMPLOYEES PROCESSED:          10
+ PAYROLL RECORDS WRITTEN:      10
+ RATE FOUND:                    8
+ DEFAULT RATE USED:             2
 ========================================
 ```
 
@@ -161,25 +134,25 @@ DEFAULT RATE USED:         2
 
 ## How to Run
 
-1. Upload [`DATA/TAX.RATES`](DATA/TAX.RATES) and [`DATA/EMP.SALARY`](DATA/EMP.SALARY) to your mainframe datasets manually through option '3.4 and edit your dataset' or with pre-prepared data
-2. Submit [`JCL/COMPRUN.jcl`](JCL/COMPRUN.jcl) with pre-prepared data
+1.  Upload [`DATA/TAX.RATES`](./DATA/TAX.RATES) and [`DATA/EMP.SALARY`](./DATA/EMP.SALARY) to your mainframe datasets.
+2.  Submit [`JCL/COMPRUN.jcl`](./JCL/COMPRUN.jcl).
 
-> **PROC reference:** `COMPRUN.jcl` uses the [`MYCOMPGO`](../../JCLPROC/MYCOMPGO.jcl) catalogued procedure for compilation and execution. Make sure `MYCOMPGO` is available in your system's `PROCLIB` before submitting.
+> **PROC reference:** `COMPRUN.jcl` uses the [`MYCOMPGO`](../../JCLPROC/MYCOMPGO.jcl) catalogued procedure.
 
 ---
 
 ## Key COBOL Concepts Used
 
-- **`OCCURS` + `INDEXED BY`** — defines `TAX-TABLE` as a fixed-size array (`OCCURS 50 TIMES`) of region/rate pairs loaded entirely into working-storage before any salary record is processed
-- **`PERFORM VARYING`** — linear search through `TAX-TABLE` from index 1 to `TAX-RATES-LOADED`; stops at the first matching entry or exhausts the table for the default rate fallback
-- **Two-phase design** — strict initialization phase (load `TAX-TABLE`, close `TAX.RATES`) before opening `EMP.SALARY`; `TAX.RATES` is read exactly once regardless of how many salary records exist
-- **`DEF-TAX-RATE` fallback** — when no entry in `TAX-TABLE` matches `EMP-REGION-CODE` the program applies `DEF-TAX-RATE` (0.200) and continues normally without stopping or logging an error
+*   **`OCCURS` + `INDEXED BY`** — defining a Working-Storage table to hold reference data.
+*   **Linear Search via `PERFORM VARYING`** — searching the table from index 1 to the current load count.
+*   **Two-phase processing** — strictly separating the initialization (loading) phase from the main processing phase.
+*   **Fallback logic** — providing a default value when a lookup fails to prevent program termination or incorrect zero calculations.
 
 ---
 
 ## Notes
 
-- Tax table loading does not check for duplicate region codes — if `TAX.RATES` contains duplicate entries for the same region, only the **first** occurrence will be matched during lookup; ensure the tax rates file has unique region codes per entry
-- The table size is bounded by the `OCCURS` limit in working-storage (`OCCURS 50 TIMES`) — if `TAX.RATES` has more than 50 records the program displays a warning and skips the excess; increase the `OCCURS` value if a larger table is needed
-- `TAX.RATES` is closed after Phase 1 and never reopened — all lookups in Phase 2 are purely in-memory
-- Tested on IBM z/OS with Enterprise COBOL
+*   **Table Capacity:** The table size is bounded by `OCCURS 50 TIMES`. If the input file has more records, the excess is ignored with a warning.
+*   **Memory Efficiency:** This pattern is ideal for small lookup tables. For tables with thousands of entries, a sorted table with `SEARCH ALL` (binary search) or a VSAM KSDS would be more appropriate.
+*   **Data Integrity:** The program assumes region codes are unique in the reference file. If duplicates exist, only the first match is used.
+*   **Decimal Handling:** Implicit decimal positions (`V999`, `V99`) are handled via `COMPUTE` to ensure mathematical accuracy before moving to edited output fields.
