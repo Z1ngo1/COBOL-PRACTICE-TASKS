@@ -2,7 +2,7 @@
 
 ## Overview
 
-Reads a raw unsorted exam results file (`EXAM.RAW`), filters out failing students (`STUD-SCORE < 50`), sorts the passing students by class ascending and by score descending within each class, and writes the result to an honor roll file (`HONOR.ROLL`).
+Reads a raw unsorted exam results file [`EXAM.RAW`](DATA/EXAM.RAW), filters out failing students (`STUD-SCORE < 50`), sorts the passing students by class ascending and by score descending within each class, and writes the result to an honor roll file [`HONOR.ROLL`](DATA/HONOR.ROLL).
 The core technique is the **COBOL `SORT` statement with `INPUT PROCEDURE` and `OUTPUT PROCEDURE`**: instead of sorting a file externally, the program controls both ends of the sort — the input procedure feeds filtered records into the sort engine via `RELEASE`, and the output procedure consumes sorted records via `RETURN`.
 
 ---
@@ -167,8 +167,8 @@ All input and expected output files are in the [`DATA/`](DATA/) folder.
 
 | File | Description |
 |---|---|
-| [`DATA/EXAM.RAW`](DATA/EXAM.RAW) | 20 student exam records, unsorted, mixed passing/failing scores |
-| [`DATA/HONOR.ROLL`](DATA/HONOR.ROLL) | Expected output — 15 passing students sorted by class asc, score desc |
+| [`EXAM.RAW`](DATA/EXAM.RAW) | 20 student exam records, unsorted, mixed passing/failing scores |
+| [`HONOR.ROLL`](DATA/HONOR.ROLL) | Expected output — 15 passing students sorted by class asc, score desc |
 
 ---
 
