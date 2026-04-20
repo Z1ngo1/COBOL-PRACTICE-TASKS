@@ -149,10 +149,10 @@ Input data and expected output are stored in the [`DATA/`](DATA/) folder:
 
 | File | Description |
 |---|---|
-| [`DATA/CARD.MASTER`](DATA/CARD.MASTER) | 8 card records loaded into VSAM KSDS |
-| [`DATA/TRANS.DAILY`](DATA/TRANS.DAILY) | 9 transaction records |
-| [`DATA/APPROVED.FILE`](DATA/APPROVED.FILE) | Expected approved output — 2 records |
-| [`DATA/DECLINED.FILE`](DATA/DECLINED.FILE) | Expected declined output — 7 records with reason codes |
+| [`CARD.MASTER`](DATA/CARD.MASTER) | 8 card records loaded into VSAM KSDS |
+| [`TRANS.DAILY`](DATA/TRANS.DAILY) | 9 transaction records |
+| [`APPROVED.FILE`](DATA/APPROVED.FILE) | Expected approved output — 2 records |
+| [`DECLINED.FILE`](DATA/DECLINED.FILE) | Expected declined output — 7 records with reason codes |
 
 ---
 
