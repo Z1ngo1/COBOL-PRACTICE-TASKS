@@ -102,11 +102,11 @@ SQL scripts and expected output are stored in [`SQL/`](SQL/) and [`DATA/`](DATA/
 
 | File | Description |
 |---|---|
-| [`SQL/CREATE.TABLE.sql`](SQL/CREATE.TABLE.sql) | DDL to create `TB_EMP_SALARY` table |
-| [`SQL/INSERT.DATA.sql`](SQL/INSERT.DATA.sql) | DML to load 10 test employee records |
-| [`DATA/TB.TB_EMP_SALARY.BEFORE`](DATA/TB.TB_EMP_SALARY.BEFORE) | Table state before salary indexing |
-| [`DATA/TB.TB_EMP_SALARY.AFTER`](DATA/TB.TB_EMP_SALARY.AFTER) | Expected table state after salary indexing |
-| [`DATA/SALARY.REPORT`](DATA/SALARY.REPORT) | Expected report output file |
+| [`CREATE.TABLE.sql`](SQL/CREATE.TABLE.sql) | DDL to create `TB_EMP_SALARY` table |
+| [`INSERT.DATA.sql`](SQL/INSERT.DATA.sql) | DML to load 10 test employee records |
+| [`TB.TB_EMP_SALARY.BEFORE`](DATA/TB.TB_EMP_SALARY.BEFORE) | Table state before salary indexing |
+| [`TB.TB_EMP_SALARY.AFTER`](DATA/TB.TB_EMP_SALARY.AFTER) | Expected table state after salary indexing |
+| [`SALARY.REPORT`](DATA/SALARY.REPORT) | Expected report output file |
 
 ---
 
