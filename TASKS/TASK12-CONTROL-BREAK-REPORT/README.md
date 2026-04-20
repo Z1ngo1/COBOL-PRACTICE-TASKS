@@ -10,9 +10,9 @@ No VSAM, no DB2 — pure sequential processing with holder variables.
 
 ## Critical Prerequisite: Input Must Be Pre-Sorted
 
-> **`SALES.DATA` must be sorted by `SALES-REGION` (ASC), then `SALES-SHOP` (ASC) before this program runs.**
+> **[`SALES.DATA`](DATA/SALES.DATA) must be sorted by `SALES-REGION` (ASC), then `SALES-SHOP` (ASC) before this program runs.**
 
-The program does **not** validate sort order. Unsorted input will silently produce wrong subtotals and a wrong grand total — no error message, no ABEND. Use a `SORT` step in the JCL **before** the program step (`COMPRUN.jcl` already includes this step).
+The program does **not** validate sort order. Unsorted input will silently produce wrong subtotals and a wrong grand total — no error message, no ABEND. Use a `SORT` step in the JCL **before** the program step ([`JCL/COMPRUN.jcl`](JCL/COMPRUN.jcl) already includes this step).
 
 ---
 
@@ -163,8 +163,8 @@ Input and expected output are in the [`DATA/`](DATA/) folder:
 
 | File | Description |
 |---|---|
-| [`DATA/SALES.DATA`](DATA/SALES.DATA) | 12 sorted sales records across 4 regions, 2 shops each |
-| [`DATA/SALES.REPORT`](DATA/SALES.REPORT) | Expected report output |
+| [`SALES.DATA`](DATA/SALES.DATA) | 12 sorted sales records across 4 regions, 2 shops each |
+| [`SALES.REPORT`](DATA/SALES.REPORT) | Expected report output |
 
 ---
 
