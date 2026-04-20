@@ -5,7 +5,7 @@
 Implements a modular COBOL batch system that reads employee sales records from a sequential file, computes commission and tax amounts by calling two specialized subprograms, and writes a formatted payout report. The system demonstrates inter-program communication via `CALL ... USING` and the `LINKAGE SECTION`.
 
 The three programs work together:
-- **`JOBSUB22`** (Main) — reads `SALES.DATA`, calls `SUB1JB22` and `SUB2JB22` for each record, writes results to `COMM.PAYOUT`.
+- **`JOBSUB22`** (Main) — reads [`SALES.DATA`](DATA/SALES.DATA), calls `SUB1JB22` and `SUB2JB22` for each record, writes results to [`COMM.PAYOUT`](DATA/COMM.PAYOUT).
 - **`SUB1JB22`** (Commission Calculator) — receives region and sales amount; returns commission amount based on regional base rate and volume bonus.
 - **`SUB2JB22`** (Tax Calculator) — receives commission amount; returns tax amount based on bracket rules.
 
@@ -100,8 +100,8 @@ All input and output files are in the [`DATA/`](DATA/) folder.
 
 | File | Description |
 |---|---|
-| [`DATA/SALES.DATA`](DATA/SALES.DATA) | 7 employee sales records (input) |
-| [`DATA/COMM.PAYOUT`](DATA/COMM.PAYOUT) | Commission payout report (output) |
+| [`SALES.DATA`](DATA/SALES.DATA) | 7 employee sales records (input) |
+| [`COMM.PAYOUT`](DATA/COMM.PAYOUT) | Commission payout report (output) |
 
 ---
 
