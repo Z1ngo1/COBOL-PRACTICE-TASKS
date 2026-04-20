@@ -2,7 +2,7 @@
 
 ## Overview
 
-Applies a daily transaction file (`TRANS.FILE`) to an existing customer master file (`OLD.MASTER`) and produces an updated master file (`NEW.MASTER`) plus an error log (`ERROR.REPORT`).
+Applies a daily transaction file [`TRANS.FILE`](./DATA/TRANS.FILE) to an existing customer master file [`OLD.MASTER`](./DATA/OLD.MASTER) and produces an updated master file [`NEW.MASTER`](./DATA/NEW.MASTER) plus an error log [`ERROR.REPORT`](./DATA/ERROR.REPORT).
 The core technique is the **Match-Merge (Balance Line) algorithm**: both files are read in parallel, their keys are compared on every iteration, and the program routes each situation to the correct action — copy, add, update, delete, or error.
 No VSAM, no DB2 — pure sequential processing with two simultaneous read cursors.
 
@@ -10,7 +10,7 @@ No VSAM, no DB2 — pure sequential processing with two simultaneous read cursor
 
 ## Critical Prerequisite: Both Files Must Be Pre-Sorted
 
-> **Both `OLD.MASTER` and `TRANS.FILE` must be sorted by ID (ascending) before this program runs.**
+> **Both [`OLD.MASTER`](./DATA/OLD.MASTER) and [`TRANS.FILE`](./DATA/TRANS.FILE) must be sorted by ID (ascending) before this program runs.**
 
 The match-merge algorithm assumes sorted input. Unsorted files will produce **incorrect output without any error message or ABEND**. Use a `SORT` step in the JCL before the program step if your input is not already sorted.
 
@@ -143,10 +143,10 @@ All input and expected output files are in the [`DATA/`](./DATA) folder.
 
 | File | Description |
 |---|---|
-| [`DATA/OLD.MASTER`](./DATA/OLD.MASTER) | 7 test customer records (pre-sorted by ID) |
-| [`DATA/TRANS.FILE`](./DATA/TRANS.FILE) | 15 daily transactions (pre-sorted by ID) |
-| [`DATA/NEW.MASTER`](./DATA/NEW.MASTER) | Expected updated master output — 9 records |
-| [`DATA/ERROR.REPORT`](./DATA/ERROR.REPORT) | Expected error log — 3 failed transactions |
+| [`OLD.MASTER`](./DATA/OLD.MASTER) | 7 test customer records (pre-sorted by ID) |
+| [`TRANS.FILE`](./DATA/TRANS.FILE) | 15 daily transactions (pre-sorted by ID) |
+| [`NEW.MASTER`](./DATA/NEW.MASTER) | Expected updated master output — 9 records |
+| [`ERROR.REPORT`](./DATA/ERROR.REPORT) | Expected error log — 3 failed transactions |
 
 ---
 
