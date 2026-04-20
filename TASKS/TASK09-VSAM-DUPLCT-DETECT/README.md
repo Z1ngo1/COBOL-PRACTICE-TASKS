@@ -99,8 +99,8 @@ Input data and expected output are stored in the [`DATA/`](DATA/) folder:
 
 | File | Description |
 |---|---|
-| [`DATA/CLIENT.MAST.VSAM`](DATA/CLIENT.MAST.VSAM) | 10 test client records loaded into VSAM |
-| [`DATA/DUPLCT.REPORT`](DATA/DUPLCT.REPORT) | Expected duplicate report output |
+| [`CLIENT.MAST.VSAM`](DATA/CLIENT.MAST.VSAM) | 10 test client records loaded into VSAM |
+| [`DUPLCT.REPORT`](DATA/DUPLCT.REPORT) | Expected duplicate report output |
 
 ---
 
