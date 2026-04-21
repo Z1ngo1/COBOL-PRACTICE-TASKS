@@ -5,9 +5,9 @@
 Implements a modular COBOL batch system that reads employee sales records from a sequential file, computes commission and tax amounts by calling two specialized subprograms, and writes a formatted payout report. The system demonstrates inter-program communication via `CALL ... USING` and the `LINKAGE SECTION`.
 
 The three programs work together:
-- **[`JOBSUB22`](COBOL/JOBSUB22)** (Main) — reads [`SALES.DATA`](DATA/SALES.DATA), calls [`SUB1JB22`](COBOL/SUB1JB22) and [`SUB2JB22`](COBOL/SUB2JB22) for each record, writes results to [`COMM.PAYOUT`](DATA/COMM.PAYOUT).
-- **[`SUB1JB22`](COBOL/SUB1JB22)** (Commission Calculator) — receives region and sales amount; returns commission amount based on regional base rate and volume bonus.
-- **[`SUB2JB22`](COBOL/SUB2JB22)** (Tax Calculator) — receives commission amount; returns tax amount based on bracket rules.
+- **[`JOBSUB22`](COBOL/JOBSUB22.cbl)** (Main) — reads [`SALES.DATA`](DATA/SALES.DATA), calls [`SUB1JB22`](COBOL/SUB1JB22.cbl) and [`SUB2JB22`](COBOL/SUB2JB22.cbl) for each record, writes results to [`COMM.PAYOUT`](DATA/COMM.PAYOUT).
+- **[`SUB1JB22`](COBOL/SUB1JB22.cbl)** (Commission Calculator) — receives region and sales amount; returns commission amount based on regional base rate and volume bonus.
+- **[`SUB2JB22`](COBOL/SUB2JB22.cbl)** (Tax Calculator) — receives commission amount; returns tax amount based on bracket rules.
 
 ---
 
