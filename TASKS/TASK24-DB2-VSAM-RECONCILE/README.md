@@ -172,8 +172,8 @@ Actual job output is stored in [`SYSOUT.txt`](OUTPUT/SYSOUT.txt).
 ## How to Run
 
 1. **Initialize DB2** — execute [`CREATE.TABLE.sql`](SQL/CREATE.TABLE.sql) to create `TB_ACCOUNTS` and load test rows.
-2. **Upload data** — Load [`ACCT.BACKUP`](DATA/ACCT.BACKUP) and [`DATA/TRANS.LOG`](DATA/TRANS.LOG) to your mainframe datasets manually through option '3.4 and edit your dataset' or with pre-prepared data
-3. **Submit JCL** — submit [`JCL/COBDB2CP.jcl`](JCL/COBDB2CP.jcl). The job will pre-compile, compile, link, and run the program.
+2. **Upload data** — Load [`ACCT.BACKUP`](DATA/ACCT.BACKUP) and [`TRANS.LOG`](DATA/TRANS.LOG) to your mainframe datasets manually through option '3.4 and edit your dataset' or with pre-prepared data
+3. **Submit JCL** — submit [`COBDB2CP.jcl`](JCL/COBDB2CP.jcl). The job will pre-compile, compile, link, and run the program.
 4. Check [`RECON.REPORT`](DATA/RECON.REPORT) and [`SYSOUT.txt`](OUTPUT/SYSOUT.txt) for the reconciliation report.
 
 ---
