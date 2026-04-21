@@ -5,7 +5,7 @@
 Implements a two-program COBOL batch system that evaluates loan requests by performing random-access lookups against a VSAM KSDS customer master file and delegating credit scoring rules to a subprogram. Approved and rejected decisions are written to a sequential approval log.
 
 The two programs work together:
-- **`JOBSUB23`** (Main) — reads [`DATA/LOAN.REQUESTS`](DATA/LOAN.REQUESTS), performs a VSAM random read on [`DATA/CREDIT.MASTER`](DATA/CREDIT.MASTER) for each request, calls [`COBOL/SUB1JB23.cbl`](COBOL/SUB1JB23.cbl) and writes the decision to [`DATA/APPROVAL.LOG`](DATA/APPROVAL.LOG).
+- **[`JOBSUB23`](COBOL/JOBSUB23.cbl)** (Main) — reads [`LOAN.REQUESTS`](DATA/LOAN.REQUESTS), performs a VSAM random read on [`CREDIT.MASTER`](DATA/CREDIT.MASTER) for each request, calls [`SUB1JB23.cbl`](COBOL/SUB1JB23.cbl) and writes the decision to [`APPROVAL.LOG`](DATA/APPROVAL.LOG).
 - **[`SUB1JB23`](COBOL/SUB1JB23.cbl)** (Credit Checker) — receives credit score, late payments, current debt, and loan amount; returns APPROVED or REJECTED with a reason code.
 
 ---
@@ -14,11 +14,11 @@ The two programs work together:
 
 | DD Name | File | Org | Mode | Description |
 |---|---|---|---|---|
-| `LOANDD` | `LOAN.REQUESTS` | PS | INPUT | Sequential loan request file, RECFM=F, LRECL=80 |
-| `MASTERDD` | `CREDIT.MASTER` | KSDS | I-O | VSAM indexed customer master, Key pos 1–6 |
-| `LOGDD` | `APPROVAL.LOG` | PS | OUTPUT | Sequential approval/rejection log |
+| `LOANDD` | [`LOAN.REQUESTS`](DATA/LOAN.REQUESTS) | PS | INPUT | Sequential loan request file, RECFM=F, LRECL=80 |
+| `MASTERDD` | [`CREDIT.MASTER`](DATA/CREDIT.MASTER) | KSDS | I-O | VSAM indexed customer master, Key pos 1–6 |
+| `LOGDD` | [`APPROVAL.LOG`](DATA/APPROVAL.LOG) | PS | OUTPUT | Sequential approval/rejection log |
 
-### Input Record Layout — `LOAN.REQUESTS` (`LOANDD`), LRECL=80, RECFM=F
+### Input Record Layout — (`LOANDD`), LRECL=80, RECFM=F
 
 | Field | Position | Format | Description |
 |---|---|---|---|
@@ -26,7 +26,7 @@ The two programs work together:
 | `LOAN-AMT` | 7–14 | `9(6)V99` | Requested loan amount |
 | `FILLER` | 15–80 | `X(66)` | Reserved |
 
-### VSAM Record Layout — `CREDIT.MASTER` (`MASTERDD`), LRECL=80, Key=1–6
+### VSAM Record Layout — (`MASTERDD`), LRECL=80, Key=1–6
 
 | Field | Position | Format | Description |
 |---|---|---|---|
@@ -36,7 +36,7 @@ The two programs work together:
 | `CURRENT-DEBT` | 12–19 | `9(6)V99` | Total current outstanding debt |
 | `FILLER` | 20–80 | `X(61)` | Reserved |
 
-### Output Record Layout — `APPROVAL.LOG` (`LOGDD`)
+### Output Record Layout — (`LOGDD`)
 
 | Field | Picture | Description |
 |---|---|---|
@@ -97,15 +97,15 @@ All input, master, and output files are in the [`DATA/`](DATA/) folder.
 
 | File | Description |
 |---|---|
-| [`DATA/LOAN.REQUESTS`](DATA/LOAN.REQUESTS) | 7 loan request records (input) |
-| [`DATA/CREDIT.MASTER`](DATA/CREDIT.MASTER) | VSAM customer master image (5 customers loaded) |
-| [`DATA/APPROVAL.LOG`](DATA/APPROVAL.LOG) | Approval/rejection log after program execution |
+| [`LOAN.REQUESTS`](DATA/LOAN.REQUESTS) | 7 loan request records (input) |
+| [`CREDIT.MASTER`](DATA/CREDIT.MASTER) | VSAM customer master image (5 customers loaded) |
+| [`APPROVAL.LOG`](DATA/APPROVAL.LOG) | Approval/rejection log after program execution |
 
 ---
 
 ## Expected SYSOUT
 
-Actual job output is stored in [`OUTPUT/SYSOUT.txt`](OUTPUT/SYSOUT.txt).
+Actual job output is stored in [`SYSOUT.txt`](OUTPUT/SYSOUT.txt).
 
 ```
 TOTAL: 7
@@ -117,9 +117,9 @@ SUCCESS: 2
 
 ## How to Run
 
-1. **Define the VSAM cluster** — submit [`JCL/DEFKSDS.jcl`](JCL/DEFKSDS.jcl) to create the [`DATA/CREDIT.MASTER`](DATA/CREDIT.MASTER) KSDS cluster via IDCAMS.
-2. **Load customer data** — use IDCAMS REPRO or a separate load step to populate [`DATA/CREDIT.MASTER`](DATA/CREDIT.MASTER) with initial records.
-3. **Compile and run** — submit [`JCL/COMPRUN.jcl`](JCL/COMPRUN.jcl). The job will:
+1. **Define the VSAM cluster** — submit [`DEFKSDS.jcl`](JCL/DEFKSDS.jcl) to create the [`CREDIT.MASTER`](DATA/CREDIT.MASTER) KSDS cluster via IDCAMS.
+2. **Load customer data** — use IDCAMS REPRO or a separate load step to populate [`CREDIT.MASTER`](DATA/CREDIT.MASTER) with initial records.
+3. **Compile and run** — submit [`COMPRUN.jcl`](JCL/COMPRUN.jcl). The job will:
    - Delete previous datasets (`STEP005`).
    - Populate `LOAN.REQUESTS` via `IEBGENER` (`STEP010`).
    - Compile the credit subprogram `SUB1JB23` (`STEP013`).
