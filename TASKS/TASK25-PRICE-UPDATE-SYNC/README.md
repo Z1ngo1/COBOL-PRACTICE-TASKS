@@ -13,13 +13,13 @@ The core technique is **Three-Source Price Sync**: for every incoming price reco
 ### [`TB_PRICE_HISTORY`](SQL/CREATE.TABLE.sql)
 
 ```sql
-CREATE TABLE TB_PRICE_HISTORY (
-  PROD_ID      CHAR(5)          NOT NULL,
-  OLD_PRICE    DECIMAL(7,2),
-  NEW_PRICE    DECIMAL(7,2),
-  CHANGE_DATE  DATE  NOT NULL WITH DEFAULT,
-  PRIMARY KEY (PROD_ID, CHANGE_DATE)
-) IN DATABASE Z73460;
+CREATE TABLE TB_PRICE_HISTORY (          
+  PROD_ID CHAR(5) NOT NULL,              
+  OLD_PRICE DECIMAL(7,2),                
+  NEW_PRICE DECIMAL(7,2),                
+  CHANGE_DATE DATE NOT NULL WITH DEFAULT,
+  PRIMARY KEY (PROD_ID,CHANGE_DATE)      
+) IN DATABASE Z73460;       
 ```
 
 | Column | Type | Description |
@@ -35,9 +35,9 @@ CREATE TABLE TB_PRICE_HISTORY (
 
 | DD Name | File | Org | Mode | Description |
 |---|---|---|---|---|
-| `INDD` | `PRICE.UPDATE` | PS | INPUT | Daily price update records, RECFM=F, LRECL=80 |
-| `VSAMDD` | `PRODUCT.MASTER` | KSDS | I-O | Product master file, random access by PROD-ID |
-| `OUTDD` | `UPDATE.LOG` | PS | OUTPUT | Update result log, RECFM=F, LRECL=80 |
+| `INDD` | [`PRICE.UPDATE`](DATA/PRICE.UPDATE) | PS | INPUT | Daily price update records, RECFM=F, LRECL=80 |
+| `VSAMDD` | [`PRODUCT.MASTER`] | KSDS | I-O | Product master file, random access by PROD-ID |
+| `OUTDD` | [`UPDATE.LOG`] | PS | OUTPUT | Update result log, RECFM=F, LRECL=80 |
 
 ### Input Record Layout — `PRICE.UPDATE` (`INDD`), LRECL=80, RECFM=F
 
