@@ -14,7 +14,7 @@ The core technique is **Three-Way Reconciliation**:
 
 ## DB2 Table
 
-### [`TB_ACCOUNTS`](SQL/CREATE.TABLE)
+### [`TB_ACCOUNTS`](SQL/CREATE.TABLE.sql)
 
 ```sql
 CREATE TABLE TB_ACCOUNTS (       
