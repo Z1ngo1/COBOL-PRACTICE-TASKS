@@ -171,7 +171,7 @@ Input and expected output are in the [`DATA/`](DATA/) folder:
 ## How to Run
 
 1. Upload [`SALES.DATA`](DATA/SALES.DATA) to your mainframe dataset manually through option '3.4 and edit your dataset' or
-2. Submit [`COMPRUN.jcl`](JCL/COMPRUN.jcl) — it includes a SORT step before the program step
+2. Submit [`COMPRUN.jcl`](JCL/COMPRUN.jcl) — it includes a inserty data step
 3. Compare output files - see [`SALES.REPORT`](DATA/SALES.REPORT)
 
 > **PROC reference:** [`JCL/COMPRUN.jcl`](JCL/COMPRUN.jcl) uses the [`MYCOMPGO`](../../JCLPROC/MYCOMPGO.jcl) catalogued procedure for compilation and execution. Make sure [`MYCOMPGO`](../../JCLPROC/MYCOMPGO.jcl) is available in your system’s `PROCLIB` before submitting.
