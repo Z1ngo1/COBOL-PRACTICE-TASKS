@@ -41,7 +41,7 @@ CREATE TABLE TB_EMPLOYEES (
 | `INDD` | [`EMP.UPDATE`](DATA/EMP.UPDATE) | PS | INPUT | External sync data, RECFM=F, LRECL=44 |
 | `OUTDD` | [`SYNC.LOG`](DATA/SYNC.LOG) | PS | OUTPUT | Sync results log, RECFM=VB, LRECL=84 |
 
-### Input Record Layout — `EMP.UPDATE` (`INDD`), LRECL=44, RECFM=F
+### Input Record Layout — (`INDD`), LRECL=44, RECFM=F
 
 | Field | Picture | Offset | Description |
 |---|---|---|---|
@@ -52,7 +52,7 @@ CREATE TABLE TB_EMPLOYEES (
 | `EMP-HIRE-DATE`| `9(8)` | 36 | Hire date (YYYYMMDD) |
 | `EMP-STATUS` | `X(1)` | 44 | Status ('A' or 'I') |
 
-### Output Record Layout — `SYNC.LOG` (`OUTDD`), RECFM=VB, LRECL=84
+### Output Record Layout — (`OUTDD`), RECFM=VB, LRECL=84
 
 | Field | Picture | Description |
 |---|---|---|
