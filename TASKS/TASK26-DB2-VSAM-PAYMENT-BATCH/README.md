@@ -11,11 +11,12 @@ Batch COBOL program that processes a payment input file (PS), validates each rec
 ### [`TB_CUSTOMER_BALANCE`](SQL/CREATE.TABLE.sql)
 
 ```sql
-CREATE TABLE TB_CUSTOMER_BALANCE (
-  CUST_ID       CHAR(5)         NOT NULL PRIMARY KEY,
-  CUST_BALANCE  DECIMAL(9,2),
-  LAST_PAYMENT  TIMESTAMP       WITH DEFAULT
-) IN DATABASE Z73460;
+CREATE TABLE TB_CUSTOMER_BALANCE (     
+   CUST_ID CHAR(5) NOT NULL,           
+   CUST_BALANCE DECIMAL(9,2),          
+   LAST_PAYMENT TIMESTAMP WITH DEFAULT,
+   PRIMARY KEY (CUST_ID)               
+) IN DATABASE Z73460;            
 ```
 
 | Column | Type | Description |
@@ -30,7 +31,7 @@ CREATE TABLE TB_CUSTOMER_BALANCE (
 
 | DD Name | File | Org | Mode | Description |
 |---|---|---|---|---|
-| `INPDD` | `PAYMENTS` | PS | INPUT | Payment transaction records, RECFM=F, LRECL=80 |
+| `INPDD` | [`PAYMENTS`](DATA/PAYMENT.INPUT) | PS | INPUT | Payment transaction records, RECFM=F, LRECL=80 |
 | `VSAMDD` | `CUSTOMER.MST` | KSDS | INPUT | Customer master for account status check |
 | `LOGDD` | `PAYMENT.LOG` | PS | OUTPUT | Detailed processing log with summary, RECFM=V, LRECL=80 |
 
