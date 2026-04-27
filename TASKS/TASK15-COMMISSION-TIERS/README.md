@@ -1,6 +1,6 @@
 # Task 15 — Commission Tiers (Tiered Table Lookup / In-Memory Array)
 
-## Overview
+## Overview 
 
 Reads a commission tiers reference file [`COMM.TIERS`](./DATA/COMM.TIERS) into an in-memory array (`TIER-TABLE`), then processes an employee salary file [`SALES.WEEKLY`](./DATA/SALES.WEEKLY) and writes a commission output [`PAYOUT.RPT`](./DATA/PAYOUT.RPT) with the calculated commission for each employee.
 The core technique is a **Tiered Table Lookup**: instead of a simple key match, the program finds the first tier where `WS-LIMIT >= SAL-AMT` — the salary bracket determines the commission rate.
