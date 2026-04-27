@@ -2,7 +2,7 @@
 
 ## Overview
 
-Reconciles end-of-day account balances across three data sources to detect discrepancies and orphan records. The program loads yesterday's balances from a VSAM KSDS into an in-memory table, applies today's transactions from a sequential file, then compares the calculated expected balance against the actual balance stored in DB2 `TB_ACCOUNTS`.
+Reconciles end-of-day account balances across three data sources to detect discrepancies and orphan records. The program loads yesterday's balances from a VSAM KSDS into an in-memory table, applies today's transactions from a sequential file, then compares the calculated expected balance against the actual balance stored in DB2 [`TB_ACCOUNTS`](DATA/TB.TB_ACCOUNTS).
 
 The core technique is **Three-Way Reconciliation**:
 1. Load yesterday's VSAM balances into memory.
@@ -14,7 +14,7 @@ The core technique is **Three-Way Reconciliation**:
 
 ## DB2 Table
 
-### `TB_ACCOUNTS`
+### [`TB_ACCOUNTS`](SQL/CREATE.TABLE)
 
 ```sql
 CREATE TABLE TB_ACCOUNTS (       
