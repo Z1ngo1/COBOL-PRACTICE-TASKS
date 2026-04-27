@@ -23,14 +23,14 @@ The core technique is **`SEARCH ALL`** (binary search): unlike `SEARCH` which wa
 | `ORDRDD` | [`ORDERS.FILE`](DATA/ORDERS.FILE) | PS | INPUT | Customer orders — order number, part ID, quantity |
 | `INVODD` | [`INVOICE.TXT`](DATA/INVOICE.TXT) | PS | OUTPUT | Invoice lines — one line per order with order number and total cost |
 
-### Input Record Layout — `PARTS.CATALOG` (`PARTDD`), LRECL=10, RECFM=F
+### Input Record Layout — (`PARTDD`), LRECL=10, RECFM=F
 
 | Field | Picture | Offset | Description |
 |---|---|---|---|
 | `PART-ID` | `9(5)` | 1 | Part ID — **sort key**, ascending |
 | `PART-PRICE` | `9(3)V99` | 6 | Unit price — implied 2 decimal places |
 
-### Input Record Layout — `ORDERS.FILE` (`ORDRDD`), LRECL=13, RECFM=F
+### Input Record Layout — (`ORDRDD`), LRECL=13, RECFM=F
 
 | Field | Picture | Offset | Description |
 |---|---|---|---|
@@ -38,7 +38,7 @@ The core technique is **`SEARCH ALL`** (binary search): unlike `SEARCH` which wa
 | `ORDR-ID` | `9(5)` | 6 | Part ID to look up in `CATALOG-TABLE` |
 | `ORDR-QUANT` | `9(3)` | 11 | Order quantity |
 
-### Output Record Layout — `INVOICE.TXT` (`INVODD`), LRECL=80, RECFM=F
+### Output Record Layout — (`INVODD`), LRECL=80, RECFM=F
 
 | Content | Description |
 |---|---|
