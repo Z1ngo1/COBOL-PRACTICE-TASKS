@@ -2,7 +2,7 @@
 
 ## Overview
 
-Reads a daily price update file (PS sequential), updates product prices in a VSAM KSDS master file via random I-O, and inserts each change as an audit record into the DB2 `TB_PRICE_HISTORY` table.
+Reads a daily price update file (PS sequential), updates product prices in a VSAM KSDS master file via random I-O, and inserts each change as an audit record into the DB2 [`TB_PRICE_HISTORY`](DATA/TB.TB_PRICE_HISTORY) table.
 
 The core technique is **Three-Source Price Sync**: for every incoming price record the program performs a VSAM random read, saves the old price, rewrites the VSAM record with the new price, then inserts the old/new pair into DB2 for a full audit trail. Commits are batched every 50 records.
 
@@ -36,10 +36,10 @@ CREATE TABLE TB_PRICE_HISTORY (
 | DD Name | File | Org | Mode | Description |
 |---|---|---|---|---|
 | `INDD` | [`PRICE.UPDATE`](DATA/PRICE.UPDATE) | PS | INPUT | Daily price update records, RECFM=F, LRECL=80 |
-| `VSAMDD` | [`PRODUCT.MASTER`] | KSDS | I-O | Product master file, random access by PROD-ID |
-| `OUTDD` | [`UPDATE.LOG`] | PS | OUTPUT | Update result log, RECFM=F, LRECL=80 |
+| `VSAMDD` | `PRODUCT.MASTER` | KSDS | I-O | Product master file, random access by PROD-ID |
+| `OUTDD` | [`UPDATE.LOG`](DATA/UPDATE.LOG) | PS | OUTPUT | Update result log, RECFM=F, LRECL=80 |
 
-### Input Record Layout — `PRICE.UPDATE` (`INDD`), LRECL=80, RECFM=F
+### Input Record Layout — (`INDD`), LRECL=80, RECFM=F
 
 | Field | Picture | Offset | Description |
 |---|---|---|---|
@@ -47,7 +47,7 @@ CREATE TABLE TB_PRICE_HISTORY (
 | `IN-NEW-PRICE` | `9(5)V99` | 6 | New price to apply |
 | `FILLER` | `X(68)` | 13 | Unused padding |
 
-### VSAM Record Layout — `PRODUCT.MASTER` (`VSAMDD`), KSDS, Key=1–5
+### VSAM Record Layout — (`VSAMDD`), KSDS, Key=1–5
 
 | Field | Picture | Offset | Description |
 |---|---|---|---|
@@ -56,7 +56,7 @@ CREATE TABLE TB_PRICE_HISTORY (
 | `VSAM-CURR-PRICE` | `9(5)V99` | 26 | Current price (overwritten on update) |
 | `FILLER` | `X(48)` | 33 | Unused padding |
 
-### Output Record Layout — `UPDATE.LOG` (`OUTDD`), LRECL=80, RECFM=F
+### Output Record Layout — (`OUTDD`), LRECL=80, RECFM=F
 
 | Field | Picture | Description |
 |---|---|---|
@@ -141,16 +141,16 @@ All input and output files are in the [`DATA/`](DATA/) folder.
 
 | File | Description |
 |---|---|
-| [`DATA/PRICE.UPDATE`](DATA/PRICE.UPDATE) | PS input — 52 price update records |
-| [`DATA/PRODUCT.MASTER`](DATA/PRODUCT.MASTER) | VSAM KSDS image — product master before run |
-| [`DATA/UPDATE.LOG`](DATA/UPDATE.LOG) | Expected update log after program execution |
-| [`DATA/TB.TB_PRICE_HISTORY`](DATA/TB.TB_PRICE_HISTORY) | DB2 audit table state after run |
+| [`PRICE.UPDATE`](DATA/PRICE.UPDATE) | PS input — 52 price update records |
+| [`PRODUCT.MASTER`](DATA/PRODUCT.MASTER) | VSAM KSDS image — product master before run |
+| [`UPDATE.LOG`](DATA/UPDATE.LOG) | Expected update log after program execution |
+| [`TB.TB_PRICE_HISTORY`](DATA/TB.TB_PRICE_HISTORY) | DB2 audit table state after run |
 
 ---
 
 ## Expected SYSOUT
 
-Actual job output is stored in [`OUTPUT/SYSOUT.txt`](OUTPUT/SYSOUT.txt).
+Actual job output is stored in [`SYSOUT.txt`](OUTPUT/SYSOUT.txt).
 
 ```
 ========================================
@@ -167,9 +167,9 @@ RECORDS NOT FOUND:   1
 
 ## How to Run
 
-1. Execute SQL in [`SQL/CREATE.TABLE.sql`](SQL/CREATE.TABLE.sql) to create `TB_PRICE_HISTORY`
-2. Upload [`DATA/PRICE.UPDATE`](DATA/PRICE.UPDATE) and [`DATA/PRODUCT.MASTER`](DATA/PRODUCT.MASTER) to your mainframe datasets
-3. Submit [`JCL/COBDB2CP.jcl`](JCL/COBDB2CP.jcl) — the job pre-compiles, compiles, link-edits, and runs `DB2VSM25`
+1. Execute SQL in [`CREATE.TABLE.sql`](SQL/CREATE.TABLE.sql) to create `TB_PRICE_HISTORY`
+2. Upload [`PRICE.UPDATE`](DATA/PRICE.UPDATE) and [`PRODUCT.MASTER`](DATA/PRODUCT.MASTER) to your mainframe datasets
+3. Submit [`COBDB2CP.jcl`](JCL/COBDB2CP.jcl) — the job pre-compiles, compiles, link-edits, and runs [`DB2VSM25`](COBOL/DB2VSM25.cbl)
 
 ---
 
