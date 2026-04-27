@@ -172,8 +172,8 @@ Actual job output is stored in [`SYSOUT.txt`](./OUTPUT/SYSOUT.txt).
 
 ## How to Run
 
-1.  Upload [`OLD.MASTER`](./DATA/OLD.MASTER) and [`TRANS.FILE`](./DATA/TRANS.FILE) to your mainframe datasets.
-2.  Submit [`COMPRUN.jcl`](./JCL/COMPRUN.jcl).
+1.  Upload [`OLD.MASTER`](./DATA/OLD.MASTER) and [`TRANS.FILE`](./DATA/TRANS.FILE) to your mainframe datasets manually through option '3.4 and edit your dataset' or
+2.  Submit [`COMPRUN.jcl`](./JCL/COMPRUN.jcl) — it includes a insert data step
 3.  Compare output files and sysout - see [`NEW.MASTER`](./DATA/NEW.MASTER), [`ERROR.REPORT`](./DATA/ERROR.REPORT)  and [`SYSOUT.txt`](OUTPUT/SYSOUT.txt)
 
 > **PROC reference:** [`COMPRUN.jcl`](./JCL/COMPRUN.jcl) uses the [`MYCOMPGO`](../../JCLPROC/MYCOMPGO.jcl) catalogued procedure.
