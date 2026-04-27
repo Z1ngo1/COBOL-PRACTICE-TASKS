@@ -11,19 +11,19 @@ Batch COBOL program that processes a payment input file (PS), validates each rec
 ### [`TB_CUSTOMER_BALANCE`](SQL/CREATE.TABLE.sql)
 
 ```sql
-CREATE TABLE TB_CUSTOMER_BALANCE (     
-   CUST_ID CHAR(5) NOT NULL,           
-   CUST_BALANCE DECIMAL(9,2),          
-   LAST_PAYMENT TIMESTAMP WITH DEFAULT,
-   PRIMARY KEY (CUST_ID)               
-) IN DATABASE Z73460;            
+CREATE TABLE TB_CUSTOMER_BALANCE (
+    CUST_ID CHAR(5) NOT NULL,
+    CUST_BALANCE DECIMAL(9,2),
+    LAST_PAYMENT TIMESTAMP WITH DEFAULT,
+    PRIMARY KEY (CUST_ID)
+) IN DATABASE Z73460;
 ```
 
 | Column | Type | Description |
 |---|---|---|
 | `CUST_ID` | `CHAR(5)` | **Primary key** — Customer identifier |
 | `CUST_BALANCE` | `DECIMAL(9,2)` | Current account balance |
-| `LAST_PAYMENT` | `TIMESTAMP` | Timestamp of the last successful payment update |
+| `LAST_PAYMENT` | `TIMESTAMP` | Timestamp of the last successful payment |
 
 ---
 
@@ -31,156 +31,103 @@ CREATE TABLE TB_CUSTOMER_BALANCE (
 
 | DD Name | File | Org | Mode | Description |
 |---|---|---|---|---|
-| `INPDD` | [`PAYMENTS`](DATA/PAYMENT.INPUT) | PS | INPUT | Payment transaction records, RECFM=F, LRECL=80 |
-| `VSAMDD` | `CUSTOMER.MST` | KSDS | INPUT | Customer master for account status check |
-| `LOGDD` | `PAYMENT.LOG` | PS | OUTPUT | Detailed processing log with summary, RECFM=V, LRECL=80 |
+| `INPDD` | [`PAYMENTS.FILE`](DATA/PAYMENTS.FILE) | PS | INPUT | Payment input records, RECFM=F, LRECL=80 |
+| `VSAMDD` | [`CUSTOMER.VSAM`](DATA/CUSTOMER.VSAM) | KSDS | INPUT | Customer master file, random access by CUST-ID |
+| `LOGDD` | [`PROCESS.LOG`](DATA/PROCESS.LOG) | PS | OUTPUT | Execution log, RECFM=V, LRECL=80 |
 
-### Input Record Layout — `PAYMENTS` (`INPDD`), LRECL=80, RECFM=F
+### Input Record Layout — (`INPDD`), LRECL=80, RECFM=F
 
 | Field | Picture | Offset | Description |
 |---|---|---|---|
 | `PAYMENT-ID` | `X(6)` | 1 | Unique payment identifier |
-| `PMT-CUST-ID` | `X(5)` | 7 | Customer ID to match VSAM/DB2 |
-| `PMT-AMOUNT` | `9(5)V99` | 12 | Payment amount (must be > 0) |
-| `PAYMENT-TYPE` | `X(1)` | 19 | `C` = Credit, `T` = Transfer, `A` = Adjustment |
+| `PMT-CUST-ID` | `X(5)` | 7 | Customer ID — used as VSAM key |
+| `PMT-AMOUNT` | `9(5)V99` | 12 | Payment amount (format: 99999.99) |
+| `PAYMENT-TYPE` | `X(1)` | 19 | Type of payment (C=Cash, T=Transfer, A=Auto) |
 | `FILLER` | `X(61)` | 20 | Unused padding |
 
-### VSAM Record Layout — `CUSTOMER.MST` (`VSAMDD`), KSDS, Key=1–5
+### VSAM Record Layout — (`VSAMDD`), KSDS, Key=1–5
 
 | Field | Picture | Offset | Description |
 |---|---|---|---|
 | `VSAM-ID` | `X(5)` | 1 | **Primary key** — Customer ID |
-| `VSAM-CUST-NAME` | `X(25)` | 6 | Full name for logging |
-| `VSAM-ACCT-STATUS` | `X(1)` | 31 | `A` = Active, `S` = Suspended |
+| `VSAM-CUST-NAME` | `X(25)` | 6 | Customer name |
+| `VSAM-ACCT-STATUS` | `X(1)` | 31 | Status (A=Active, S=Suspended) |
 
 ---
 
-## Business Logic: Robust Four-Level Processing
+## Business Logic
 
-The program implements a hierarchical error handling strategy. Any level failure increments counters and may trigger a job return code escalation.
+The program implements a robust four-level validation and processing pipeline:
 
-### Level 1 — Validation of Input Data
+### Phase 1 — Input Validation
+Checks for basic data integrity:
+- `PAYMENT-ID` must not be spaces.
+- `PMT-AMOUNT` must be greater than zero.
+- `PAYMENT-TYPE` must be one of: 'C', 'T', 'A'.
+**Action on failure**: Log error, increment `SKIP-COUNT`, skip to next record.
 
-Checks the basic integrity of the `PAYMENTS` record:
-- **`PAYMENT-ID`** must not be spaces.
-- **`PMT-AMOUNT`** must be greater than zero.
-- **`PAYMENT-TYPE`** must be one of `C` (Credit), `T` (Transfer), or `A` (Adjustment).
-- *Failure*: logs "VALIDATION ERROR", increments `SKIP-COUNT`, proceeds to next record.
+### Phase 2 — VSAM Account Lookup
+Performs a random read of `CUSTOMER.VSAM` using `PMT-CUST-ID`:
+- **Status '23'** (Not Found): Log missing customer, increment `SKIP-COUNT`.
+- **Other Non-Zero Status**: Log fatal VSAM error, `ROLLBACK`, set `RC=12`, and stop processing.
 
-### Level 2 — VSAM Lookup
+### Phase 3 — Account Status Check
+Evaluates the `VSAM-ACCT-STATUS` for the found customer:
+- **'S' (Suspended)**: Log rejected payment, increment `SKIP-COUNT`.
+- **'A' (Active)**: Proceed to DB2 update.
 
-Performs a random read of `CUSTOMER.MST` by `PMT-CUST-ID`:
-- **Status `23` (Not Found)**: logs "NOT FOUND", increments `SKIP-COUNT`, proceeds to next.
-- **Other non-zero status**: logs "VSAM ERROR", increments `ERROR-COUNT`, issues `ROLLBACK`, sets `RC=12`, and stops the loop.
-
-### Level 3 — Account Status Check
-
-If VSAM record exists, checks `VSAM-ACCT-STATUS`:
-- **`S` (Suspended)**: logs "ACCOUNT SUSPENDED", increments `SKIP-COUNT`, proceeds to next.
-- **`A` (Active)**: proceeds to DB2 update.
-
-### Level 4 — DB2 Update
-
-Updates `CUST_BALANCE` and `LAST_PAYMENT` in `TB_CUSTOMER_BALANCE`:
-- **SQLCODE `0` (Success)**: increments `SUCCESS-COUNT`, logs success.
-- **SQLCODE `-911` (Deadlock)**: logs "DEADLOCK", increments `ERROR-COUNT`, issues `ROLLBACK`, sets `RC=12`, and stops the loop.
-- **Any other negative SQLCODE**: logs code, increments `ERROR-COUNT`, issues `ROLLBACK`, sets `RC=8`, and stops the loop.
+### Phase 4 — DB2 Balance Update
+Updates `CUST_BALANCE` (addition) and `LAST_PAYMENT` (current timestamp) in `TB_CUSTOMER_BALANCE`:
+- **SQLCODE 0**: Success, increment `SUCCESS-COUNT`.
+- **SQLCODE -911** (Deadlock): `ROLLBACK`, set `RC=12`, and stop processing.
+- **SQLCODE < 0**: Log DB2 error code, `ROLLBACK`, set `RC=8`, and stop processing.
 
 ---
 
-## Return Code Logic (Finalization)
+## Return Codes
 
-The job return code (RC) is set based on processing outcomes:
+The final job return code is determined by the severity of encountered errors:
 
-| Severity | Condition | Final RC | Description |
-|---|---|---|---|
-| **High** | Fatal VSAM/DB2 error or Deadlock | **12** | Program stopped early; partial rollback executed |
-| **High** | DB2 update error | **8** | Program stopped early; partial rollback executed |
-| **Medium** | `ERROR-COUNT > 10` | **16** | Too many processing errors; investigate data quality |
-| **Low** | `ERROR-COUNT > 0` | **4** | Completed with minor errors/warnings |
-| **Success** | `ERROR-COUNT = 0` | **0** | Clean execution |
+| RC | Condition | Severity |
+|---|---|---|
+| `0` | No errors encountered | Clean run |
+| `4` | `ERROR-COUNT` between 1 and 10 | Warnings (recoverable errors) |
+| `8` | DB2 update error occurred | Serious error |
+| `12` | Fatal VSAM error or DB2 Deadlock (-911) | Fatal (processing stopped) |
+| `16` | `ERROR-COUNT` exceeds 10 | Critical failure (high error rate) |
 
 ---
 
 ## Program Flow
 
-1. `OPEN-PARA` — open `PAYMENTS` (INPUT), `CUSTOMER.MST` (INPUT), `PAYMENT.LOG` (OUTPUT); check FILE STATUS
-2. `INITIALIZE-PARA` — zero counters, set `RETURN-CODE = 0`
-3. `READ-PS-PARA` — main loop until EOF or `WS-ERROR`:
-   - 3.1. `READ PAYMENT-FILE`
-   - 3.2. **Level 1**: check spaces, amount, and type; if fail → log, skip
-   - 3.3. **Level 2**: `READ VSAM-FILE` by key; if status 23 → log, skip; if other error → log, `ROLLBACK`, `RC=12`, stop
-   - 3.4. **Level 3**: check status; if 'S' → log, skip
-   - 3.5. **Level 4**: `EXEC SQL UPDATE`; if SQLCODE 0 → log success; if -911 → `ROLLBACK`, `RC=12`, stop; if other negative → `ROLLBACK`, `RC=8`, stop
-4. `FINAL-PARA` — if `RC` still 0, evaluate `ERROR-COUNT` to set final RC (0, 4, or 16)
-5. `FINAL-LOG` — write summary footer and counters to `PAYMENT.LOG`
-6. `CLOSE-PARA` — `EXEC SQL COMMIT WORK` (if no fatal error); close files
-7. `STOP RUN`
-
----
-
-## SQL Handling
-
-| Scenario | SQLCODE | Logic Branch |
-|---|---|---|
-| Update Successful | `0` | Log success; increment `SUCCESS-COUNT` |
-| Deadlock / Timeout | `-911` | Log error; `ROLLBACK`; `RC=12`; `STOP RUN` |
-| Any other error | `< 0` | Log code; `ROLLBACK`; `RC=8`; `STOP RUN` |
+1. **INITIALIZE**: Zero out counters, set default RC=0.
+2. **OPEN**: Open PS Input, VSAM KSDS, and Variable-length Log file.
+3. **PROCESS LOOP**: Read `PAYMENTS.FILE` until EOF or fatal error:
+   - Perform Phase 1-4.
+   - Write results for each record to `PROCESS.LOG`.
+4. **FINAL-PARA**: Determine final RC if no fatal error occurred.
+5. **FINAL-LOG**: Write summary section (Total, Success, Errors, Skipped, RC) to `PROCESS.LOG`.
+6. **CLOSE**: Perform final `COMMIT` (if no fatal errors), close all files.
 
 ---
 
 ## Test Data
 
-All input and output files are in the [`DATA/`](DATA/) folder.
-
-| File | Description |
-|---|---|
-| [`DATA/PAYMENT.INPUT`](DATA/PAYMENT.INPUT) | PS input — test payments with valid and invalid records |
-| [`DATA/VSAM.ACCOUNTS`](DATA/VSAM.ACCOUNTS) | VSAM KSDS — customer statuses (Active/Suspended) |
-| [`DATA/TB.TB_CUSTOMER_BALANCE`](DATA/TB.TB_CUSTOMER_BALANCE) | DB2 table image — balance before and after updates |
-
----
-
-## Expected SYSOUT (PAYMENT.LOG)
-
-```text
-000001 SUCCESS: PAYMENT PROCESSED
-000002 VALIDATION ERROR: INVALID PAYMENT RECORD
-000003 NOT FOUND: CUSTOMER ID 99999
-000004 ACCOUNT SUSPENDED: PAYMENT REJECTED
--------------------------------------
-TOTAL PROCESSED: 4
-SUCCESSFUL:      1
-ERRORS:          0
-SKIPPED:         3
-RETURN CODE:     0
-```
+The folder [`DATA/`](DATA/) contains the following environment files:
+- [`PAYMENTS.FILE`](DATA/PAYMENTS.FILE) — Input test records (including valid and invalid entries).
+- [`CUSTOMER.VSAM`](DATA/CUSTOMER.VSAM) — KSDS dataset for customer lookups.
+- [`PROCESS.LOG`](DATA/PROCESS.LOG) — Resulting log file after a test run.
+- [`TB.TB_CUSTOMER_BALANCE.BEFORE`](DATA/TB.TB_CUSTOMER_BALANCE.BEFORE) — DB2 table state before execution.
+- [`TB.TB_CUSTOMER_BALANCE.AFTER`](DATA/TB.TB_CUSTOMER_BALANCE.AFTER) — DB2 table state after execution.
 
 ---
 
 ## How to Run
 
-1. Execute SQL in [`SQL/CREATE.TABLE.sql`](SQL/CREATE.TABLE.sql) to create `TB_CUSTOMER_BALANCE`
-2. Upload test data to your mainframe datasets
-3. Submit [`JCL/COBDB2CP.jcl`](JCL/COBDB2CP.jcl) to run the batch process
-
----
-
-## Key COBOL + DB2 Concepts Used
-
-- **Tiered Error Handling** — systematic validation at each stage (Input → VSAM → Logic → DB2)
-- **Dynamic Return Codes** — using `RETURN-CODE` to signal job status to the scheduler/JCL
-- **VSAM Random Read** — `ACCESS MODE IS RANDOM` used for status checks by key
-- **Atomic Updates** — `UPDATE ... SET ... WHERE` ensures balance changes are atomic
-- **Deadlock Handling** — explicit check for SQLCODE `-911` with controlled termination
-- **Structured Variable-Length Logging** — `RECFM=V` log file for detailed transaction auditing
-- **`TIMESTAMP` updates** — using DB2 `CURRENT TIMESTAMP` for audit trail tracking
-
----
-
-## Notes
-
-- The program stops the loop (`SET WS-ERROR TO TRUE`) on any fatal VSAM or DB2 error to prevent further data corruption
-- `SUCCESS-COUNT` only increments if the DB2 update returns SQLCODE `0`
-- `SKIP-COUNT` tracks records that failed validation, status checks, or were missing from VSAM
-- Tested on IBM z/OS with DB2 and Enterprise COBOL
+1. **DB2 Setup**: Run [`CREATE.TABLE.sql`](SQL/CREATE.TABLE.sql) and [`INSERT.DATA.sql`](SQL/INSERT.DATA.sql).
+2. **VSAM Setup**: Run [`DEFKSDS.jcl`](JCL/DEFKSDS.jcl) to define and load the KSDS cluster.
+3. **Execution**: Submit [`COBDB2CP.jcl`](JCL/COBDB2CP.jcl). This JCL handles:
+   - Deleting old datasets.
+   - Creating input `PAYMENTS.FILE` via `IEBGENER`.
+   - Compiling `DB2VSM26.cbl` with DB2 pre-compiler.
+   - Running the program under TSO batch (`IKJEFT01`).
