@@ -15,7 +15,7 @@ The core technique is the **Table Lookup** pattern: instead of reading two files
 | `EMPDD` | [`EMP.SALARY`](./DATA/EMP.SALARY) | PS | INPUT | Employee salary records — ID, name, region code, salary |
 | `OUTDD` | [`PAYROLL.TXT`](./DATA/PAYROLL.TXT) | PS | OUTPUT | Payroll results — one line per employee with tax amount |
 
-### Input Record Layout — `TAX.RATES` (`TAXDD`), LRECL=80, RECFM=F
+### Input Record Layout — (`TAXDD`), LRECL=80, RECFM=F
 
 | Field | Picture | Offset | Description |
 |---|---|---|---|
@@ -23,7 +23,7 @@ The core technique is the **Table Lookup** pattern: instead of reading two files
 | `RATE` | `V999` | 3 | Tax rate — implied 3 decimal places (e.g. `200` = 0.200 = 20%) |
 | FILLER | `X(75)` | 4 | Padding to 80 bytes |
 
-### Input Record Layout — `EMP.SALARY` (`EMPDD`), LRECL=80, RECFM=F
+### Input Record Layout — (`EMPDD`), LRECL=80, RECFM=F
 
 | Field | Picture | Offset | Description |
 |---|---|---|---|
@@ -33,7 +33,7 @@ The core technique is the **Table Lookup** pattern: instead of reading two files
 | `EMP-SALARY` | `9(5)V99` | 28 | Employee salary — implied 2 decimal places |
 | FILLER | `X(46)` | 35 | Padding to 80 bytes |
 
-### Output Record Layout — `PAYROLL.TXT` (`OUTDD`), LRECL=80, RECFM=F
+### Output Record Layout — (`OUTDD`), LRECL=80, RECFM=F
 
 | Field | Picture | Offset | Description |
 |---|---|---|---|
@@ -134,8 +134,8 @@ Actual job output is stored in [`SYSOUT.txt`](./OUTPUT/SYSOUT.txt).
 
 ## How to Run
 
-1.  Upload [`TAX.RATES`](./DATA/TAX.RATES) and [`EMP.SALARY`](./DATA/EMP.SALARY) to your mainframe datasets.
-2.  Submit [`COMPRUN.jcl`](./JCL/COMPRUN.jcl).
+1.  Upload [`TAX.RATES`](./DATA/TAX.RATES) and [`EMP.SALARY`](./DATA/EMP.SALARY) to your mainframe datasets manually through option '3.4 and edit your dataset' or
+2.  Submit [`COMPRUN.jcl`](./JCL/COMPRUN.jcl) — it includes a insert data step
 3.  Compare output files and sysout - see [`PAYROLL.TXT`](./DATA/PAYROLL.TXT) and [`SYSOUT.txt`](OUTPUT/SYSOUT.txt)
 
 > **PROC reference:** [`COMPRUN.jcl`](./JCL/COMPRUN.jcl) uses the [`MYCOMPGO`](../../JCLPROC/MYCOMPGO.jcl) catalogued procedure.
