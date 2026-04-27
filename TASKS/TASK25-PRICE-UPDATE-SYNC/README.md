@@ -142,7 +142,8 @@ All input and output files are in the [`DATA/`](DATA/) folder.
 | File | Description |
 |---|---|
 | [`PRICE.UPDATE`](DATA/PRICE.UPDATE) | PS input — 52 price update records |
-| [`PRODUCT.MASTER`](DATA/PRODUCT.MASTER) | VSAM KSDS image — product master before run |
+| [`PRODUCT.MASTER.BEFORE`](DATA/PRODUCT.MASTER.BEFORE) | VSAM KSDS image — product master before run |
+| [`PRODUCT.MASTER.AFTER`](DATA/PRODUCT.MASTER.AFTER) | VSAM KSDS image — product master after run |
 | [`UPDATE.LOG`](DATA/UPDATE.LOG) | Expected update log after program execution |
 | [`TB.TB_PRICE_HISTORY`](DATA/TB.TB_PRICE_HISTORY) | DB2 audit table state after run |
 
@@ -167,7 +168,7 @@ RECORDS NOT FOUND:   1
 
 ## How to Run
 
-1. Execute SQL in [`CREATE.TABLE.sql`](SQL/CREATE.TABLE.sql) to create `TB_PRICE_HISTORY`
+1. Execute SQL in [`CREATE.TABLE.sql`](SQL/CREATE.TABLE.sql) to create `TB_PRICE_HISTORY` via SPUFI or DSNTEP2
 2. Upload [`PRICE.UPDATE`](DATA/PRICE.UPDATE) and [`PRODUCT.MASTER`](DATA/PRODUCT.MASTER) to your mainframe datasets
 3. Submit [`COBDB2CP.jcl`](JCL/COBDB2CP.jcl) — the job pre-compiles, compiles, link-edits, and runs [`DB2VSM25`](COBOL/DB2VSM25.cbl)
 
