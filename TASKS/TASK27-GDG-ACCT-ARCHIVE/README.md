@@ -52,34 +52,34 @@ The program performs temporal classification and routing in three phases:
 
 ### Phase 1 — History Cross-Reference
 For each record in the daily input, the program performs a random read of the `ACCT.HISTORY.VSAM` file using the Account ID.
-*   • **Not Found (Status '23')**: The record is classified as \"Orphaned\" and routed to the Unmatched GDG.
-*   • **Found (Status '00')**: The program retrieves the historical transaction date and proceeds to Phase 2.
+* **Not Found (Status '23')**: The record is classified as \"Orphaned\" and routed to the Unmatched GDG.
+* **Found (Status '00')**: The program retrieves the historical transaction date and proceeds to Phase 2.
 
 ### Phase 2 — Temporal Retention Analysis
 The program calculates a **Cutoff Date** (Today - 180 Days) using COBOL intrinsic functions `INTEGER-OF-DATE` and `DATE-OF-INTEGER`.
-*   • **Active**: If `HIST-LAST-TRNS-DATE >= Cutoff`, the account is considered current.
-*   • **Archive**: If `HIST-LAST-TRNS-DATE < Cutoff`, the account is flagged for archiving.
+* **Active**: If `HIST-LAST-TRNS-DATE >= Cutoff`, the account is considered current.
+* **Archive**: If `HIST-LAST-TRNS-DATE < Cutoff`, the account is flagged for archiving.
 
 ### Phase 3 — Generation Routing
 Records are written to their respective GDG generation (`+1` in JCL):
-*   • **Active GDG**: Current business-as-usual accounts.
-*   • **Archived GDG**: Stagnant accounts moved to long-term storage.
-*   • **Unmatched GDG**: Exception records for data integrity investigation.
+* **Active GDG**: Current business-as-usual accounts.
+* **Archived GDG**: Stagnant accounts moved to long-term storage.
+* **Unmatched GDG**: Exception records for data integrity investigation.
 
 Program Flow
 ------------
 
-*   1\. **INITIALIZE**: Calculate dynamic cutoff date (Current - 180 days); zero out counters.
-*   2\. **OPEN**: Open PS Input, VSAM KSDS, and three GDG output files; verify FILE STATUS.
-*   3\. **PROCESS LOOP**: Read `ACCT.DATA` until EOF:
+1. **INITIALIZE**: Calculate dynamic cutoff date (Current - 180 days); zero out counters.
+2. **OPEN**: Open PS Input, VSAM KSDS, and three GDG output files; verify FILE STATUS.
+3. **PROCESS LOOP**: Read `ACCT.DATA` until EOF:
     *   ◦ **PERFORM CHECK-ACCT-HIST** — Random read of VSAM Master.
     *   ◦ **ON STATUS '23'** — Increment `UNMATCH-COUNT`, call `WRITE-UNMATCHED`.
     *   ◦ **ON FOUND** — Compare `HIST-LAST-TRNS-DATE` to Cutoff.
     *   ◦ **IF >= CUTOFF** — Increment `ACTIVE-COUNT`, call `WRITE-ACTIVE`.
     *   ◦ **IF < CUTOFF** — Increment `ARCHIVE-COUNT`, call `WRITE-ARCHIVE`.
-*   4\. **FINAL-REPORT**: Write summary counts and processing status to `PROCESS.REPORT`.
-*   5\. **RETURN-CODE**: Set RC=0 (Clean), RC=4 (<10 Unmatched), or RC=12 (10+ Unmatched).
-*   6\. **CLOSE**: Close all files and terminate.
+4. **FINAL-REPORT**: Write summary counts and processing status to `PROCESS.REPORT`.
+5. **RETURN-CODE**: Set RC=0 (Clean), RC=4 (<10 Unmatched), or RC=12 (10+ Unmatched).
+6. **CLOSE**: Close all files and terminate.
 
 Return Codes
 ------------
@@ -105,24 +105,25 @@ Test Data
 How to Run
 ----------
 
-*   1\. **Define GDGs** — Submit [`DEFGDG.jcl`](JCL/DEFGDG.jcl) to define the base clusters for Active, Archive, and Unmatch generations.
-*   2\. **Setup VSAM** — Submit [`DEFKSDS.jcl`](JCL/DEFKSDS.jcl) to initialize the history KSDS.
-*   3\. **Load VSAM Data** — Submit [`DATAVSAM.jcl`](../../JCL%20SAMPLES/DATAVSAM.jcl) to populate the historical master file with initial test data.
-*   4\. **Execute Batch** — Submit [`COMPRUN.jcl`](JCL/COMPRUN.jcl). This JCL handles data generation, compilation, and the execution step using `GDG (+1)` logic.
-*   5\. **Verify Results** — Check summary counts in [`PROCESS.REPORT`](DATA/PROCESS.REPORT) and verify generation versioning in the GDG clusters.
+1. **Define GDGs** — Submit [`DEFGDG.jcl`](JCL/DEFGDG.jcl) to define the base clusters for Active, Archive, and Unmatch generations.
+2. **Setup VSAM** — Submit [`DEFKSDS.jcl`](JCL/DEFKSDS.jcl) to initialize the history KSDS.
+3. **Load VSAM Data** — Submit [`DATAVSAM.jcl`](../../JCL%20SAMPLES/DATAVSAM.jcl) to populate the historical master file with initial test data.
+4. **Execute Batch** — Submit [`COMPRUN.jcl`](JCL/COMPRUN.jcl). This JCL handles data generation, compilation, and the execution step using `GDG (+1)` logic.
+5. **Verify Results** — Check summary counts in [`PROCESS.REPORT`](DATA/PROCESS.REPORT) and verify generation versioning in the GDG clusters.
 
 Key Concepts Used
 -----------------
 
-*   • **Multi-GDG Routing** — Manages three simultaneous generation updates (`GDGDD1/2/3`) in a single execution pass.
-*   • **Dynamic Temporal Partitioning** — Automates the 180-day lifecycle window by calculating the cutoff at runtime using intrinsic functions.
-*   • **Tri-State Lifecycle Logic** — Implements a record state machine: *Active* (Operational), *Stagnant* (Archived), or *Orphaned* (Unmatched).
-*   • **Generation Integrity** — Exception records (unmatched) are preserved in versioned GDGs for forensic audit trails.
-*   • **LRECL Compaction** — Demonstrates data trimming during the archiving process (Input 58 -> Output 48).
+* **Multi-GDG Routing** — Manages three simultaneous generation updates (`GDGDD1/2/3`) in a single execution pass.
+* **Dynamic Temporal Partitioning** — Automates the 180-day lifecycle window by calculating the cutoff at runtime using intrinsic functions.
+* **Tri-State Lifecycle Logic** — Implements a record state machine: *Active* (Operational), *Stagnant* (Archived), or *Orphaned* (Unmatched).
+* **Generation Integrity** — Exception records (unmatched) are preserved in versioned GDGs for forensic audit trails.
+* **LRECL Compaction** — Demonstrates data trimming during the archiving process (Input 58 -> Output 48).
 
 Notes
 -----
 
-*   • **Input-to-Output Mapping** — The program acts as a router; it does not modify the data content except for removing trailing fillers during the routing phase.
-*   • **Date Logic** — Cutoff is calculated based on the system date at the moment of execution.
-*   • **Error Threshold** — The RC=12 threshold is specifically designed to catch large-scale synchronization failures between the daily feed and the master history.
+* **Input-to-Output Mapping** — The program acts as a router; it does not modify the data content except for removing trailing fillers during the routing phase.
+* **Date Logic** — Cutoff is calculated based on the system date at the moment of execution.
+* **Error Threshold** — The RC=12 threshold is specifically designed to catch large-scale synchronization failures between the daily feed and the master history.
+* Tested on IBM z/OS with DB2 and Enterprise COBOL
