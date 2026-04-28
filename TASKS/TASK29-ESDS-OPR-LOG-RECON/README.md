@@ -6,6 +6,27 @@ Reads a daily operation log stored in an ESDS sequential file. For each operatio
 
 ---
 
+## DB2 Table
+
+### [`TB_ACCOUNT_BAL`](SQL/CREATE.TABLE.sql)
+
+```sql
+CREATE TABLE TB_ACCOUNT_BAL (     
+   ACCT_ID CHAR(6) NOT NULL,      
+   BALANCE DECIMAL(11,2),         
+   LAST_DATE DATE,                
+   PRIMARY KEY(ACCT_ID)           
+) IN DATABASE Z73460;    
+```
+
+| Column | Type | Description |
+|---|---|---|
+| `ACCT_ID` | `CHAR(6)` | **Primary key**  |
+| `BALANCE` | `DECIMAL(11,2)` | account balance |
+| `LAST_DATE` | `DATE` | DATE |
+
+---
+
 ## Files
 
 | DD Name | File | Org | Mode | Description |
