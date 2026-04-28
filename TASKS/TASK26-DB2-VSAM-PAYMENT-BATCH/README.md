@@ -157,30 +157,12 @@ Input and expected output files are stored in the [`DATA/`](DATA/) folder:
 
 ---
 
-## Expected SYSOUT
-
-Actual job output is stored in [`SYSOUT.txt`](OUTPUT/SYSOUT.txt).
-
-```
-========================================
-PAYMENT BATCH PROCESSING SUMMARY
-========================================
-TOTAL RECORDS  READ:    15
-SUCCESSFUL     UPDATES: 10
-ERRORS         FOUND:    3
-SKIPPED        RECORDS:  2
-FINAL RETURN CODE:       4
-========================================
-```
-
----
-
 ## How to Run
 
 1. **DB2 Setup** — run [`CREATE.TABLE.sql`](SQL/CREATE.TABLE.sql) and [`INSERT.DATA.sql`](SQL/INSERT.DATA.sql) via SPUFI or DSNTEP2.
 2. **VSAM Setup** — run [`DEFKSDS.jcl`](JCL/DEFKSDS.jcl) to define the KSDS cluster, then load [`CUSTOMER.VSAM`](DATA/CUSTOMER.VSAM) via REPRO (see [`DATAVSAM.jcl`](../../JCL%20SAMPLES/DATAVSAM.jcl)) or manually through **File Manager** in ISPF.
 3. **Compile and run** — submit [`COBDB2CP.jcl`](JCL/COBDB2CP.jcl).
-4. **Compare output** — see [`PROCESS.LOG`](DATA/PROCESS.LOG), [`TB.TB_CUSTOMER_BALANCE.AFTER`](DATA/TB.TB_CUSTOMER_BALANCE.AFTER), and [`SYSOUT.txt`](OUTPUT/SYSOUT.txt).
+4. **Compare output** — see [`PROCESS.LOG`](DATA/PROCESS.LOG) and [`TB.TB_CUSTOMER_BALANCE.AFTER`](DATA/TB.TB_CUSTOMER_BALANCE.AFTER)
 5. **Check the job return code** — JCL condition code should match the expected RC from the summary log.
 
 ---
