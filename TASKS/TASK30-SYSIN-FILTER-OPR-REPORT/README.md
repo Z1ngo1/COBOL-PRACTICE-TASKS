@@ -9,7 +9,7 @@ Reads filter parameters from a SYSIN stream (date range, minimum amount, operati
 ## Files
 
 | DD Name | File | Org | Mode | Description |
-|---|---|---|---|---|
+|---|---|---|---|
 | `SYSIN` | `SYSIN` | PS | INPUT | JCL inline filter parameters |
 | `OPRDD` | [`OPR.LOG.KSDS`](DATA/OPR.LOG.KSDS) | KSDS | INPUT | Operation log (sequential scan) |
 | `REPDD` | [`FILTERED.REPORT`](DATA/FILTERED.REPORT) | PS | OUTPUT | Filtered report file |
@@ -124,11 +124,19 @@ Input and output files are stored in the [`DATA/`](DATA/) folder:
 
 ## Key COBOL Concepts Used
 
-- `ORGANIZATION IS INDEXED` + `ACCESS MODE IS SEQUENTIAL` — KSDS scanned sequentially from first to last record
-- `SELECT SYSIN-FILE ASSIGN TO SYSIN` — reading JCL inline parameters as a flat file
-- `INSPECT TALLYING ... FOR CHARACTERS BEFORE '='` — locating the `=` delimiter position in each SYSIN line
-- `FUNCTION NUMVAL` — converting alphanumeric SYSIN value to numeric for amount comparison
-- `EXIT PARAGRAPH` — early exit pattern for multi-filter evaluation without nested `IF`
-- `88` level condition names — `EOF-SYSIN` and `EOF-OPR` for clean loop control
-- `EVALUATE TRUE` — key-based dispatch when parsing SYSIN parameter names
-- `Z(6)9.99` picture — suppressing leading zeros in formatted amount output
+- `INSPECT TALLYING WS-POS-EQUAL FOR CHARACTERS BEFORE '='` — finds the byte position of `=` in a SYSIN line without looping; the resulting count is then used as an offset to split the record into key and value substrings via reference modification
+- `SYSIN-REC(1:WS-POS-EQUAL)` / `SYSIN-REC(WS-POS-EQUAL + 2:...)` — reference modification with a computed offset to extract key and value from a single 80-byte record; the split point changes dynamically for every line
+- `FUNCTION NUMVAL(WS-VALUE(1:9))` — converts the alphanumeric `MIN-AMOUNT` string from SYSIN to a numeric value for comparison with `OPR-AMOUNT`; direct comparison without this would be alphanumeric and produce wrong results for amounts like `000050000`
+- `WS-OPR-TYPE = '*'` as wildcard — a single sentinel value that disables the type filter entirely; the condition `WS-OPR-TYPE NOT = '*' AND OPR-TYPE NOT = WS-OPR-TYPE` handles both filtered and pass-all mode in one check with no extra flag
+- Date comparison on `X(8)` strings — `YYYYMMDD` format allows correct `<` / `>` comparison without numeric conversion; year-first ordering makes lexicographic and chronological order identical
+- Two completely independent `PERFORM UNTIL EOF` loops — Phase 1 reads SYSIN to completion before Phase 2 starts; this ensures all parameters are fully loaded before the first KSDS record is evaluated
+
+---
+
+## Notes
+
+- All four filters default to “pass everything”: `FROM-DATE=00000000`, `TO-DATE=99999999`, `MIN-AMOUNT=0`, `OPR-TYPE=*` — running the program with an empty SYSIN stream copies the entire KSDS to the report unchanged
+- SYSIN parsing is tolerant: lines without `=` are skipped silently, and unknown keys are ignored with `CONTINUE` — blank lines or comment-like lines in the SYSIN block do not cause errors
+- The KSDS is opened with `ACCESS MODE IS SEQUENTIAL` — there is no random lookup by key; the composite key (`ACCT-ID` + `DATE` + `OPR-ID`) only determines the physical sort order of records in the cluster
+- The program has no summary counter or SYSOUT totals — the only output is the filtered PS report file; to see how many records matched, count lines in `FILTERED.REPORT`
+- Tested on IBM z/OS with Enterprise COBOL
