@@ -97,6 +97,9 @@ Test Data
 | :--- | :--- |
 | [`ACCT.DATA`](DATA/ACCT.DATA) | Input containing mix of active, old, and non-existent Account IDs |
 | [`ACCT.HISTORY.VSAM`](DATA/ACCT.HISTORY.VSAM) | Master history KSDS used for date comparisons |
+| [`ACCT.ACTIVE.GDG.G0001V00`](DATA/ACCT.ACTIVE.GDG.G0001V00) | Resulting generation for active accounts |
+| [`ARCHIVE.OLD.GDG.G0001V00`](DATA/ARCHIVE.OLD.GDG.G0001V00) | Resulting generation for archived accounts |
+| [`UNMATCH.GDG.G0001V00`](DATA/UNMATCH.GDG.G0001V00) | Resulting generation for unmatched accounts |
 | [`PROCESS.REPORT`](DATA/PROCESS.REPORT) | Summary showing counts for Active, Archived, and Unmatched pools |
 
 How to Run
@@ -104,8 +107,9 @@ How to Run
 
 *   1\. **Define GDGs** — Submit [`DEFGDG.jcl`](JCL/DEFGDG.jcl) to define the base clusters for Active, Archive, and Unmatch generations.
 *   2\. **Setup VSAM** — Submit [`DEFKSDS.jcl`](JCL/DEFKSDS.jcl) to initialize the history KSDS.
-*   3\. **Execute Batch** — Submit [`COMPRUN.jcl`](JCL/COMPRUN.jcl). This JCL handles data generation, compilation, and the execution step using `GDG (+1)` logic.
-*   4\. **Verify Results** — Check summary counts in [`PROCESS.REPORT`](DATA/PROCESS.REPORT) and verify generation versioning in the GDG clusters.
+*   3\. **Load VSAM Data** — Submit [`DATAVSAM.jcl`](../../JCL%20SAMPLES/DATAVSAM.jcl) to populate the historical master file with initial test data.
+*   4\. **Execute Batch** — Submit [`COMPRUN.jcl`](JCL/COMPRUN.jcl). This JCL handles data generation, compilation, and the execution step using `GDG (+1)` logic.
+*   5\. **Verify Results** — Check summary counts in `PROCESS.REPORT` and verify generation versioning in the GDG clusters.
 
 Key Concepts Used
 -----------------
