@@ -109,7 +109,7 @@ How to Run
 *   2\. **Setup VSAM** — Submit [`DEFKSDS.jcl`](JCL/DEFKSDS.jcl) to initialize the history KSDS.
 *   3\. **Load VSAM Data** — Submit [`DATAVSAM.jcl`](../../JCL%20SAMPLES/DATAVSAM.jcl) to populate the historical master file with initial test data.
 *   4\. **Execute Batch** — Submit [`COMPRUN.jcl`](JCL/COMPRUN.jcl). This JCL handles data generation, compilation, and the execution step using `GDG (+1)` logic.
-*   5\. **Verify Results** — Check summary counts in `PROCESS.REPORT` and verify generation versioning in the GDG clusters.
+*   5\. **Verify Results** — Check summary counts in [`PROCESS.REPORT`](DATA/PROCESS.REPORT) and verify generation versioning in the GDG clusters.
 
 Key Concepts Used
 -----------------
