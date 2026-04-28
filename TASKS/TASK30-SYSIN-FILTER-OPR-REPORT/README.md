@@ -9,7 +9,7 @@ Reads filter parameters from a SYSIN stream (date range, minimum amount, operati
 ## Files
 
 | DD Name | File | Org | Mode | Description |
-|---|---|---|---|
+|---|---|---|---|---|
 | `SYSIN` | `SYSIN` | PS | INPUT | JCL inline filter parameters |
 | `OPRDD` | [`OPR.LOG.KSDS`](DATA/OPR.LOG.KSDS) | KSDS | INPUT | Operation log (sequential scan) |
 | `REPDD` | [`FILTERED.REPORT`](DATA/FILTERED.REPORT) | PS | OUTPUT | Filtered report file |
