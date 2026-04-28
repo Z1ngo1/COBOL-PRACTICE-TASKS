@@ -120,10 +120,6 @@ SUCCESS: 2
 1. **Define the VSAM cluster** — submit [`DEFKSDS.jcl`](JCL/DEFKSDS.jcl) to create the [`CREDIT.MASTER`](DATA/CREDIT.MASTER) KSDS cluster via IDCAMS.
 2. **Load customer data** — use IDCAMS REPRO or a separate load step to populate [`CREDIT.MASTER`](DATA/CREDIT.MASTER) with initial records.
 3. **Compile and run** — submit [`COMPRUN.jcl`](JCL/COMPRUN.jcl). The job will:
-   - Delete previous datasets (`STEP005`).
-   - Populate `LOAN.REQUESTS` via `IEBGENER` (`STEP010`).
-   - Compile the credit subprogram `SUB1JB23` (`STEP013`).
-   - Compile and link `JOBSUB23` with `SUB1JB23`, then execute (`STEP015`).
 4. Check `Z73460.TASK23.APPROVAL.LOG` for results.
 
 ---
