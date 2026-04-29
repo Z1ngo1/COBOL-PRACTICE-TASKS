@@ -96,15 +96,15 @@ Input and output files are stored in the [`DATA/`](DATA/) folder:
 
 | File | Description |
 |---|---|
-| [`DATA/CUST.IN.PS`](DATA/CUST.IN.PS) | 10 customer records (various regions and statuses) |
-| [`DATA/CUST.MSTER.VSAM`](DATA/CUST.MSTER.VSAM) | VSAM master file — output of Program 1, input of Program 2 |
-| [`DATA/CUST.OUT.PS`](DATA/CUST.OUT.PS) | Filtered report — active customers for the selected region |
+| [`CUST.IN.PS`](DATA/CUST.IN.PS) | 10 customer records (various regions and statuses) |
+| [`CUST.MSTER.VSAM`](DATA/CUST.MSTER.VSAM) | VSAM master file — output of Program 1, input of Program 2 |
+| [`CUST.OUT.PS`](DATA/CUST.OUT.PS) | Filtered report — active customers for the selected region |
 
 ---
 
 ## Expected SYSOUT
 
-Actual job output is stored in [`OUTPUT/FIRST.SYSOUT.txt`](OUTPUT/FIRST.SYSOUT.txt) and [`OUTPUT/SECOND.SYSOUT.txt`](OUTPUT/SECOND.SYSOUT.txt).
+Actual job output is stored in [`FIRST.SYSOUT.txt`](OUTPUT/FIRST.SYSOUT.txt) and [`SECOND.SYSOUT.txt`](OUTPUT/SECOND.SYSOUT.txt).
 
 **Program 1 — COP1LB32:**
 ```
@@ -124,7 +124,7 @@ TOTAL CREDIT LIMIT: 30000.00
 
 1. **Define VSAM KSDS cluster** — run [`DEFKSDS.jcl`](JCL/DEFKSDS.jcl)
 2. **Compile and run both programs** — run [`COMPRUN.jcl`](JCL/COMPRUN.jcl) (compiles `COP1LB32` and `COP2LB32`, loads PS input data, runs Program 1 then Program 2 with region filter in SYSIN)
-3. **Review output** — see [`DATA/CUST.OUT.PS`](DATA/CUST.OUT.PS) and SYSOUT files in [`OUTPUT/`](OUTPUT/)
+3. **Review output** — see [`CUST.OUT.PS`](DATA/CUST.OUT.PS) and SYSOUT files in [`OUTPUT/`](OUTPUT/)
 
 ---
 
