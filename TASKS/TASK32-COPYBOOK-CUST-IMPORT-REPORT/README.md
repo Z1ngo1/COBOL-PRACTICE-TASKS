@@ -37,7 +37,7 @@ Shared by both programs. Used in FD sections of both input and output files, and
 
 | Phase | Condition | Action |
 |---|---|---|
-| 1 — Read PS input | Record read OK | Call write logic |
+| 1 — Read PS input | Record read OK | Proceed to write |
 | 1 — Read PS input | Read error | Display status, `STOP RUN` |
 | 2 — Write to KSDS | Write OK | `ADD 1 TO WS-LOAD-COUNT` |
 | 2 — Write to KSDS | Write error | Display status + `CUST-ID`, `STOP RUN` |
@@ -50,8 +50,6 @@ Shared by both programs. Used in FD sections of both input and output files, and
 3. **CLOSE** all files.
 4. **Display** total loaded count.
 5. **STOP RUN**.
-
-SYSOUT: [`OUTPUT/FIRST.SYSOUT.txt`](OUTPUT/FIRST.SYSOUT.txt)
 
 ---
 
@@ -90,19 +88,35 @@ SYSOUT: [`OUTPUT/FIRST.SYSOUT.txt`](OUTPUT/FIRST.SYSOUT.txt)
 5. **Display** total active count, total balance, total credit limit.
 6. **STOP RUN**.
 
-SYSOUT: [`OUTPUT/SECOND.SYSOUT.txt`](OUTPUT/SECOND.SYSOUT.txt)
+---
+
+## Test Data
+
+Input and output files are stored in the [`DATA/`](DATA/) folder:
+
+| File | Description |
+|---|---|
+| [`DATA/CUST.IN.PS`](DATA/CUST.IN.PS) | 10 customer records (various regions and statuses) |
+| [`DATA/CUST.MSTER.VSAM`](DATA/CUST.MSTER.VSAM) | VSAM master file — output of Program 1, input of Program 2 |
+| [`DATA/CUST.OUT.PS`](DATA/CUST.OUT.PS) | Filtered report — active customers for the selected region |
 
 ---
 
-## Files Summary
+## Expected SYSOUT
 
-| File | Org | Description |
-|---|---|---|
-| [`DATA/CUST.IN.PS`](DATA/CUST.IN.PS) | PS | Input customer records |
-| [`DATA/CUST.MSTER.VSAM`](DATA/CUST.MSTER.VSAM) | KSDS | Master file — output of Program 1, input of Program 2 |
-| [`DATA/CUST.OUT.PS`](DATA/CUST.OUT.PS) | PS | Filtered report output of Program 2 |
-| [`OUTPUT/FIRST.SYSOUT.txt`](OUTPUT/FIRST.SYSOUT.txt) | — | SYSOUT of Program 1 (load count) |
-| [`OUTPUT/SECOND.SYSOUT.txt`](OUTPUT/SECOND.SYSOUT.txt) | — | SYSOUT of Program 2 (count, balance, credit limit totals) |
+Actual job output is stored in [`OUTPUT/FIRST.SYSOUT.txt`](OUTPUT/FIRST.SYSOUT.txt) and [`OUTPUT/SECOND.SYSOUT.txt`](OUTPUT/SECOND.SYSOUT.txt).
+
+**Program 1 — COP1LB32:**
+```
+TOTAL LOADED: 10
+```
+
+**Program 2 — COP2LB32 (region filter `US`):**
+```
+TOTAL ACTIVE IN REGION US: 3
+TOTAL BALANCE: 15000.00
+TOTAL CREDIT LIMIT: 30000.00
+```
 
 ---
 
