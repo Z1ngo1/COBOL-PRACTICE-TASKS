@@ -149,8 +149,8 @@ All intermediate and final files are stored in the [`DATA/`](DATA/) folder:
 ## How to Run
 
 1. **Define GDG base** — run [`DEFGDG.jcl`](JCL/DEFGDG.jcl) to allocate the GDG base `Z73460.TASK31.QMF.GDG`
-2. **Create DB2 tables and load data** — run SQL from [`SQL/`](SQL/) folder: [`CREATE.T_CUSTOMER.sql`](SQL/CREATE.T_CUSTOMER.sql), [`CREATE.T_ACCOUNT.sql`](CREATE.T_ACCOUNT.sql), then INSERT scripts [`INSERT.T_CUSTOMER.sql`](SQL/INSERT.T_CUSTOMER.sql), [`INSERT.T_ACCOUNT.sql`](INSERT.T_ACCOUNT.sql)
-3. **Import QMF objects into QMF catalog** — load `TASK31P.proc`, `Q1TASK31.sql`, `Q2TASK31.sql`, `Q1TASK31F.form`, `Q2TASK31F.form` into QMF using `SAVE` or ISPF QMF panels
+2. **Create DB2 tables and load data** — run SQL from [`SQL/`](SQL/) folder: [`CREATE.T_CUSTOMER.sql`](SQL/CREATE.T_CUSTOMER.sql), [`CREATE.T_ACCOUNT.sql`](SQL/CREATE.T_ACCOUNT.sql), then INSERT scripts [`INSERT.T_CUSTOMER.sql`](SQL/INSERT.T_CUSTOMER.sql), [`INSERT.T_ACCOUNT.sql`](SQL/INSERT.T_ACCOUNT.sql)
+3. **Import QMF objects into QMF catalog** — load [`TASK31P.proc`](QMF/TASK31P.proc), [`Q1TASK31.sql`](Q1TASK31.sql), [`Q2TASK31.sql`](Q2TASK31.sql), [`Q1TASK31F.form`](Q1TASK31F.form), [`Q2TASK31F.form`](Q2TASK31F.form) into QMF using ISPF QMF panels
 4. **Run the pipeline** — submit [`DB2PROC.jcl`](JCL/DB2PROC.jcl)
 5. **Review output** — see [`DATA/SORTED.REPORT`](DATA/SORTED.REPORT)
 
