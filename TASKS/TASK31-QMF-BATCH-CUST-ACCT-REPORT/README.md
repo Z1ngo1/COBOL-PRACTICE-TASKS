@@ -99,7 +99,9 @@ ORDER BY A.ACCT_TYPE, C.REGION;
 | Object | File | Description |
 |---|---|---|
 | `Q1TASK31F` | [`Q1TASK31F.form`](QMF/FORM/Q1TASK31F.form) | Column headers and formatting for Query 1 output |
+| `Q1TASK31F.txt` | [`Q1TASK31F.form`](QMF/FORM/Q1TASK31F.txt) | Column headers and formatting for Query 1 output query output |
 | `Q2TASK31F` | [`Q2TASK31F.form`](QMF/FORM/Q2TASK31F.form) | Column headers and formatting for Query 2 output |
+| `Q2TASK31F.txt` | [`Q2TASK31F.form`](QMF/FORM/Q2TASK31F.txt) | Column headers and formatting for Query 2 output query output|
 
 ---
 
@@ -150,7 +152,7 @@ All intermediate and final files are stored in the [`DATA/`](DATA/) folder:
 
 1. **Define GDG base** — run [`DEFGDG.jcl`](JCL/DEFGDG.jcl) to allocate the GDG base `Z73460.TASK31.QMF.GDG`
 2. **Create DB2 tables and load data** — run SQL from [`SQL/`](SQL/) folder: [`CREATE.T_CUSTOMER.sql`](SQL/CREATE.T_CUSTOMER.sql), [`CREATE.T_ACCOUNT.sql`](SQL/CREATE.T_ACCOUNT.sql), then INSERT scripts [`INSERT.T_CUSTOMER.sql`](SQL/INSERT.T_CUSTOMER.sql), [`INSERT.T_ACCOUNT.sql`](SQL/INSERT.T_ACCOUNT.sql)
-3. **Import QMF objects into QMF catalog** — load [`TASK31P.proc`](QMF/TASK31P.proc), [`Q1TASK31.sql`](QMF/Q1TASK31.sql), [`Q2TASK31.sql`](QMF/Q2TASK31.sql), [`Q1TASK31F.form`](QMF/Q1TASK31F.form), [`Q2TASK31F.form`](QMF/Q2TASK31F.form) into QMF using ISPF QMF panels
+3. **Import QMF objects into QMF catalog** — load [`TASK31P.proc`](QMF/PROC/TASK31P.proc), [`Q1TASK31.sql`](QMF/QUERY/Q1TASK31.sql), [`Q2TASK31.sql`](QMF/QUERY/Q2TASK31.sql), [`Q1TASK31F.form`](QMF/FORM/Q1TASK31F.form), [`Q2TASK31F.form`](QMF/FORM/Q2TASK31F.form) into QMF using ISPF QMF panels
 4. **Run the pipeline** — submit [`DB2PROC.jcl`](JCL/DB2PROC.jcl)
 5. **Review output** — see [`DATA/SORTED.REPORT`](DATA/SORTED.REPORT)
 
