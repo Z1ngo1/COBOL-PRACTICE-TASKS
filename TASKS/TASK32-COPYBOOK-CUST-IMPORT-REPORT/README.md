@@ -24,52 +24,71 @@ Shared by both programs. Used in FD sections of both input and output files, and
 
 ---
 
-## Programs
+## Program 1 — [`COP1LB32.cbl`](COBOL/COP1LB32.cbl) — PS to VSAM Import
 
-### Program 1 — [`COP1LB32.cbl`](COBOL/COP1LB32.cbl) — PS to VSAM Import
-
-**Files:**
+### Files
 
 | DD Name | File | Org | Mode | Description |
 |---|---|---|---|---|
 | `INDD` | [`CUST.IN.PS`](DATA/CUST.IN.PS) | PS | INPUT | Customer input file |
 | `MASTDD` | [`CUST.MSTER.VSAM`](DATA/CUST.MSTER.VSAM) | KSDS | OUTPUT | VSAM master file |
 
-**Business Logic:**
+### Business Logic
 
-| Phase | Action |
-|---|---|
-| 1 — Read PS input | Read `CUST-IN-FILE` record by record until EOF |
-| 2 — Write to KSDS | `MOVE CUST-IN-REC TO CUST-MASTER-REC`, then `WRITE`; stop on error |
-| 3 — Statistics | `DISPLAY 'TOTAL LOADED: '` with record count on SYSOUT |
+| Phase | Condition | Action |
+|---|---|---|
+| 1 — Read PS input | Record read OK | Call write logic |
+| 1 — Read PS input | Read error | Display status, `STOP RUN` |
+| 2 — Write to KSDS | Write OK | `ADD 1 TO WS-LOAD-COUNT` |
+| 2 — Write to KSDS | Write error | Display status + `CUST-ID`, `STOP RUN` |
+| 3 — Statistics | EOF reached | `DISPLAY 'TOTAL LOADED: '` with count |
+
+### Program Flow
+
+1. **OPEN** — `CUST-IN-FILE` (INPUT), `CUST-MASTER-FILE` (OUTPUT).
+2. **Read loop** — read `CUST-IN-FILE` until EOF; for each record: `MOVE CUST-IN-REC TO CUST-MASTER-REC`, `WRITE CUST-MASTER-REC`, `ADD 1 TO WS-LOAD-COUNT`.
+3. **CLOSE** all files.
+4. **Display** total loaded count.
+5. **STOP RUN**.
 
 SYSOUT: [`OUTPUT/FIRST.SYSOUT.txt`](OUTPUT/FIRST.SYSOUT.txt)
 
 ---
 
-### Program 2 — [`COP2LB32.cbl`](COBOL/COP2LB32.cbl) — VSAM Filtered Report
+## Program 2 — [`COP2LB32.cbl`](COBOL/COP2LB32.cbl) — VSAM Filtered Report
 
-**Files:**
+### Files
 
 | DD Name | File | Org | Mode | Description |
 |---|---|---|---|---|
 | `MASTDD` | [`CUST.MSTER.VSAM`](DATA/CUST.MSTER.VSAM) | KSDS | INPUT | VSAM master file |
 | `OUTDD` | [`CUST.OUT.PS`](DATA/CUST.OUT.PS) | PS | OUTPUT | Filtered report file |
 
-**SYSIN Filter Parameter:**
+### SYSIN Filter Parameter
 
 | Field | PIC | Description |
 |---|---|---|
 | `WS-REGION-FILTER` | `X(2)` | Region code to filter by; read via `ACCEPT` |
 
-**Business Logic:**
+### Business Logic
 
-| Phase | Action |
-|---|---|
-| 1 — Read filter | `ACCEPT WS-REGION-FILTER` from SYSIN |
-| 2 — Scan KSDS | Read sequentially; skip if `CUST-STATUS ≠ 'A'` or `CUST-REGION ≠ WS-REGION-FILTER` |
-| 2 — Match | Write record; add 1 to count; accumulate balance and credit limit totals |
-| 3 — Statistics | Display count, total balance, total credit limit on SYSOUT |
+| Phase | Condition | Action |
+|---|---|---|
+| 1 — Read filter | — | `ACCEPT WS-REGION-FILTER` from SYSIN |
+| 2 — Scan KSDS | `CUST-STATUS ≠ 'A'` | Skip record |
+| 2 — Scan KSDS | `CUST-REGION ≠ WS-REGION-FILTER` | Skip record |
+| 2 — Scan KSDS | Both conditions pass | Write record; accumulate count, balance, credit limit |
+| 2 — Scan KSDS | Write error | Display status + `CUST-ID`, `STOP RUN` |
+| 3 — Statistics | EOF reached | Display count, total balance, total credit limit |
+
+### Program Flow
+
+1. **OPEN** — `CUST-MASTER-FILE` (INPUT), `CUST-OUT-FILE` (OUTPUT).
+2. **ACCEPT** — read `WS-REGION-FILTER` (2 bytes) from SYSIN.
+3. **Read loop** — read `CUST-MASTER-FILE` sequentially until EOF; for each record: check `CUST-STATUS = 'A'` AND `CUST-REGION = WS-REGION-FILTER`; if both pass — write to `CUST-OUT-FILE`, accumulate totals.
+4. **CLOSE** all files.
+5. **Display** total active count, total balance, total credit limit.
+6. **STOP RUN**.
 
 SYSOUT: [`OUTPUT/SECOND.SYSOUT.txt`](OUTPUT/SECOND.SYSOUT.txt)
 
