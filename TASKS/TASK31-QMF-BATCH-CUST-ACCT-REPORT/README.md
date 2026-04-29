@@ -135,18 +135,21 @@ All intermediate and final files are stored in the [`DATA/`](DATA/) folder:
 
 | Dataset | Description |
 |---|---|
-| [`DATA/QUERY1`](DATA/QUERY1) | QMF text export of Query 1 (customer counts by region/segment) |
-| [`DATA/QUERY2`](DATA/QUERY2) | QMF text export of Query 2 (balances by account type/region) |
-| [`DATA/QMF.GDG.G0001V00`](DATA/QMF.GDG.G0001V00) | GDG generation `(+1)` — VB separator header for Query 1 |
-| [`DATA/QMF.GDG.G0002V00`](DATA/QMF.GDG.G0002V00) | GDG generation `(+2)` — VB separator header for Query 2 |
-| [`DATA/SORTED.REPORT`](DATA/SORTED.REPORT) | Final merged and dated report |
+| [`QUERY1`](DATA/QUERY1) | QMF text export of Query 1 (customer counts by region/segment) |
+| [`QUERY2`](DATA/QUERY2) | QMF text export of Query 2 (balances by account type/region) |
+| [`QMF.GDG.G0001V00`](DATA/QMF.GDG.G0001V00) | GDG generation `(+1)` — VB separator header for Query 1 |
+| [`QMF.GDG.G0002V00`](DATA/QMF.GDG.G0002V00) | GDG generation `(+2)` — VB separator header for Query 2 |
+| [`SORTED.REPORT`](DATA/SORTED.REPORT) | Final merged and dated report |
+| [`TB.T_ACCOUNT`](DATA/TB.T_ACCOUNT) | INPUT DATA FROM T_ACCOUNT TABLE |
+| [`TB.T_CUSTOMER`](DATA/TB.T_CUSTOMER) | INPUT DATA FROM T_CUSTOMER TABLE |
+
 
 ---
 
 ## How to Run
 
 1. **Define GDG base** — run [`DEFGDG.jcl`](JCL/DEFGDG.jcl) to allocate the GDG base `Z73460.TASK31.QMF.GDG`
-2. **Create DB2 tables and load data** — run SQL from [`SQL/`](SQL/) folder: `CREATE.T_CUSTOMER.sql`, `CREATE.T_ACCOUNT.sql`, then INSERT scripts
+2. **Create DB2 tables and load data** — run SQL from [`SQL/`](SQL/) folder: [`CREATE.T_CUSTOMER.sql`](SQL/CREATE.T_CUSTOMER.sql), [`CREATE.T_ACCOUNT.sql`](CREATE.T_ACCOUNT.sql), then INSERT scripts [`INSERT.T_CUSTOMER.sql`](SQL/INSERT.T_CUSTOMER.sql), [`INSERT.T_ACCOUNT.sql`](INSERT.T_ACCOUNT.sql)
 3. **Import QMF objects into QMF catalog** — load `TASK31P.proc`, `Q1TASK31.sql`, `Q2TASK31.sql`, `Q1TASK31F.form`, `Q2TASK31F.form` into QMF using `SAVE` or ISPF QMF panels
 4. **Run the pipeline** — submit [`DB2PROC.jcl`](JCL/DB2PROC.jcl)
 5. **Review output** — see [`DATA/SORTED.REPORT`](DATA/SORTED.REPORT)
