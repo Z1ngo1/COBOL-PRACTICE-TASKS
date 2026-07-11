@@ -1,4 +1,4 @@
-# Task 20 — DB2 Upsert: Employee Directory Synchronization
+# Task 20 - DB2 Upsert: Employee Directory Synchronization
 
 ## Overview
 
@@ -25,7 +25,7 @@ CREATE TABLE TB_EMPLOYEES (
 
 | Column | Type | Description |
 |---|---|---|
-| `EMP_ID` | `CHAR(5)` | **Primary key** — Employee ID |
+| `EMP_ID` | `CHAR(5)` | **Primary key** - Employee ID |
 | `EMP_NAME` | `VARCHAR(20)` | Full name |
 | `DEPT` | `CHAR(3)` | Department code |
 | `SALARY` | `DECIMAL(7,2)` | Monthly salary |
@@ -41,27 +41,27 @@ CREATE TABLE TB_EMPLOYEES (
 | `INDD` | [`EMP.UPDATE`](DATA/EMP.UPDATE) | PS | INPUT | External sync data, RECFM=F, LRECL=44 |
 | `OUTDD` | [`SYNC.LOG`](DATA/SYNC.LOG) | PS | OUTPUT | Sync results log, RECFM=VB, LRECL=84 |
 
-### Input Record Layout — (`INDD`), LRECL=44, RECFM=F
+### Input Record Layout - (`INDD`), LRECL=44, RECFM=F
 
 | Field | Picture | Offset | Description |
 |---|---|---|---|
-| `EMP-ID` | `X(5)` | 1 | Employee ID — mandatory |
-| `EMP-NAME` | `X(20)` | 6 | Employee name — mandatory |
+| `EMP-ID` | `X(5)` | 1 | Employee ID - mandatory |
+| `EMP-NAME` | `X(20)` | 6 | Employee name - mandatory |
 | `EMP-DEPT` | `X(3)` | 26 | Department code |
 | `EMP-SALARY` | `S9(5)V99` | 29 | Salary (numeric, > 0) |
 | `EMP-HIRE-DATE`| `9(8)` | 36 | Hire date (YYYYMMDD) |
 | `EMP-STATUS` | `X(1)` | 44 | Status ('A' or 'I') |
 
-### Output Record Layout — (`OUTDD`), RECFM=VB, LRECL=84
+### Output Record Layout - (`OUTDD`), RECFM=VB, LRECL=84
 
 | Field | Picture | Description |
 |---|---|---|
 | `LOG-REC` | `X(80)` | One log line: `<EMP-ID> <EMP-NAME> <STATUS-MESSAGE>` |
 
 Status messages:
-- `INSERTED (NEW EMPLOYEE)` — successful INSERT
-- `UPDATE (SALARY CHANGE FROM <old> TO <new>)` — successful UPDATE with change
-- `UPDATED (NO SALARY CHANGE: <salary>)` — successful UPDATE without salary change
+- `INSERTED (NEW EMPLOYEE)` - successful INSERT
+- `UPDATE (SALARY CHANGE FROM <old> TO <new>)` - successful UPDATE with change
+- `UPDATED (NO SALARY CHANGE: <salary>)` - successful UPDATE without salary change
 - `ID VALIDATION ERROR: ID IS EMPTY`
 - `VALIDATION ERROR: NAME IS EMPTY`
 - `SALARY VALIDATION ERROR: <reason>` (NON-NUMERIC / NEGATIVE / ZERO)
@@ -84,7 +84,7 @@ MAIN-LOGIC.
     STOP RUN.
 ```
 
-### Phase 1 — Validation
+### Phase 1 - Validation
 
 For each record read from `EMP-FILE`, the program executes four validation paragraphs. If any fail, `RECORDS-ERRORS` is incremented and the record is skipped.
 
@@ -95,7 +95,7 @@ VALIDATE-SALARY: Check IS NUMERIC, NOT NEGATIVE, NOT ZERO
 VALIDATE-STATUS: Check IS 'A' OR 'I'
 ```
 
-### Phase 2 — Existence Check & Action (Upsert)
+### Phase 2 - Existence Check & Action (Upsert)
 
 If validation passes, the program queries DB2 to see if the record exists:
 
@@ -117,7 +117,7 @@ END-EXEC.
   - Logs `INSERTED (NEW EMPLOYEE)`
 - **Negative SQLCODE**: Logs DB2 error and skips record.
 
-### Phase 3 — Commit Strategy
+### Phase 3 - Commit Strategy
 
 The program uses a batch commit approach to optimize performance:
 
@@ -129,21 +129,21 @@ The program uses a batch commit approach to optimize performance:
 
 ## Program Flow
 
-1. `OPEN-ALL-FILES` — open `EMP-FILE` (INPUT) and `SYNC-LOG` (OUTPUT); check FILE STATUS for both
+1. `OPEN-ALL-FILES` - open `EMP-FILE` (INPUT) and `SYNC-LOG` (OUTPUT); check FILE STATUS for both
 2. `READ` first record from `EMP-FILE`
-3. `PROCESS-ALL-RECORDS` — main loop until `AT END`:
-   - 3.1. `VALIDATE-ID` — skip record with error log if EMP-ID is blank
-   - 3.2. `VALIDATE-NAME` — skip record with error log if EMP-NAME is blank
-   - 3.3. `VALIDATE-SALARY` — skip if non-numeric, negative, or zero
-   - 3.4. `VALIDATE-STATUS` — skip if not 'A' or 'I'
-   - 3.5. `EXEC SQL SELECT` — check existence in `TB_EMPLOYEES`
+3. `PROCESS-ALL-RECORDS` - main loop until `AT END`:
+   - 3.1. `VALIDATE-ID` - skip record with error log if EMP-ID is blank
+   - 3.2. `VALIDATE-NAME` - skip record with error log if EMP-NAME is blank
+   - 3.3. `VALIDATE-SALARY` - skip if non-numeric, negative, or zero
+   - 3.4. `VALIDATE-STATUS` - skip if not 'A' or 'I'
+   - 3.5. `EXEC SQL SELECT` - check existence in `TB_EMPLOYEES`
    - 3.6. SQLCODE 0 → `UPDATE-EMPLOYEE` + log salary change or no-change message
    - 3.7. SQLCODE 100 → `INSERT-EMPLOYEE` + log `INSERTED (NEW EMPLOYEE)`
    - 3.8. Negative SQLCODE < -900 → `ROLLBACK` + `STOP RUN`
    - 3.9. Increment `COMMIT-COUNTER`; if `>= 50` → `EXEC SQL COMMIT`, reset counter
    - 3.10. `READ` next record
-4. `CLOSE-ALL-FILES` — `EXEC SQL COMMIT` for remaining records; close both files
-5. `DISPLAY-SUMMARY` — print records processed, inserted, updated, errors, commit batches
+4. `CLOSE-ALL-FILES` - `EXEC SQL COMMIT` for remaining records; close both files
+5. `DISPLAY-SUMMARY` - print records processed, inserted, updated, errors, commit batches
 6. `STOP RUN`
 
 ---
@@ -200,12 +200,12 @@ COMMIT BATCHES:     1
 
 ## Key COBOL + DB2 Concepts Used
 
-- **`SELECT ... INTO`** — used to check existence and retrieve old values for change logging
-- **Upsert Logic** — the combination of conditional branching based on SQLCODE `0` vs `100`
-- **`FUNCTION TRIM` + `FUNCTION REVERSE`** — used for VARCHAR length calculation and log formatting
-- **Date Formatting** — converts `YYYYMMDD` input string to DB2-compatible `YYYY-MM-DD` format
-- **Batch Commit** — `COMMIT-COUNTER` ensures commits occur every 50 records to minimize overhead
-- **Atomicity Note** — The SELECT-then-UPDATE/INSERT pattern is non-atomic. In a concurrent environment, a race condition between the SELECT and INSERT could cause -803 (duplicate key) errors on INSERT, which will be logged as errors and skipped. For production use, consider replacing with a single atomic MERGE statement.
+- **`SELECT ... INTO`** - used to check existence and retrieve old values for change logging
+- **Upsert Logic** - the combination of conditional branching based on SQLCODE `0` vs `100`
+- **`FUNCTION TRIM` + `FUNCTION REVERSE`** - used for VARCHAR length calculation and log formatting
+- **Date Formatting** - converts `YYYYMMDD` input string to DB2-compatible `YYYY-MM-DD` format
+- **Batch Commit** - `COMMIT-COUNTER` ensures commits occur every 50 records to minimize overhead
+- **Atomicity Note** - The SELECT-then-UPDATE/INSERT pattern is non-atomic. In a concurrent environment, a race condition between the SELECT and INSERT could cause -803 (duplicate key) errors on INSERT, which will be logged as errors and skipped. For production use, consider replacing with a single atomic MERGE statement.
 
 ---
 
