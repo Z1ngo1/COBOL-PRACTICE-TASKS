@@ -1,4 +1,4 @@
-# Task 16 — Wholesale Warehouse (Binary Search / SEARCH ALL)
+# Task 16 - Wholesale Warehouse (Binary Search / SEARCH ALL)
 
 ## Overview
 
@@ -19,18 +19,18 @@ The core technique is **`SEARCH ALL`** (binary search): unlike `SEARCH` which wa
 
 | DD Name | File | Org | Mode | Description |
 |---|---|---|---|---|
-| `PARTDD` | [`PARTS.CATALOG`](DATA/PARTS.CATALOG) | PS | INPUT | Parts catalog — part ID + price; pre-sorted by `PART-ID` ascending |
-| `ORDRDD` | [`ORDERS.FILE`](DATA/ORDERS.FILE) | PS | INPUT | Customer orders — order number, part ID, quantity |
-| `INVODD` | [`INVOICE.TXT`](DATA/INVOICE.TXT) | PS | OUTPUT | Invoice lines — one line per order with order number and total cost |
+| `PARTDD` | [`PARTS.CATALOG`](DATA/PARTS.CATALOG) | PS | INPUT | Parts catalog - part ID + price; pre-sorted by `PART-ID` ascending |
+| `ORDRDD` | [`ORDERS.FILE`](DATA/ORDERS.FILE) | PS | INPUT | Customer orders - order number, part ID, quantity |
+| `INVODD` | [`INVOICE.TXT`](DATA/INVOICE.TXT) | PS | OUTPUT | Invoice lines - one line per order with order number and total cost |
 
-### Input Record Layout — (`PARTDD`), LRECL=10, RECFM=F
+### Input Record Layout - (`PARTDD`), LRECL=10, RECFM=F
 
 | Field | Picture | Offset | Description |
 |---|---|---|---|
-| `PART-ID` | `9(5)` | 1 | Part ID — **sort key**, ascending |
-| `PART-PRICE` | `9(3)V99` | 6 | Unit price — implied 2 decimal places |
+| `PART-ID` | `9(5)` | 1 | Part ID - **sort key**, ascending |
+| `PART-PRICE` | `9(3)V99` | 6 | Unit price - implied 2 decimal places |
 
-### Input Record Layout — (`ORDRDD`), LRECL=13, RECFM=F
+### Input Record Layout - (`ORDRDD`), LRECL=13, RECFM=F
 
 | Field | Picture | Offset | Description |
 |---|---|---|---|
@@ -38,7 +38,7 @@ The core technique is **`SEARCH ALL`** (binary search): unlike `SEARCH` which wa
 | `ORDR-ID` | `9(5)` | 6 | Part ID to look up in `CATALOG-TABLE` |
 | `ORDR-QUANT` | `9(3)` | 11 | Order quantity |
 
-### Output Record Layout — (`INVODD`), LRECL=80, RECFM=F
+### Output Record Layout - (`INVODD`), LRECL=80, RECFM=F
 
 | Content | Description |
 |---|---|
@@ -49,7 +49,7 @@ The core technique is **`SEARCH ALL`** (binary search): unlike `SEARCH` which wa
 
 ## Business Logic: Two-Phase Processing
 
-### Phase 1 — Load Catalog Table (Initialization)
+### Phase 1 - Load Catalog Table (Initialization)
 
 The program loads the entire parts catalog into a Working-Storage table before any order is processed.
 
@@ -64,9 +64,9 @@ END-PERFORM
 CLOSE PARTS.CATALOG
 ```
 
-After this phase the entire catalog lives in `CATALOG-TABLE` in memory. `PARTS-LOADED` serves as the `DEPENDING ON` value — `SEARCH ALL` will only scan entries 1 through `PARTS-LOADED`, so no dummy entries are touched. Table size is bounded by `OCCURS 1 TO 100` — overflow records are ignored with a warning.
+After this phase the entire catalog lives in `CATALOG-TABLE` in memory. `PARTS-LOADED` serves as the `DEPENDING ON` value - `SEARCH ALL` will only scan entries 1 through `PARTS-LOADED`, so no dummy entries are touched. Table size is bounded by `OCCURS 1 TO 100` - overflow records are ignored with a warning.
 
-### Phase 2 — Process Orders
+### Phase 2 - Process Orders
 
 For each order record the program performs a binary search against the in-memory catalog and writes exactly one invoice line.
 
@@ -87,7 +87,7 @@ CLOSE ORDERS.FILE, INVOICE.TXT
 `SEARCH ALL` requires:
 1. `ASCENDING KEY IS WS-PART-ID` declared in the `OCCURS` clause
 2. Input file pre-sorted by `PART-ID` ascending
-3. **No `SET IDX TO 1` before the search** — `SEARCH ALL` manages the index itself
+3. **No `SET IDX TO 1` before the search** - `SEARCH ALL` manages the index itself
 
 ```cobol
 SET NOT-FOUND TO TRUE.
@@ -130,17 +130,17 @@ WS-TOTAL-COST = WS-PRICE(IDX) * ORDR-QUANT   (when part found)
 
 ## Program Flow
 
-1.  **PERFORM OPEN-CATALOG-FILE** — opens `PARTDD` (INPUT) for initialization.
-2.  **PERFORM LOAD-CATALOG-TABLE** — reads `PARTS.CATALOG` into `CATALOG-TABLE` until EOF. Increments `PARTS-LOADED` for each record; records beyond 100 are skipped with a warning.
-3.  **PERFORM CLOSE-CATALOG-FILE** — closes `PARTDD`; the catalog is never reopened.
-4.  **PERFORM OPEN-ORDER-FILES** — opens `ORDRDD` (INPUT) and `INVODD` (OUTPUT).
-5.  **PERFORM PROCESS-ORDERS** — main loop `UNTIL EOF` on `ORDERS.FILE`.
+1.  **PERFORM OPEN-CATALOG-FILE** - opens `PARTDD` (INPUT) for initialization.
+2.  **PERFORM LOAD-CATALOG-TABLE** - reads `PARTS.CATALOG` into `CATALOG-TABLE` until EOF. Increments `PARTS-LOADED` for each record; records beyond 100 are skipped with a warning.
+3.  **PERFORM CLOSE-CATALOG-FILE** - closes `PARTDD`; the catalog is never reopened.
+4.  **PERFORM OPEN-ORDER-FILES** - opens `ORDRDD` (INPUT) and `INVODD` (OUTPUT).
+5.  **PERFORM PROCESS-ORDERS** - main loop `UNTIL EOF` on `ORDERS.FILE`.
     *   **READ ORDERS-FILE**.
-    *   **PERFORM SEARCH-PART-PRICE** — executes `SEARCH ALL CATALOG-ENTRY` using `ORDR-ID` as the lookup key.
+    *   **PERFORM SEARCH-PART-PRICE** - executes `SEARCH ALL CATALOG-ENTRY` using `ORDR-ID` as the lookup key.
     *   **IF FOUND** → `COMPUTE WS-TOTAL-COST`, format invoice line, and **WRITE INVOICE-REC**.
     *   **IF NOT FOUND** → write `NOT FOUND` line; increment `PARTS-NOT-FOUND`.
-6.  **DISPLAY-SUMMARY** — prints final statistics to SYSOUT (parts loaded, orders processed, invoices written, found vs. not-found counts).
-7.  **PERFORM CLOSE-ORDER-FILES** — closes `ORDRDD` and `INVODD`.
+6.  **DISPLAY-SUMMARY** - prints final statistics to SYSOUT (parts loaded, orders processed, invoices written, found vs. not-found counts).
+7.  **PERFORM CLOSE-ORDER-FILES** - closes `ORDRDD` and `INVODD`.
 8.  **STOP RUN**.
 
 ---
@@ -187,18 +187,18 @@ PARTS NOT FOUND:       6
 
 ## Key COBOL Concepts Used
 
-- **`SEARCH ALL`** — binary search on `CATALOG-TABLE`; the compiler generates a bisection algorithm instead of a linear scan; requires `ASCENDING KEY IS WS-PART-ID` in the `OCCURS` clause and pre-sorted input; the index is managed internally — no `SET IDX TO 1` before the call
-- **`OCCURS ... DEPENDING ON`** — `CATALOG-ENTRY OCCURS 1 TO 100 DEPENDING ON PARTS-LOADED` limits the active table size to the number of loaded entries; `SEARCH ALL` respects this boundary and never reads uninitialized slots
-- **`ASCENDING KEY IS`** — mandatory clause for `SEARCH ALL`; tells the compiler which field is the sort key and enables the binary search algorithm; without it the program will not compile
-- **Two-phase design** — strict initialization phase (load `CATALOG-TABLE`, close `PARTS.CATALOG`) before opening `ORDERS.FILE`; the catalog is read exactly once regardless of how many orders exist
-- **`AT END` / `WHEN` in `SEARCH ALL`** — `AT END` fires when the part is not found (binary search exhausted); `WHEN` fires on an exact match; only one `WHEN` clause is allowed in `SEARCH ALL` and it must use `=` equality
+- **`SEARCH ALL`** - binary search on `CATALOG-TABLE`; the compiler generates a bisection algorithm instead of a linear scan; requires `ASCENDING KEY IS WS-PART-ID` in the `OCCURS` clause and pre-sorted input; the index is managed internally - no `SET IDX TO 1` before the call
+- **`OCCURS ... DEPENDING ON`** - `CATALOG-ENTRY OCCURS 1 TO 100 DEPENDING ON PARTS-LOADED` limits the active table size to the number of loaded entries; `SEARCH ALL` respects this boundary and never reads uninitialized slots
+- **`ASCENDING KEY IS`** - mandatory clause for `SEARCH ALL`; tells the compiler which field is the sort key and enables the binary search algorithm; without it the program will not compile
+- **Two-phase design** - strict initialization phase (load `CATALOG-TABLE`, close `PARTS.CATALOG`) before opening `ORDERS.FILE`; the catalog is read exactly once regardless of how many orders exist
+- **`AT END` / `WHEN` in `SEARCH ALL`** - `AT END` fires when the part is not found (binary search exhausted); `WHEN` fires on an exact match; only one `WHEN` clause is allowed in `SEARCH ALL` and it must use `=` equality
 
 ---
 
 ## Notes
 
-- `PARTS.CATALOG` must be sorted **ascending** by `PART-ID` — `SEARCH ALL` does not validate sort order; unsorted input silently produces wrong results
-- The table is bounded by `OCCURS 1 TO 100` — if `PARTS.CATALOG` has more than 100 records the program displays a warning and ignores the excess; increase both the `OCCURS` maximum and the `PARTS-LOADED` `PIC` size if a larger catalog is needed
-- `PARTS.CATALOG` is closed after Phase 1 and never reopened — all lookups in Phase 2 are purely in-memory
+- `PARTS.CATALOG` must be sorted **ascending** by `PART-ID` - `SEARCH ALL` does not validate sort order; unsorted input silently produces wrong results
+- The table is bounded by `OCCURS 1 TO 100` - if `PARTS.CATALOG` has more than 100 records the program displays a warning and ignores the excess; increase both the `OCCURS` maximum and the `PARTS-LOADED` `PIC` size if a larger catalog is needed
+- `PARTS.CATALOG` is closed after Phase 1 and never reopened - all lookups in Phase 2 are purely in-memory
 - Every order record produces exactly one output line in `INVOICE.TXT` regardless of found/not-found result
 - Tested on IBM z/OS with Enterprise COBOL
