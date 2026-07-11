@@ -1,4 +1,4 @@
-# Task 09 — Client Duplicate Detection (VSAM KSDS + SORT + PS Report)
+# Task 09 - Client Duplicate Detection (VSAM KSDS + SORT + PS Report)
 
 ## Overview
 
@@ -15,17 +15,17 @@ Any group with more than one record is written to a PS duplicate report. A summa
 | `SRTDD` | Sort work file | SD | WORK | Internal sort work area |
 | `REPDD` | [`DUPLICATE.REPORT`](DATA/DUPLCT.REPORT) | PS | OUTPUT | Duplicate records report, LRECL=80, RECFM=F |
 
-### VSAM Record Layout (`VSAMDD`) — LRECL=74
+### VSAM Record Layout (`VSAMDD`) - LRECL=74
 
 | Field | Picture | Offset | Description |
 |---|---|---|---|
-| `MAST-ID` | `X(6)` | 1 | **Primary key** — client ID |
+| `MAST-ID` | `X(6)` | 1 | **Primary key** - client ID |
 | `MAST-NAME` | `X(30)` | 7 | Full name |
 | `MAST-BIRTH` | `X(8)` | 37 | Birth date (`YYYYMMDD`) |
 | `MAST-PASSPORT` | `X(10)` | 45 | Passport number |
 | `MAST-CITY` | `X(20)` | 55 | City |
 
-### Report Record Layout (`REPDD`) — LRECL=80, RECFM=F
+### Report Record Layout (`REPDD`) - LRECL=80, RECFM=F
 
 | Field | Picture | Content |
 |---|---|---|
@@ -56,32 +56,32 @@ Two clients are considered potential duplicates if both conditions match:
 | Condition | Action |
 |---|---|
 | `GROUP-COUNT > 1` after key change | Write all buffered records to `REPDD`, increment `TOTAL-GROUPS` and `TOTAL-DUPS` |
-| `GROUP-COUNT = 1` | Skip — no duplicate, nothing written |
+| `GROUP-COUNT = 1` | Skip - no duplicate, nothing written |
 | Buffer overflow (`GROUP-COUNT >= 50`) | Warning to SYSOUT, extra record dropped |
 
 ---
 
 ## Program Flow
 
-1. **PERFORM OPEN-REPORT-FILE** — open `REPDD` as OUTPUT
+1. **PERFORM OPEN-REPORT-FILE** - open `REPDD` as OUTPUT
 2. **SORT** `CLIENT-SORT-WORK`:
    - Sort keys: `SRT-NAME ASC`, `SRT-BIRTH ASC`, `SRT-ID ASC`
    - Input: `USING CLIENT-MASTER-FILE` (reads `VSAMDD` automatically)
    - Output: `OUTPUT PROCEDURE IS PRCSS-SORT-REC THRU PROCESS-EXIT`
 3. **PRCSS-SORT-REC** (OUTPUT PROCEDURE):
-   - **RETURN** first record from sort work — save `WS-CUR-NAME`, `WS-CUR-BIRTH`, call `ADD-TO-GROUP-BUFFER`
+   - **RETURN** first record from sort work - save `WS-CUR-NAME`, `WS-CUR-BIRTH`, call `ADD-TO-GROUP-BUFFER`
    - **PERFORM UNTIL EOF:**
      - **RETURN** next sorted record
      - If `SRT-NAME = WS-CUR-NAME` AND `SRT-BIRTH = WS-CUR-BIRTH`:
-       - **PERFORM ADD-TO-GROUP-BUFFER** — append to current group
+       - **PERFORM ADD-TO-GROUP-BUFFER** - append to current group
      - Else (key change):
-       - **PERFORM WRITE-DUPLICATE-GROUP** — flush previous group if `COUNT > 1`
+       - **PERFORM WRITE-DUPLICATE-GROUP** - flush previous group if `COUNT > 1`
        - Reset `WS-CUR-NAME`, `WS-CUR-BIRTH`, `WS-GROUP-COUNT = 0`
-       - **PERFORM ADD-TO-GROUP-BUFFER** — start new group
-   - After loop: **PERFORM WRITE-DUPLICATE-GROUP** — flush last group
-4. Check `SORT-RETURN NOT = 0` — `DISPLAY` error and `STOP RUN`
+       - **PERFORM ADD-TO-GROUP-BUFFER** - start new group
+   - After loop: **PERFORM WRITE-DUPLICATE-GROUP** - flush last group
+4. Check `SORT-RETURN NOT = 0` - `DISPLAY` error and `STOP RUN`
 5. **PERFORM CLOSE-REPORT-FILE**
-6. **PERFORM DISPLAY-SUMMARY-REPORT** — print statistics to SYSOUT
+6. **PERFORM DISPLAY-SUMMARY-REPORT** - print statistics to SYSOUT
 7. `STOP RUN`
 
 ### ADD-TO-GROUP-BUFFER
@@ -120,9 +120,9 @@ SUSPICIOUS RECORDS FOUND:     8
 
 ## How to Run
 
-1. **Define VSAM cluster** — run [`DEFKSDS.jcl`](JCL/DEFKSDS.jcl)
-2. **Load initial master data** — load [`CLIENT.MAST.VSAM`](DATA/CLIENT.MAST.VSAM) into the KSDS cluster either via REPRO (see [`DATAVSAM.jcl`](../../JCL%20SAMPLES/DATAVSAM.jcl)) or manually through **File Manager** in ISPF 
-3. **Compile and run** — run [`COMPRUN.jcl`](JCL/COMPRUN.jcl)
+1. **Define VSAM cluster** - run [`DEFKSDS.jcl`](JCL/DEFKSDS.jcl)
+2. **Load initial master data** - load [`CLIENT.MAST.VSAM`](DATA/CLIENT.MAST.VSAM) into the KSDS cluster either via REPRO (see [`DATAVSAM.jcl`](../../JCL%20SAMPLES/DATAVSAM.jcl)) or manually through **File Manager** in ISPF 
+3. **Compile and run** - run [`COMPRUN.jcl`](JCL/COMPRUN.jcl)
 4. **Compare output files and sysout** - see [`DUPLCT.REPORT`](DATA/DUPLCT.REPORT) and [`SYSOUT.txt`](OUTPUT/SYSOUT.txt)
 
 > **PROC reference:** [`COMPRUN.jcl`](JCL/COMPRUN.jcl) uses the [`MYCOMPGO`](../../JCLPROC/MYCOMPGO.jcl) catalogued procedure for compilation and execution. Make sure [`MYCOMPGO`](../../JCLPROC/MYCOMPGO.jcl) is available in your system's `PROCLIB` before submitting.
@@ -131,23 +131,23 @@ SUSPICIOUS RECORDS FOUND:     8
 
 ## Key COBOL Concepts Used
 
-- `SORT ... USING ... OUTPUT PROCEDURE IS` — internal COBOL sort with a custom output procedure; the `USING` clause reads `CLIENT-MASTER-FILE` automatically, no explicit `OPEN`/`READ`/`CLOSE` needed for the input file
-- `SD` (Sort Description) — describes the sort work file record layout used as sort keys
-- `RETURN ... AT END` — equivalent of `READ` inside an output procedure; fetches the next sorted record one at a time
-- `OUTPUT PROCEDURE ... THRU` — defines a range of paragraphs that process sorted records; must end with `GO TO PROCESS-EXIT` to avoid fall-through
-- `OCCURS 50 TIMES` — internal table used as a group buffer; stores up to 50 records per duplicate group before flushing to the report
-- Control-break pattern — key-change detection (`IF NAME = CURRENT AND BIRTH = CURRENT`) with end-of-file flush of the last group; classic batch accumulation technique
-- `SORT-RETURN` — system field set by COBOL after `SORT`; `0` = success, non-zero = failure
-- `ACCESS MODE IS SEQUENTIAL` on KSDS — reads records in primary key order; combined with the sort, guarantees deterministic output order
+- `SORT ... USING ... OUTPUT PROCEDURE IS` - internal COBOL sort with a custom output procedure; the `USING` clause reads `CLIENT-MASTER-FILE` automatically, no explicit `OPEN`/`READ`/`CLOSE` needed for the input file
+- `SD` (Sort Description) - describes the sort work file record layout used as sort keys
+- `RETURN ... AT END` - equivalent of `READ` inside an output procedure; fetches the next sorted record one at a time
+- `OUTPUT PROCEDURE ... THRU` - defines a range of paragraphs that process sorted records; must end with `GO TO PROCESS-EXIT` to avoid fall-through
+- `OCCURS 50 TIMES` - internal table used as a group buffer; stores up to 50 records per duplicate group before flushing to the report
+- Control-break pattern - key-change detection (`IF NAME = CURRENT AND BIRTH = CURRENT`) with end-of-file flush of the last group; classic batch accumulation technique
+- `SORT-RETURN` - system field set by COBOL after `SORT`; `0` = success, non-zero = failure
+- `ACCESS MODE IS SEQUENTIAL` on KSDS - reads records in primary key order; combined with the sort, guarantees deterministic output order
 
 ---
 
 ## Known Limitations
 
-- **Group buffer capped at 50 records** — if a duplicate group contains more than 50 entries,
+- **Group buffer capped at 50 records** - if a duplicate group contains more than 50 entries,
   excess records are silently excluded from `REPDD`. A `WARNING: GROUP BUFFER OVERFLOW` message
   is printed to SYSOUT, but the job continues. `TOTAL-DUPS` will be understated in this case.
-- **`SUSPICIOUS RECORDS FOUND` counts all records in a group, not just the extras** — for a
+- **`SUSPICIOUS RECORDS FOUND` counts all records in a group, not just the extras** - for a
   group of 3 identical clients, the counter increments by 3 (not 2). This is by design: the
   report shows all members of a duplicate group so an analyst can review every record.
 
@@ -155,9 +155,9 @@ SUSPICIOUS RECORDS FOUND:     8
 
 ## Notes
 
-- The VSAM file is sorted by `CLIENT-ID` (primary key), but duplicates are detected on `NAME + BIRTH-DATE` — that is why an internal `SORT` is required before grouping
+- The VSAM file is sorted by `CLIENT-ID` (primary key), but duplicates are detected on `NAME + BIRTH-DATE` - that is why an internal `SORT` is required before grouping
 - The group buffer holds up to **50 records** per group; if a group exceeds this limit, extra records are dropped with a warning to SYSOUT but do not stop the job
-- The last group is flushed **after** the `PERFORM UNTIL EOF` loop ends — without this final `PERFORM WRITE-DUPLICATE-GROUP`, the last group would never be written (classic end-of-file accumulation bug)
-- Records with `GROUP-COUNT = 1` are silently skipped and never appear in the report — only confirmed duplicates (2+ records with the same key) are reported
+- The last group is flushed **after** the `PERFORM UNTIL EOF` loop ends - without this final `PERFORM WRITE-DUPLICATE-GROUP`, the last group would never be written (classic end-of-file accumulation bug)
+- Records with `GROUP-COUNT = 1` are silently skipped and never appear in the report - only confirmed duplicates (2+ records with the same key) are reported
 - `SORT-RETURN` is checked after the `SORT` statement completes; a non-zero return code means the sort work file failed or ran out of space
 - Tested on IBM z/OS with Enterprise COBOL
