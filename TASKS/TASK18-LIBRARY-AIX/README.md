@@ -1,10 +1,10 @@
-# Task 18 — VSAM Alternate Index: Library Book Finder
+# Task 18 - VSAM Alternate Index: Library Book Finder
 
 ## Overview
 
 Reads author names from a search request file [`SEARCH.REQ`](DATA/SEARCH.REQ), and for each author performs a VSAM `START` on the Alternate Index (`VSAM-AUTHOR`) to position on the first matching book. Then uses `READ NEXT` to browse all books by that author in AIX order. Found books are written to a result report file [`RESULT.RPT`](DATA/RESULT.RPT). Authors not found in the catalog trigger a NOT FOUND line. A summary of statistics is printed to SYSOUT at the end.
 
-The core technique is **VSAM Dynamic Access with an Alternate Index (AIX)**: `START` positions on the AIX key, and `READ NEXT` browses records in AIX order until the author field changes — allowing retrieval of all books by a given author without knowing their ISBNs.
+The core technique is **VSAM Dynamic Access with an Alternate Index (AIX)**: `START` positions on the AIX key, and `READ NEXT` browses records in AIX order until the author field changes - allowing retrieval of all books by a given author without knowing their ISBNs.
 
 ---
 
@@ -12,19 +12,19 @@ The core technique is **VSAM Dynamic Access with an Alternate Index (AIX)**: `ST
 
 | DD Name | File | Org | Mode | Description |
 |---|---|---|---|---|
-| `VSAMDD` | [`LIBRARY.MASTER.VSAM`](DATA/LIBRARY.MASTER) | VSAM KSDS | INPUT | Base cluster — accessed via PATH (AIX) |
-| `VSAMDD1` | `LIBRARY.MASTER.VSAM.PATH` | VSAM PATH | INPUT | PATH over AIX — used for AIX-based START/READ NEXT |
+| `VSAMDD` | [`LIBRARY.MASTER.VSAM`](DATA/LIBRARY.MASTER) | VSAM KSDS | INPUT | Base cluster - accessed via PATH (AIX) |
+| `VSAMDD1` | `LIBRARY.MASTER.VSAM.PATH` | VSAM PATH | INPUT | PATH over AIX - used for AIX-based START/READ NEXT |
 | `SRCHDD` | [`SEARCH.REQ`](DATA/SEARCH.REQ) | PS | INPUT | Author search requests, RECFM=FB, LRECL=80 |
 | `RSLTDD` | [`RESULT.RPT`](DATA/RESULT.RPT) | PS | OUTPUT | Search results report, RECFM=VB, LRECL=84 |
 
-### Input Record Layout — (`SRCHDD`), LRECL=80, RECFM=FB
+### Input Record Layout - (`SRCHDD`), LRECL=80, RECFM=FB
 
 | Field | Picture | Offset | Description |
 |---|---|---|---|
 | `SEARCH-AUTHOR` | `X(20)` | 1 | Author name to search |
 | FILLER | `X(60)` | 21 | Unused |
 
-### VSAM Record Layout — (`VSAMDD`), LRECL=64
+### VSAM Record Layout - (`VSAMDD`), LRECL=64
 
 | Field | Picture | Offset | Description |
 |---|---|---|---|
@@ -34,7 +34,7 @@ The core technique is **VSAM Dynamic Access with an Alternate Index (AIX)**: `ST
 | `VSAM-YEAR` | `X(4)` | 61 | Publication year |
 | FILLER | `X(16)` | 65 | Unused (padded to RECORDSIZE 64,64) |
 
-### Output Record Layout — (`RSLTDD`), RECFM=VB, LRECL=84
+### Output Record Layout - (`RSLTDD`), RECFM=VB, LRECL=84
 
 | Field | Picture | Description |
 |---|---|---|
@@ -56,11 +56,11 @@ MAIN-LOGIC.
     STOP RUN.
 ```
 
-### Phase 1 — `OPEN-ALL-FILES`
+### Phase 1 - `OPEN-ALL-FILES`
 
-Opens `VSAM-FILE` (INPUT), `SEARCH-FILE` (INPUT), and `RESULT-FILE` (OUTPUT). Checks FILE STATUS after each OPEN — if not `'00'`, displays an error and stops.
+Opens `VSAM-FILE` (INPUT), `SEARCH-FILE` (INPUT), and `RESULT-FILE` (OUTPUT). Checks FILE STATUS after each OPEN - if not `'00'`, displays an error and stops.
 
-### Phase 2 — `PROCESS-ALL-SEARCHES` (main loop)
+### Phase 2 - `PROCESS-ALL-SEARCHES` (main loop)
 
 Loops over all author names from `SEARCH-FILE`. Blank lines (`SEARCH-AUTHOR = SPACES`) are skipped silently. For each valid author the program delegates to `SEARCH-AUTHOR-BOOKS`.
 
@@ -77,7 +77,7 @@ PROCESS-ALL-SEARCHES:
 
 `READ-SEARCH-AUTHOR` reads one record from `SEARCH-FILE`, increments `READ-COUNTER`, and sets `EOF` flag at end of file.
 
-### Phase 3 — `SEARCH-AUTHOR-BOOKS` (AIX search per author)
+### Phase 3 - `SEARCH-AUTHOR-BOOKS` (AIX search per author)
 
 For each author writes a HEADER-LINE to `RESULT-FILE`, then performs a VSAM `START` on the Alternate Index to position on the first matching book.
 
@@ -95,7 +95,7 @@ SEARCH-AUTHOR-BOOKS:
   WRITE SEPARATOR-LINE (40 dashes)
 ```
 
-### Phase 4 — `READ-MATCHING-BOOKS` (AIX browse)
+### Phase 4 - `READ-MATCHING-BOOKS` (AIX browse)
 
 Reads records sequentially via `READ NEXT` in AIX order while `VSAM-AUTHOR` matches `SEARCH-AUTHOR`. Stops when the author field changes or end-of-file is reached.
 
@@ -124,7 +124,7 @@ READ-MATCHING-BOOKS:
 |---|---|---|
 | Base Cluster | `LIBRARY.MASTER.VSAM` | KSDS keyed by `VSAM-ISBN` (10 bytes, offset 0) |
 | Alternate Index | `LIBRARY.MASTER.VSAM.AIX` | Keyed by `VSAM-AUTHOR` (20 bytes, offset 10), NONUNIQUEKEY |
-| PATH | `LIBRARY.MASTER.VSAM.PATH` | Logical link between AIX and base cluster — used in COBOL as `VSAMDD1` |
+| PATH | `LIBRARY.MASTER.VSAM.PATH` | Logical link between AIX and base cluster - used in COBOL as `VSAMDD1` |
 
 `NONUNIQUEKEY` (= `WITH DUPLICATES` in COBOL) allows multiple books to share the same author key. `UPGRADE` keeps the AIX synchronized automatically when the base cluster is updated.
 
@@ -135,32 +135,32 @@ READ-MATCHING-BOOKS:
 | Operation | Random access | AIX browse |
 |---|---|---|
 | Position | `READ` with primary key | `START KEY IS EQUAL TO <alt-key>` |
-| Traverse | — | `READ NEXT` (returns records in AIX key order) |
+| Traverse | - | `READ NEXT` (returns records in AIX key order) |
 | End detection | FILE STATUS `'23'` (not found) | Author field changes OR AT END |
 | Access mode required | RANDOM | DYNAMIC |
 
-`ACCESS MODE IS DYNAMIC` in FILE-CONTROL is mandatory — it enables both random (`START`) and sequential (`READ NEXT`) access in the same program.
+`ACCESS MODE IS DYNAMIC` in FILE-CONTROL is mandatory - it enables both random (`START`) and sequential (`READ NEXT`) access in the same program.
 
 ---
 
 ## Program Flow
 
-1.  **PERFORM OPEN-ALL-FILES** — opens `VSAMDD` (INPUT), `SRCHDD` (INPUT), and `RSLTDD` (OUTPUT); checks FILE STATUS after each open.
-2.  **PERFORM READ-SEARCH-AUTHOR** — reads first record from `SEARCH-FILE`; sets EOF flag if file is empty.
-3.  **PERFORM PROCESS-ALL-SEARCHES** — main loop `UNTIL EOF` on `SEARCH-FILE`.
+1.  **PERFORM OPEN-ALL-FILES** - opens `VSAMDD` (INPUT), `SRCHDD` (INPUT), and `RSLTDD` (OUTPUT); checks FILE STATUS after each open.
+2.  **PERFORM READ-SEARCH-AUTHOR** - reads first record from `SEARCH-FILE`; sets EOF flag if file is empty.
+3.  **PERFORM PROCESS-ALL-SEARCHES** - main loop `UNTIL EOF` on `SEARCH-FILE`.
     *   **IF `SEARCH-AUTHOR = SPACES`** → skip silently; increment `READ-COUNTER` only.
     *   **ELSE** → increment `SEARCHES-PROCESSED`; **PERFORM SEARCH-AUTHOR-BOOKS**.
-        *   **WRITE HEADER-LINE** — writes `"SEARCH FOR: <author>"` to `RESULT-FILE`.
+        *   **WRITE HEADER-LINE** - writes `"SEARCH FOR: <author>"` to `RESULT-FILE`.
         *   **START VSAM-FILE KEY IS EQUAL TO VSAM-AUTHOR**.
             *   **INVALID KEY** → increment `AUTHORS-NOT-FOUND`; write NOT-FOUND-LINE.
             *   **NOT INVALID KEY** → increment `AUTHORS-FOUND`; **PERFORM READ-MATCHING-BOOKS**.
                 *   **READ VSAM-FILE NEXT RECORD** in a loop until author changes or AT END.
                 *   **IF author matches** → increment `BOOKS-FOUND`; write DETAIL-LINE.
                 *   **IF author changes** → set EOF-AUTHOR flag; exit browse loop.
-        *   **WRITE SEPARATOR-LINE** — writes 40 dashes after each author block.
-    *   **PERFORM READ-SEARCH-AUTHOR** — reads next record from `SEARCH-FILE`.
-4.  **PERFORM CLOSE-ALL-FILES** — closes `VSAMDD`, `SRCHDD`, and `RSLTDD`.
-5.  **PERFORM DISPLAY-SUMMARY** — prints final statistics to SYSOUT (searches read, processed, authors found/not found, books found).
+        *   **WRITE SEPARATOR-LINE** - writes 40 dashes after each author block.
+    *   **PERFORM READ-SEARCH-AUTHOR** - reads next record from `SEARCH-FILE`.
+4.  **PERFORM CLOSE-ALL-FILES** - closes `VSAMDD`, `SRCHDD`, and `RSLTDD`.
+5.  **PERFORM DISPLAY-SUMMARY** - prints final statistics to SYSOUT (searches read, processed, authors found/not found, books found).
 6.  **STOP RUN**.
 
 ---
@@ -169,16 +169,16 @@ READ-MATCHING-BOOKS:
 
 | Step | Program | COND | Description |
 |---|---|---|---|
-| STEP005 | IDCAMS | — | Delete existing VSAM cluster (SET MAXCC=0 to suppress RC=8 if not found), then DEFINE new KSDS cluster |
-| STEP010 | IDCAMS | (04,LT) | REPRO inline data into `LIBRARY.MASTER.VSAM` — loads 14 book records |
+| STEP005 | IDCAMS | - | Delete existing VSAM cluster (SET MAXCC=0 to suppress RC=8 if not found), then DEFINE new KSDS cluster |
+| STEP010 | IDCAMS | (04,LT) | REPRO inline data into `LIBRARY.MASTER.VSAM` - loads 14 book records |
 | STEP015 | IDCAMS | (04,LT) | DEFINE AIX on `VSAM-AUTHOR` field (KEYS(20 10), NONUNIQUEKEY, UPGRADE) |
 | STEP020 | IDCAMS | (04,LT) | DEFINE PATH connecting the AIX to the base cluster |
-| STEP025 | IDCAMS | (04,LT) | BLDINDEX — physically builds the AIX from the loaded base cluster |
+| STEP025 | IDCAMS | (04,LT) | BLDINDEX - physically builds the AIX from the loaded base cluster |
 | STEP030 | IEFBR14 | (04,LT) | Delete `SEARCH.REQ` if it already exists (MOD,DELETE,DELETE) |
-| STEP035 | IEBGENER | (04,LT) | Create `SEARCH.REQ` from inline SYSIN — 7 author names (includes 2 not in catalog) |
+| STEP035 | IEBGENER | (04,LT) | Create `SEARCH.REQ` from inline SYSIN - 7 author names (includes 2 not in catalog) |
 | STEP040 | IEFBR14 | (04,LT) | Delete `RESULT.RPT` if it already exists |
 | STEP045 | IGYWCL | (04,LT) | Compile and link-edit `VSAM18` COBOL source from `Z73460.COB.PRAC(VSAM18)` |
-| STEP050 | VSAM18 | (04,LT) | Execute the search program — reads `SEARCH.REQ`, searches VSAM via AIX, writes `RESULT.RPT` |
+| STEP050 | VSAM18 | (04,LT) | Execute the search program - reads `SEARCH.REQ`, searches VSAM via AIX, writes `RESULT.RPT` |
 
 `COND=(04,LT)` means: skip this step if any previous step RC > 4 (i.e., run only if all previous steps passed cleanly).
 
@@ -216,20 +216,20 @@ BOOKS FOUND (TOTAL):   14
 
 ## How to Run
 
-1. Submit [`ALLSTEPS.jcl`](JCL/ALLSTEPS.jcl) — it handles everything end-to-end: defines VSAM, loads data, builds AIX, creates search file, compiles and runs the program
+1. Submit [`ALLSTEPS.jcl`](JCL/ALLSTEPS.jcl) - it handles everything end-to-end: defines VSAM, loads data, builds AIX, creates search file, compiles and runs the program
 
 > **Note:** The JCL compiles source from `Z73460.COB.PRAC(VSAM18)` using the `IGYWCL` procedure and loads the compiled module into `Z73460.LOAD(VSAM18)`. Make sure your source PDS and load library names match your system before submitting.
 
-> **Note:** [`RESULT.RPT`](DATA/RESULT.RPT) (`RSLTDD`) is defined as `RECFM=VB, LRECL=84` — variable-blocked format with 4-byte RDW prefix. The COBOL program writes 80-byte logical records via `RESULT-REC PIC X(80)`.
+> **Note:** [`RESULT.RPT`](DATA/RESULT.RPT) (`RSLTDD`) is defined as `RECFM=VB, LRECL=84` - variable-blocked format with 4-byte RDW prefix. The COBOL program writes 80-byte logical records via `RESULT-REC PIC X(80)`.
 >
 > **Alternative:** To run individual steps separately:
 
-2. [`DEFKSDS.jcl`](JCL/DEFKSDS.jcl) — Define VSAM cluster (STEP005)
-3. [`DATAVSAM.jcl`](../../JCL%20SAMPLES/DATAVSAM.jcl) — Load data into base cluster (STEP010)
-4. [`DEFAIX.jcl`](JCL/DEFAIX.jcl) — Define Alternate Index (STEP015)
-5. [`DEFPATH.jcl`](JCL/DEFPATH.jcl) — Define PATH (STEP020)
-6. [`BLDINDX.jcl`](JCL/BLDINDX.jcl) — Build the AIX (STEP025)
-7. [`COMPRUN.jcl`](JCL/COMPRUN.jcl) — Compile and run VSAM18 program (STEP030-STEP050)
+2. [`DEFKSDS.jcl`](JCL/DEFKSDS.jcl) - Define VSAM cluster (STEP005)
+3. [`DATAVSAM.jcl`](../../JCL%20SAMPLES/DATAVSAM.jcl) - Load data into base cluster (STEP010)
+4. [`DEFAIX.jcl`](JCL/DEFAIX.jcl) - Define Alternate Index (STEP015)
+5. [`DEFPATH.jcl`](JCL/DEFPATH.jcl) - Define PATH (STEP020)
+6. [`BLDINDX.jcl`](JCL/BLDINDX.jcl) - Build the AIX (STEP025)
+7. [`COMPRUN.jcl`](JCL/COMPRUN.jcl) - Compile and run VSAM18 program (STEP030-STEP050)
 
 Final step. Compare output files and sysout - see [`RESULT.RPT`](DATA/RESULT.RPT) and [`SYSOUT.txt`](OUTPUT/SYSOUT.txt)
 
@@ -237,21 +237,21 @@ Final step. Compare output files and sysout - see [`RESULT.RPT`](DATA/RESULT.RPT
 
 ## Key COBOL Concepts Used
 
-- **`ACCESS MODE IS DYNAMIC`** — mandatory for combining `START` (random positioning) and `READ NEXT` (sequential browsing) on the same file in the same program; without DYNAMIC, you can only do one or the other
-- **`ALTERNATE RECORD KEY IS VSAM-AUTHOR WITH DUPLICATES`** — declares the AIX key in FILE-CONTROL; `WITH DUPLICATES` allows multiple records to share the same alternate key value (multiple books per author)
-- **`START KEY IS EQUAL TO`** — positions the file cursor on the first AIX record matching the given author; does not read a record — only positions; `INVALID KEY` fires if no matching record exists
-- **`READ NEXT`** — after a successful `START`, each `READ NEXT` returns the next record in AIX key order; records with the same AIX key (same author) are returned consecutively
-- **`NONUNIQUEKEY` / `WITH DUPLICATES`** — the AIX allows multiple base cluster records to map to the same alternate key; without this, each author could have only one book
-- **`UPGRADE`** — the AIX is automatically rebuilt whenever the base cluster is updated; without UPGRADE, the AIX must be rebuilt manually with BLDINDEX after each load
-- **`PATH`** — a logical name that ties together the AIX and the base cluster; the COBOL program references the PATH via `VSAMDD1` DD name for AIX-based access
+- **`ACCESS MODE IS DYNAMIC`** - mandatory for combining `START` (random positioning) and `READ NEXT` (sequential browsing) on the same file in the same program; without DYNAMIC, you can only do one or the other
+- **`ALTERNATE RECORD KEY IS VSAM-AUTHOR WITH DUPLICATES`** - declares the AIX key in FILE-CONTROL; `WITH DUPLICATES` allows multiple records to share the same alternate key value (multiple books per author)
+- **`START KEY IS EQUAL TO`** - positions the file cursor on the first AIX record matching the given author; does not read a record - only positions; `INVALID KEY` fires if no matching record exists
+- **`READ NEXT`** - after a successful `START`, each `READ NEXT` returns the next record in AIX key order; records with the same AIX key (same author) are returned consecutively
+- **`NONUNIQUEKEY` / `WITH DUPLICATES`** - the AIX allows multiple base cluster records to map to the same alternate key; without this, each author could have only one book
+- **`UPGRADE`** - the AIX is automatically rebuilt whenever the base cluster is updated; without UPGRADE, the AIX must be rebuilt manually with BLDINDEX after each load
+- **`PATH`** - a logical name that ties together the AIX and the base cluster; the COBOL program references the PATH via `VSAMDD1` DD name for AIX-based access
 
 ---
 
 ## Notes
 
 - `SET MAXCC=0` in STEP005 prevents the job from failing with RC=8 if the VSAM cluster does not yet exist at delete time
-- The program checks FILE STATUS after every OPEN, WRITE, and key error — bad status causes immediate `STOP RUN` with a descriptive message
+- The program checks FILE STATUS after every OPEN, WRITE, and key error - bad status causes immediate `STOP RUN` with a descriptive message
 - Blank lines in `SEARCH.REQ` are skipped silently (`IF SEARCH-AUTHOR NOT = SPACES`) but still counted in `READ-COUNTER`
 - `READ-COUNTER` counts all records read from `SEARCH-FILE` (including blank lines); `SEARCHES-PROCESSED` counts only non-blank author names actually searched
-- The AIX browse stops as soon as `VSAM-AUTHOR` changes — this works correctly because AIX returns records in author-key order, so all books by the same author are consecutive
+- The AIX browse stops as soon as `VSAM-AUTHOR` changes - this works correctly because AIX returns records in author-key order, so all books by the same author are consecutive
 - Tested on IBM z/OS with Enterprise COBOL
