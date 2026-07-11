@@ -1,4 +1,4 @@
-# Task 06 — Client Database Cleanup and Archiving (VSAM Dynamic + Delete)
+# Task 06 - Client Database Cleanup and Archiving (VSAM Dynamic + Delete)
 
 ## Overview
 
@@ -14,14 +14,14 @@ Reads all records from a VSAM KSDS client master file [`CLIENT.MASTER`](DATA/CLI
 | `CLTDD` | [`CLIENT.MASTER`](DATA/CLIENT.MASTER.BEFORE) | KSDS | I-O | Client master file (read + delete) |
 | `OUTDD` | [`ARCHIVE.OLD`](DATA/ARCHIVE.OLD) | PS | OUTPUT | Archive file for deleted clients |
 
-### Cutoff Parameter Record Layout (`INDD`) — LRECL=80, RECFM=F
+### Cutoff Parameter Record Layout (`INDD`) - LRECL=80, RECFM=F
 
 | Field | PIC | Position | Description |
 |---|---|---|---|
 | `PARAM-DATE` | `X(8)` | 1–8 | Cutoff date in `YYYYMMDD` format |
 | FILLER | `X(72)` | 9–80 | Unused |
 
-### Client Master Record Layout (`CLTDD`) — KSDS, LRECL=34
+### Client Master Record Layout (`CLTDD`) - KSDS, LRECL=34
 
 | Field | PIC | Position | Description |
 |---|---|---|---|
@@ -29,7 +29,7 @@ Reads all records from a VSAM KSDS client master file [`CLIENT.MASTER`](DATA/CLI
 | `CLIENT-NAME` | `X(20)` | 7–26 | Client full name |
 | `CLIENT-LAST-DATE` | `9(8)` | 27–34 | Last activity date `YYYYMMDD` (numeric) |
 
-### Archive Record Layout (`OUTDD`) — PS, LRECL=34, RECFM=FB
+### Archive Record Layout (`OUTDD`) - PS, LRECL=34, RECFM=FB
 
 | Field | PIC | Position | Description |
 |---|---|---|---|
@@ -53,7 +53,7 @@ The program implements a conditional deletion logic where records are compared a
 
 ## Program Flow
 
-1. **OPEN** — `PARAM.FILE` (INPUT), `CLIENT.MASTER` (I-O), and `ARCHIVE.OLD` (OUTPUT).
+1. **OPEN** - `PARAM.FILE` (INPUT), `CLIENT.MASTER` (I-O), and `ARCHIVE.OLD` (OUTPUT).
 2. **READ** cutoff date from `PARAM.FILE` into `WS-CUTOFF-DATE`.
 3. **START** VSAM master at the beginning of the file (Key >= Low-Values); check FILE STATUS.
 4. **READ NEXT** record from VSAM:
@@ -69,7 +69,7 @@ The program implements a conditional deletion logic where records are compared a
      - Skip deletion.
      - Increment `REC-KEPT`.
 6. Go to step 4 (Read Next).
-7. **DISPLAY SUMMARY** — print totals for records read, deleted, and kept.
+7. **DISPLAY SUMMARY** - print totals for records read, deleted, and kept.
 8. **CLOSE** all files → **STOP RUN**.
 
 ---
@@ -110,10 +110,10 @@ RECORDS KEPT:       5
 
 ## How to Run
 
-1. **Define VSAM cluster** — run [`DEFKSDS.jcl`](JCL/DEFKSDS.jcl)
-2. **Load initial master data** — load [`CLIENT.MASTER.BEFORE`](DATA/CLIENT.MASTER.BEFORE) into the KSDS cluster either via REPRO (see [`DATAVSAM.jcl`](../../JCL%20SAMPLES/DATAVSAM.jcl)) or manually through **File Manager** in ISPF
-3. **Compile and run** — run [`COMPRUN.jcl`](JCL/COMPRUN.jcl)
-3. **Compile and run** — run [`COMPRUN.jcl`](JCL/COMPRUN.jcl)
+1. **Define VSAM cluster** - run [`DEFKSDS.jcl`](JCL/DEFKSDS.jcl)
+2. **Load initial master data** - load [`CLIENT.MASTER.BEFORE`](DATA/CLIENT.MASTER.BEFORE) into the KSDS cluster either via REPRO (see [`DATAVSAM.jcl`](../../JCL%20SAMPLES/DATAVSAM.jcl)) or manually through **File Manager** in ISPF
+3. **Compile and run** - run [`COMPRUN.jcl`](JCL/COMPRUN.jcl)
+3. **Compile and run** - run [`COMPRUN.jcl`](JCL/COMPRUN.jcl)
 4. **Compare output files and sysout** - see [`CLIENT.MASTER.AFTER`](DATA/CLIENT.MASTER.AFTER), [`ARCHIVE.OLD`](DATA/ARCHIVE.OLD) AND [`SYSOUT.txt`](OUTPUT/SYSOUT.txt)
 
 > **PROC reference:** [`COMPRUN.jcl`](JCL/COMPRUN.jcl) uses the [`MYCOMPGO`](../../JCLPROC/MYCOMPGO.jcl) catalogued procedure for compilation and execution. Make sure [`MYCOMPGO`](../../JCLPROC/MYCOMPGO.jcl) is available in your system's `PROCLIB` before submitting.
@@ -122,10 +122,10 @@ RECORDS KEPT:       5
 
 ## Key COBOL Concepts Used
 
-- `ACCESS MODE IS DYNAMIC` — allows combining `START` (random positioning) and `READ NEXT` (sequential browsing)
-- `DELETE` — removes the record most recently read by a successful sequential READ
-- `START` — used here to position the cursor at the first record of the KSDS cluster
-- Date comparison — numeric comparison of `YYYYMMDD` format (higher values = newer dates)
+- `ACCESS MODE IS DYNAMIC` - allows combining `START` (random positioning) and `READ NEXT` (sequential browsing)
+- `DELETE` - removes the record most recently read by a successful sequential READ
+- `START` - used here to position the cursor at the first record of the KSDS cluster
+- Date comparison - numeric comparison of `YYYYMMDD` format (higher values = newer dates)
 
 ---
 
