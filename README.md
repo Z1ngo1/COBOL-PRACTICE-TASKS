@@ -2,15 +2,15 @@ COBOL practice tasks with DB2, JCL, and VSAM examples
 
 # 📚 COBOL Practice Tasks
 
-> ⚠️ **Disclaimer:** All programs in this repository are **personal learning exercises** — written,
+> ⚠️ **Disclaimer:** All programs in this repository are **personal learning exercises** - written,
 > designed, and tested entirely by me while studying IBM mainframe development. They may be
 > **incomplete**, may not cover all edge cases or error conditions, and are not intended for
-> production use. Some tasks may share **similar structure, logic, or concepts** — this is
+> production use. Some tasks may share **similar structure, logic, or concepts** - this is
 > intentional, as certain patterns (table lookup, control break, batch commit, etc.) are repeated
 > across different contexts to reinforce understanding. Think of this repository as a solid
 > **reference point for beginners** who are just getting started with COBOL, JCL, VSAM, DB2, and
-> related mainframe technologies. Every program here was built from scratch — no copy-paste,
-> no AI-generated code. If something helps you — great!
+> related mainframe technologies. Every program here was built from scratch - no copy-paste,
+> no AI-generated code. If something helps you - great!
 
 ---
 
@@ -26,9 +26,9 @@ This repository contains hands-on COBOL batch programs built on IBM z/OS as part
 ```
 ## Repository Structure
 COBOL-PRACTICE-TASKS/  
-├── JCL SAMPLES/ — Reusable JCL templates (compile, run, VSAM setup, etc.)  
-├── JCLPROC/ — Catalogued JCL procedure used by all tasks  
-└── TASKS/ — Individual practice tasks (TASK01 through TASK32)  
+├── JCL SAMPLES/ - Reusable JCL templates (compile, run, VSAM setup, etc.)  
+├── JCLPROC/ - Catalogued JCL procedure used by all tasks  
+└── TASKS/ - Individual practice tasks (TASK01 through TASK32)  
 ```
 
 ---
@@ -39,19 +39,19 @@ A grouped overview of all tasks by the main technology combination used. Click a
 
 ### Pure Sequential (PS only)
 
-> No VSAM, no DB2 — only flat sequential files and core COBOL logic.
+> No VSAM, no DB2 - only flat sequential files and core COBOL logic.
 
 | Task | Name | Key Technique |
 |------|------|---------------|
-| [TASK12](TASKS/TASK12-CONTROL-BREAK-REPORT/) | Multi-Level Sales Report | Control Break — 3-level totals (shop → region → grand) |
+| [TASK12](TASKS/TASK12-CONTROL-BREAK-REPORT/) | Multi-Level Sales Report | Control Break - 3-level totals (shop → region → grand) |
 | [TASK13](TASKS/TASK13-MASTER-SYNC/) | Master File Synchronization | Match-Merge (Balance Line) algorithm |
-| [TASK14](TASKS/TASK14-TAX-CALCULATION/) | Tax Calculation | Table Lookup — linear search, `OCCURS` array |
-| [TASK15](TASKS/TASK15-COMMISSION-TIERS/) | Commission Tiers | Tiered Bracket Lookup — `>=` range search |
-| [TASK16](TASKS/TASK16-BINARY-SEARCH/) | Wholesale Warehouse | `SEARCH ALL` — binary search, `ASCENDING KEY` |
+| [TASK14](TASKS/TASK14-TAX-CALCULATION/) | Tax Calculation | Table Lookup - linear search, `OCCURS` array |
+| [TASK15](TASKS/TASK15-COMMISSION-TIERS/) | Commission Tiers | Tiered Bracket Lookup - `>=` range search |
+| [TASK16](TASKS/TASK16-BINARY-SEARCH/) | Wholesale Warehouse | `SEARCH ALL` - binary search, `ASCENDING KEY` |
 | [TASK17](TASKS/TASK17-INTERNAL-SORT/) | Academic Performance Rating | `SORT` with `INPUT PROCEDURE` / `OUTPUT PROCEDURE`, filter before sort |
-| [TASK22](TASKS/TASK22-SALES-COMM-CALL/) | Sales Commission with CALL | `CALL` / `LINKAGE SECTION` — subprogram design |
+| [TASK22](TASKS/TASK22-SALES-COMM-CALL/) | Sales Commission with CALL | `CALL` / `LINKAGE SECTION` - subprogram design |
 | [TASK30](TASKS/TASK30-SYSIN-FILTER-OPR-REPORT/) | SYSIN Filter Operations Report | Runtime parameters from JCL `SYSIN` inline data |
-| [TASK32](TASKS/TASK32-COPYBOOK-CUST-IMPORT-REPORT/) | Copybook Customer Import Report | `COPY` statement — shared record layouts via copybooks |
+| [TASK32](TASKS/TASK32-COPYBOOK-CUST-IMPORT-REPORT/) | Copybook Customer Import Report | `COPY` statement - shared record layouts via copybooks |
 
 ---
 
@@ -83,7 +83,7 @@ A grouped overview of all tasks by the main technology combination used. Click a
 
 ### VSAM ESDS
 
-> Entry-Sequenced Data Sets — append-only sequential VSAM files used as logs or queues.
+> Entry-Sequenced Data Sets - append-only sequential VSAM files used as logs or queues.
 
 | Task | Name | Key Technique |
 |------|------|---------------|
@@ -109,7 +109,7 @@ A grouped overview of all tasks by the main technology combination used. Click a
 
 ### DB2 + VSAM
 
-> Programs that use both DB2 and VSAM in a single run — cross-technology data processing.
+> Programs that use both DB2 and VSAM in a single run - cross-technology data processing.
 
 | Task | Name | Key Technique |
 |------|------|---------------|
@@ -132,8 +132,8 @@ Reusable JCL templates that support the tasks in this repository. Each member de
 
 | File | Description |
 |---|---|
-| [`JCLCOMP.jcl`](JCL%20SAMPLES/JCLCOMP.jcl) | Compile-only JCL — compiles a COBOL source member using IGYWC |
-| [`JCLRUN.jcl`](JCL%20SAMPLES/JCLRUN.jcl) | Run-only JCL — executes an already-compiled load module |
+| [`JCLCOMP.jcl`](JCL%20SAMPLES/JCLCOMP.jcl) | Compile-only JCL - compiles a COBOL source member using IGYWC |
+| [`JCLRUN.jcl`](JCL%20SAMPLES/JCLRUN.jcl) | Run-only JCL - executes an already-compiled load module |
 | [`COMPRUN.jcl`](JCL%20SAMPLES/COMPRUN.jcl) | Combined compile + run in one job using the `MYCOMPGO` proc |
 | [`COBDB2CP.jcl`](JCL%20SAMPLES/COBDB2CP.jcl) | DB2 precompile → COBOL compile → link-edit → run for DB2 programs |
 | [`DEFKSDS.jcl`](JCL%20SAMPLES/DEFKSDS.jcl) | Define a VSAM KSDS cluster using IDCAMS `DEFINE CLUSTER` |
@@ -165,7 +165,7 @@ Each task is a self-contained project folder with COBOL source, JCL, sample data
 
 ---
 
-### [TASK05 — Banking Transaction System](TASKS/TASK05-VSAM-BANKING/)
+### [TASK05 - Banking Transaction System](TASKS/TASK05-VSAM-BANKING/)
 **Technologies:** `COBOL` + `VSAM KSDS` + `PS`
 
 Reads a sequential transaction file (PS) and updates customer account balances in a VSAM KSDS master file using `READ` + `REWRITE`. Invalid transactions (account not found, insufficient funds) are written to a separate PS error report. Demonstrates random VSAM access, FILE STATUS `23` handling, and `REWRITE` semantics.
@@ -174,7 +174,7 @@ Reads a sequential transaction file (PS) and updates customer account balances i
 
 ---
 
-### [TASK06 — Client Database Cleanup & Archiving](TASKS/TASK06-VSAM-CLIENT-ARCHIVE/)
+### [TASK06 - Client Database Cleanup & Archiving](TASKS/TASK06-VSAM-CLIENT-ARCHIVE/)
 **Technologies:** `COBOL` + `VSAM KSDS` + `PS`
 
 Reads all records from a VSAM KSDS sequentially using Dynamic access mode, deletes inactive clients (last activity date ≤ cutoff date from a PS parameter file), and writes deleted records to a PS archive file. Prints a summary report to SYSOUT.
@@ -183,7 +183,7 @@ Reads all records from a VSAM KSDS sequentially using Dynamic access mode, delet
 
 ---
 
-### [TASK07 — Employee Salary Indexing System](TASKS/TASK07-DB2-SALARY-INDEX/)
+### [TASK07 - Employee Salary Indexing System](TASKS/TASK07-DB2-SALARY-INDEX/)
 **Technologies:** `COBOL` + `DB2` + `PS`
 
 Opens a DB2 cursor (`WITH HOLD`) over the `TB_EMP_SALARY` table, applies department-based salary increases (IT +10%, SAL +5%, others +3%), caps at 100,000, and updates each row in place using `UPDATE WHERE CURRENT OF`. Commits every 100 rows; any SQL error triggers ROLLBACK + STOP RUN. Writes a salary change report to a PS file.
@@ -192,7 +192,7 @@ Opens a DB2 cursor (`WITH HOLD`) over the `TB_EMP_SALARY` table, applies departm
 
 ---
 
-### [TASK08 — Sales Bonus Indexing System](TASKS/TASK08-DB2-SALES-BONUS/)
+### [TASK08 - Sales Bonus Indexing System](TASKS/TASK08-DB2-SALES-BONUS/)
 **Technologies:** `COBOL` + `DB2` + `PS`
 
 Similar to Task07 but with two-step bonus calculation: base region multiplier (EU +12%, NE +10%, AS +8%, SW +5%) followed by a +5% high-sales boost for employees with annual sales ≥ 150,000. Bonus capped at 20,000. Status assigned by priority (CAP / HIGHSAL / LOW / OK). Commits every 50 rows.
@@ -201,7 +201,7 @@ Similar to Task07 but with two-step bonus calculation: base region multiplier (E
 
 ---
 
-### [TASK09 — Client Duplicate Detection](TASKS/TASK09-VSAM-DUPLCT-DETECT/)
+### [TASK09 - Client Duplicate Detection](TASKS/TASK09-VSAM-DUPLCT-DETECT/)
 **Technologies:** `COBOL` + `VSAM KSDS` + `SORT` + `PS`
 
 Reads a VSAM KSDS client master file, sorts all records by `NAME + BIRTH-DATE` using the internal COBOL `SORT` verb with `OUTPUT PROCEDURE`, groups consecutive duplicate records, and writes a PS duplicate report. Any group with 2+ records sharing the same name and birth date is flagged.
@@ -210,7 +210,7 @@ Reads a VSAM KSDS client master file, sorts all records by `NAME + BIRTH-DATE` u
 
 ---
 
-### [TASK10 — Invoice Generation](TASKS/TASK10-INVOICE-GENERATE/)
+### [TASK10 - Invoice Generation](TASKS/TASK10-INVOICE-GENERATE/)
 **Technologies:** `COBOL` + `VSAM KSDS` + `PS`
 
 Reads a sequential PS orders file, performs a random VSAM KSDS read for each order to look up product name and unit price, calculates `TOTAL-COST = QUANTITY × UNIT-PRICE`, and writes enriched invoice lines to a PS output file. Orders with unknown product IDs are skipped and logged to SYSOUT.
@@ -219,16 +219,16 @@ Reads a sequential PS orders file, performs a random VSAM KSDS read for each ord
 
 ---
 
-### [TASK11 — Credit Card Transaction Validation](TASKS/TASK11-CARD-VALIDATION/)
+### [TASK11 - Credit Card Transaction Validation](TASKS/TASK11-CARD-VALIDATION/)
 **Technologies:** `COBOL` + `VSAM KSDS` + `PS`
 
-Reads a daily PS transaction file, validates each transaction against a VSAM KSDS card master through three sequential checks: **card existence → blocked status → expiry date**. Approved transactions go to one PS output file; declined transactions go to another with a reason code (`NOT FOUND`, `BLOCKED`, `EXPIRED`). Current date is read from the OS at startup — no hardcoded dates.
+Reads a daily PS transaction file, validates each transaction against a VSAM KSDS card master through three sequential checks: **card existence → blocked status → expiry date**. Approved transactions go to one PS output file; declined transactions go to another with a reason code (`NOT FOUND`, `BLOCKED`, `EXPIRED`). Current date is read from the OS at startup - no hardcoded dates.
 
 **Key concepts:** `ACCEPT ... FROM DATE YYYYMMDD`, reference modification `(3:2)`, validation cascade (stop on first failure), `$$$$9.99` currency picture, `MOVE SPACES` before each loop iteration to prevent data bleeding.
 
 ---
 
-### [TASK12 — Multi-Level Sales Control Break Report](TASKS/TASK12-CONTROL-BREAK-REPORT/)
+### [TASK12 - Multi-Level Sales Control Break Report](TASKS/TASK12-CONTROL-BREAK-REPORT/)
 **Technologies:** `COBOL` + `PS` (sequential only)
 
 Reads a pre-sorted PS sales file and generates a formatted report with **three levels of totals**: shop subtotal → region subtotal → grand total. Uses the classic **Control Break (Level Break)** algorithm with holder variables (`PREV-REGION`, `PREV-SHOP`), first-record priming read, end-of-file flush, and major-break cascade rule (flush shop before flushing region).
@@ -237,7 +237,7 @@ Reads a pre-sorted PS sales file and generates a formatted report with **three l
 
 ---
 
-### [TASK13 — Master File Synchronization (Match-Merge)](TASKS/TASK13-MASTER-SYNC/)
+### [TASK13 - Master File Synchronization (Match-Merge)](TASKS/TASK13-MASTER-SYNC/)
 **Technologies:** `COBOL` + `PS` + `PS`
 
 Applies a sorted PS transaction file to a sorted PS old master file to produce an updated new master and an error log. Uses the **Match-Merge (Balance Line) algorithm**: two parallel read cursors, `HIGH-VALUES` as EOF sentinel, and a three-way key comparison (TRANS > MASTER → copy, TRANS < MASTER → orphan transaction, TRANS = MASTER → update/delete/error). Supports `A`dd, `U`pdate, and `D`elete transactions.
@@ -246,7 +246,7 @@ Applies a sorted PS transaction file to a sorted PS old master file to produce a
 
 ---
 
-### [TASK14 — Tax Calculation (Table Lookup)](TASKS/TASK14-TAX-CALCULATION/)
+### [TASK14 - Tax Calculation (Table Lookup)](TASKS/TASK14-TAX-CALCULATION/)
 **Technologies:** `COBOL` + `PS` + `PS`
 
 Loads a tax rate reference file into an in-memory `OCCURS` table (Phase 1), then processes an employee salary file and calculates tax for each employee using a linear search through the loaded table (Phase 2). Employees whose region code is not in the table get a hardcoded 20% default rate.
@@ -255,7 +255,7 @@ Loads a tax rate reference file into an in-memory `OCCURS` table (Phase 1), then
 
 ---
 
-### [TASK15 — Commission Tiers (Tiered Table Lookup)](TASKS/TASK15-COMMISSION-TIERS/)
+### [TASK15 - Commission Tiers (Tiered Table Lookup)](TASKS/TASK15-COMMISSION-TIERS/)
 **Technologies:** `COBOL` + `PS` + `PS`
 
 Similar to Task14, but uses a **tiered bracket lookup** instead of an exact key match: the table stores salary upper-bound limits sorted ascending, and the program finds the first tier where `WS-LIMIT >= SAL-AMT` to determine the commission rate. Input tiers file must be pre-sorted ascending by limit.
@@ -264,7 +264,7 @@ Similar to Task14, but uses a **tiered bracket lookup** instead of an exact key 
 
 ---
 
-### [TASK16 — Wholesale Warehouse (Binary Search)](TASKS/TASK16-BINARY-SEARCH/)
+### [TASK16 - Wholesale Warehouse (Binary Search)](TASKS/TASK16-BINARY-SEARCH/)
 **Technologies:** `COBOL` + `PS` + `PS`
 
 Loads a pre-sorted parts catalog into an in-memory table with `OCCURS ... DEPENDING ON`, then processes customer orders using **`SEARCH ALL`** (binary search) for fast part price lookups. Each order produces one invoice line (found: calculated total; not found: `NOT FOUND` line). Demonstrates the difference between `SEARCH` (linear) and `SEARCH ALL` (binary, requires `ASCENDING KEY`).
@@ -273,7 +273,7 @@ Loads a pre-sorted parts catalog into an in-memory table with `OCCURS ... DEPEND
 
 ---
 
-### [TASK17 — Academic Performance Rating (Internal Sort)](TASKS/TASK17-INTERNAL-SORT/)
+### [TASK17 - Academic Performance Rating (Internal Sort)](TASKS/TASK17-INTERNAL-SORT/)
 **Technologies:** `COBOL` + `PS` + `SD`
 
 Reads an unsorted exam results file, filters out failing students (score < 50) in the **INPUT PROCEDURE** via `RELEASE`, sorts passing students by class ascending / score descending, then writes the honor roll in the **OUTPUT PROCEDURE** via `RETURN`. No external sort utility needed.
@@ -282,7 +282,7 @@ Reads an unsorted exam results file, filters out failing students (score < 50) i
 
 ---
 
-### [TASK18 — Library Book Finder (VSAM Alternate Index)](TASKS/TASK18-LIBRARY-AIX/)
+### [TASK18 - Library Book Finder (VSAM Alternate Index)](TASKS/TASK18-LIBRARY-AIX/)
 **Technologies:** `COBOL` + `VSAM KSDS` + `VSAM AIX` + `PATH` + `PS`
 
 Reads author names from a PS search request file and for each author performs a VSAM `START` on an Alternate Index (AIX keyed by author name), then uses `READ NEXT` to browse all books by that author in AIX order. Results are written to a PS report. The JCL (`ALLSTEPS.jcl`) handles full setup: define cluster → load data → define AIX → define PATH → BLDINDEX → compile → run.
@@ -291,7 +291,7 @@ Reads author names from a PS search request file and for each author performs a 
 
 ---
 
-### [TASK19 — DB2 Bulk Insert with Validation](TASKS/TASK19-DB2-BULK-INSERT/)
+### [TASK19 - DB2 Bulk Insert with Validation](TASKS/TASK19-DB2-BULK-INSERT/)
 **Technologies:** `COBOL` + `DB2` + `PS`
 
 Reads new customer records from a PS file, validates each record through a cascade (ID not blank → email contains `@` → phone is 10 numeric digits), and inserts valid records into DB2 table `TB_CUSTOMERS`. Invalid records and DB2 errors are logged to a PS log file. Commits in batches of 100 successful inserts. Duplicate key (`-803`) is handled gracefully; critical errors (SQLCODE < -900) trigger ROLLBACK + STOP RUN.
@@ -300,16 +300,16 @@ Reads new customer records from a PS file, validates each record through a casca
 
 ---
 
-### [TASK20 — DB2 Upsert (Merge Pattern)](TASKS/TASK20-DB2-UPSERT/)
+### [TASK20 - DB2 Upsert (Merge Pattern)](TASKS/TASK20-DB2-UPSERT/)
 **Technologies:** `COBOL` + `DB2` + `PS`
 
-Reads records from a PS input file and performs an "upsert" — attempts to `UPDATE` an existing DB2 row first; if `SQLCODE = 100` (not found), falls back to `INSERT`. This pattern ensures idempotent data loading without requiring a prior `SELECT`. Demonstrates the classic COBOL/DB2 upsert (update-or-insert) technique.
+Reads records from a PS input file and performs an "upsert" - attempts to `UPDATE` an existing DB2 row first; if `SQLCODE = 100` (not found), falls back to `INSERT`. This pattern ensures idempotent data loading without requiring a prior `SELECT`. Demonstrates the classic COBOL/DB2 upsert (update-or-insert) technique.
 
 **Key concepts:** Upsert pattern (`UPDATE` → check SQLCODE 100 → `INSERT`), idempotent batch loading, SQLCODE 100 as "not found" sentinel.
 
 ---
 
-### [TASK21 — DB2 Foreign Key Validation](TASKS/TASK21-DB2-FK-VALIDATION/)
+### [TASK21 - DB2 Foreign Key Validation](TASKS/TASK21-DB2-FK-VALIDATION/)
 **Technologies:** `COBOL` + `DB2` + `PS`
 
 Reads records from a PS input file and validates referential integrity against a parent DB2 table before inserting into a child table. Invalid records (parent key not found) are logged to an error file. Demonstrates how to perform application-level FK validation using a `SELECT` before `INSERT` when DB2-enforced FK constraints are not available.
@@ -318,7 +318,7 @@ Reads records from a PS input file and validates referential integrity against a
 
 ---
 
-### [TASK22 — Sales Commission with CALL](TASKS/TASK22-SALES-COMM-CALL/)
+### [TASK22 - Sales Commission with CALL](TASKS/TASK22-SALES-COMM-CALL/)
 **Technologies:** `COBOL` + `PS` (subprogram CALL)
 
 Separates commission calculation logic into a called subprogram. The main program reads a PS sales file and passes each record to a subordinate COBOL program via `CALL ... USING LINKAGE SECTION`. The subprogram calculates the commission and returns the result. Demonstrates modular COBOL design with the `CALL` / `LINKAGE SECTION` pattern.
@@ -327,7 +327,7 @@ Separates commission calculation logic into a called subprogram. The main progra
 
 ---
 
-### [TASK23 — VSAM Credit Approval](TASKS/TASK23-VSAM-CREDIT-APPROVAL/)
+### [TASK23 - VSAM Credit Approval](TASKS/TASK23-VSAM-CREDIT-APPROVAL/)
 **Technologies:** `COBOL` + `VSAM KSDS` + `PS`
 
 Reads credit application records from a PS input file, looks up each applicant in a VSAM KSDS master file to check existing credit history, applies approval rules based on credit score and outstanding balance, and splits records into approved and declined PS output files.
@@ -336,7 +336,7 @@ Reads credit application records from a PS input file, looks up each applicant i
 
 ---
 
-### [TASK24 — DB2 + VSAM Reconciliation](TASKS/TASK24-DB2-VSAM-RECONCILE/)
+### [TASK24 - DB2 + VSAM Reconciliation](TASKS/TASK24-DB2-VSAM-RECONCILE/)
 **Technologies:** `COBOL` + `DB2` + `VSAM KSDS` + `PS`
 
 Reads records from both a DB2 table (via cursor) and a VSAM KSDS file, compares balances for matching keys, and writes a PS reconciliation report listing matches, mismatches, and records present in only one source. Demonstrates how to correlate data across two different storage technologies in a single COBOL program.
@@ -345,7 +345,7 @@ Reads records from both a DB2 table (via cursor) and a VSAM KSDS file, compares 
 
 ---
 
-### [TASK25 — Price Update Sync](TASKS/TASK25-PRICE-UPDATE-SYNC/)
+### [TASK25 - Price Update Sync](TASKS/TASK25-PRICE-UPDATE-SYNC/)
 **Technologies:** `COBOL` + `VSAM KSDS` + `PS`
 
 Reads a PS price update file and applies bulk price changes to a VSAM KSDS product master using `REWRITE`. Records not found in VSAM are logged to an error report. Demonstrates a batch price synchronization pattern common in retail and inventory systems.
@@ -354,7 +354,7 @@ Reads a PS price update file and applies bulk price changes to a VSAM KSDS produ
 
 ---
 
-### [TASK26 — DB2 + VSAM Payment Batch](TASKS/TASK26-DB2-VSAM-PAYMENT-BATCH/)
+### [TASK26 - DB2 + VSAM Payment Batch](TASKS/TASK26-DB2-VSAM-PAYMENT-BATCH/)
 **Technologies:** `COBOL` + `DB2` + `VSAM KSDS` + `PS`
 
 Processes a batch of payment transactions: reads payment records from a PS file, validates the payer against a DB2 accounts table, applies the payment to a VSAM KSDS balance master via `REWRITE`, and writes a PS summary report. Shows how DB2 and VSAM can be used together in a single transaction processing program.
@@ -363,7 +363,7 @@ Processes a batch of payment transactions: reads payment records from a PS file,
 
 ---
 
-### [TASK27 — GDG Account Archive](TASKS/TASK27-GDG-ACCT-ARCHIVE/)
+### [TASK27 - GDG Account Archive](TASKS/TASK27-GDG-ACCT-ARCHIVE/)
 **Technologies:** `COBOL` + `GDG` + `PS`
 
 Reads an account master file and writes a new Generation Data Group (GDG) generation as an archive snapshot. Demonstrates how GDG datasets work in JCL (`GDG(0)`, `GDG(+1)`) and how COBOL programs write to them like regular sequential files. Useful for daily/weekly archiving patterns.
@@ -372,7 +372,7 @@ Reads an account master file and writes a new Generation Data Group (GDG) genera
 
 ---
 
-### [TASK28 — ESDS Client Transaction Report](TASKS/TASK28-ESDS-CLIENT-TRANS-REPORT/)
+### [TASK28 - ESDS Client Transaction Report](TASKS/TASK28-ESDS-CLIENT-TRANS-REPORT/)
 **Technologies:** `COBOL` + `VSAM ESDS` + `PS`
 
 Reads client transaction records sequentially from a VSAM ESDS (Entry-Sequenced Data Set), generates a formatted PS report summarizing transactions per client, and writes total counts to SYSOUT. Demonstrates ESDS access patterns (sequential-only, append-only, no keyed access).
@@ -381,7 +381,7 @@ Reads client transaction records sequentially from a VSAM ESDS (Entry-Sequenced 
 
 ---
 
-### [TASK29 — ESDS Operations Log Reconciliation](TASKS/TASK29-ESDS-OPR-LOG-RECON/)
+### [TASK29 - ESDS Operations Log Reconciliation](TASKS/TASK29-ESDS-OPR-LOG-RECON/)
 **Technologies:** `COBOL` + `VSAM ESDS` + `PS`
 
 Reads an operations log stored in VSAM ESDS, reconciles log entries against a PS reference file to identify unmatched or duplicate log events, and writes a PS reconciliation output. Shows how ESDS is used as an append-only audit log and how to detect anomalies in sequential log data.
@@ -390,7 +390,7 @@ Reads an operations log stored in VSAM ESDS, reconciles log entries against a PS
 
 ---
 
-### [TASK30 — SYSIN Filter Operations Report](TASKS/TASK30-SYSIN-FILTER-OPR-REPORT/)
+### [TASK30 - SYSIN Filter Operations Report](TASKS/TASK30-SYSIN-FILTER-OPR-REPORT/)
 **Technologies:** `COBOL` + `PS` + `SYSIN`
 
 Reads filter parameters directly from the JCL `SYSIN` DD (inline data) and uses them to filter a PS operations file, writing matching records to a PS output report. Demonstrates how COBOL programs read runtime parameters from JCL inline data rather than a separate dataset.
@@ -399,7 +399,7 @@ Reads filter parameters directly from the JCL `SYSIN` DD (inline data) and uses 
 
 ---
 
-### [TASK31 — QMF Batch Customer Account Report](TASKS/TASK31-QMF-BATCH-CUST-ACCT-REPORT/)
+### [TASK31 - QMF Batch Customer Account Report](TASKS/TASK31-QMF-BATCH-CUST-ACCT-REPORT/)
 **Technologies:** `COBOL` + `DB2` + `PS`
 
 Generates a formatted customer account report from DB2 using a cursor-driven COBOL program. Applies grouping and subtotals similar to a QMF batch report. Demonstrates how to replicate QMF-style reports programmatically in COBOL with full control over formatting.
@@ -408,7 +408,7 @@ Generates a formatted customer account report from DB2 using a cursor-driven COB
 
 ---
 
-### [TASK32 — Copybook Customer Import Report](TASKS/TASK32-COPYBOOK-CUST-IMPORT-REPORT/)
+### [TASK32 - Copybook Customer Import Report](TASKS/TASK32-COPYBOOK-CUST-IMPORT-REPORT/)
 **Technologies:** `COBOL` + `PS` + `COPY`
 
 Reads customer import data from a PS file using shared record layouts defined in copybooks (`COPY` members). Generates a formatted import summary report. Demonstrates how copybooks promote reuse and consistency across multiple programs that share the same record layouts.
@@ -421,13 +421,13 @@ Reads customer import data from a PS file using shared record layouts defined in
 
 1. **Clone or browse** this repository
 2. Each `TASKS/TASKxx-*/` folder contains:
-   - `COBOL/` — COBOL source program
-   - `JCL/` — JCL to compile and run (uses [`MYCOMPGO`](JCLPROC/MYCOMPGO.jcl) proc)
-   - `DATA/` — Sample input files and expected output
-   - `SQL/` — DB2 DDL/DML scripts *(DB2 tasks only)*
-   - `DCLGEN/` — DCLGEN copybooks *(DB2 tasks only)*
-   - `OUTPUT/` — `SYSOUT.txt` with actual job output
-   - `README.md` — Detailed description of the task
+   - `COBOL/` - COBOL source program
+   - `JCL/` - JCL to compile and run (uses [`MYCOMPGO`](JCLPROC/MYCOMPGO.jcl) proc)
+   - `DATA/` - Sample input files and expected output
+   - `SQL/` - DB2 DDL/DML scripts *(DB2 tasks only)*
+   - `DCLGEN/` - DCLGEN copybooks *(DB2 tasks only)*
+   - `OUTPUT/` - `SYSOUT.txt` with actual job output
+   - `README.md` - Detailed description of the task
 3. Review the task README for prerequisites (VSAM definitions, DB2 table creation)
 4. Make sure [`MYCOMPGO`](JCLPROC/MYCOMPGO.jcl) is in your system `PROCLIB`
 5. For DB2 tasks, use [`COBDB2CP.jcl`](JCL%20SAMPLES/COBDB2CP.jcl) instead of the standard `COMPRUN`
