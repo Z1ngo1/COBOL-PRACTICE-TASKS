@@ -1,4 +1,4 @@
-# Task 21 — DB2 Order Loader with Foreign Key Validation
+# Task 21 - DB2 Order Loader with Foreign Key Validation
 
 ## Overview
 
@@ -24,7 +24,7 @@ CREATE TABLE TB_PRODUCTS (
 
 | Column | Type | Description |
 |---|---|---|
-| `PROD_ID` | `CHAR(5)` | **Primary key** — Product ID used by orders |
+| `PROD_ID` | `CHAR(5)` | **Primary key** - Product ID used by orders |
 | `PROD_NAME` | `VARCHAR(30)` | Product display name |
 | `UNIT_PRICE` | `DECIMAL(7,2)` | Unit price used for order pricing |
 | `STOCK_QTY` | `INTEGER` | Current stock quantity in units |
@@ -44,7 +44,7 @@ CREATE TABLE TB_ORDERS (
 
 | Column | Type | Description |
 |---|---|---|
-| `ORDER_ID` | `CHAR(6)` | **Primary key** — Unique order identifier |
+| `ORDER_ID` | `CHAR(6)` | **Primary key** - Unique order identifier |
 | `ORDER_DATE` | `DATE` | Order date (YYYY-MM-DD) |
 | `PROD_ID` | `CHAR(5)` | Product ID; must exist in `TB_PRODUCTS.PROD_ID` |
 | `QUANTITY` | `INTEGER` | Ordered quantity; must be greater than zero |
@@ -58,7 +58,7 @@ CREATE TABLE TB_ORDERS (
 | `ORDIN` | [`ORDERS.FILE`](DATA/ORDERS.FILE) | PS | INPUT | Sequential order input, RECFM=F, LRECL=80 |
 | `ORDLOG` | [`ORDER.LOG`](DATA/ORDER.LOG) | PS | OUTPUT | Order load log with error and success messages |
 
-### Input Record Layout — (`ORDIN`), LRECL=80, RECFM=F
+### Input Record Layout - (`ORDIN`), LRECL=80, RECFM=F
 
 | Field | Position | Format | Description |
 |---|---|---|---|
@@ -68,15 +68,15 @@ CREATE TABLE TB_ORDERS (
 | `IN-QUANTITY` | 20–23 | `9(4)` | Order Quantity (> 0) |
 | `FILLER` | 24–80 | `X(57)` | Reserved |
 
-### Output Record Layout — (`ORDLOG`)
+### Output Record Layout - (`ORDLOG`)
 
 | Field | Picture | Description |
 |---|---|---|
 | `LOG-REC` | `X(80)` | One log line per input record with order id, product id, and status message |
 
 Typical status messages include:
-- `INSERTED (VALID ORDER)` — successful insert into `TB_ORDERS`
-- `REJECTED: PROD-ID NOT FOUND IN TB_PRODUCTS` — failed referential check
+- `INSERTED (VALID ORDER)` - successful insert into `TB_ORDERS`
+- `REJECTED: PROD-ID NOT FOUND IN TB_PRODUCTS` - failed referential check
 - `VALIDATION ERROR: ORDER-ID EMPTY`
 - `VALIDATION ERROR: ORDER-DATE MONTH INVALID`
 - `VALIDATION ERROR: QUANTITY NOT > 0`
@@ -123,9 +123,9 @@ The program applies a multi-stage pipeline to each order record: field validatio
    - If all checks pass, convert `IN-ORDER-DATE` from `YYYYMMDD` to `YYYY-MM-DD`.
    - Execute `INSERT` into `TB_ORDERS`.
    - Handle `SQLCODE`:
-     - `0` — success, update counters, update in-memory array, and log success.
-     - `-803` — duplicate key; log duplicate and increment error counter.
-     - `< 0` (critical, not handled explicitly) — log, `ROLLBACK`, and terminate.
+     - `0` - success, update counters, update in-memory array, and log success.
+     - `-803` - duplicate key; log duplicate and increment error counter.
+     - `< 0` (critical, not handled explicitly) - log, `ROLLBACK`, and terminate.
    - After each successful insert, increment commit counter; when it reaches 100, issue `COMMIT` and reset.
 
 3. **Termination**
@@ -197,11 +197,11 @@ COMMIT BATCHES: 1
 
 ## Key COBOL + DB2 Concepts Used
 
-- **Foreign Key Validation via Lookup** — uses `SELECT` against `TB_PRODUCTS` to ensure `PROD-ID` exists before insert.
-- **In-Memory Duplicate Detection** — `OCCURS` table for the first 100 `ORDER-ID`s to catch duplicates without going to DB2.
-- **DB2 Duplicate Key Handling (`-803`)** — relies on DB2 primary key constraint to catch any remaining duplicates.
-- **Date Conversion** — transforms `YYYYMMDD` string into DB2 `DATE` format `YYYY-MM-DD` before insert.
-- **Batch Commit / Rollback** — controlled commits every 100 records and rollback on severe errors to keep data consistent.
+- **Foreign Key Validation via Lookup** - uses `SELECT` against `TB_PRODUCTS` to ensure `PROD-ID` exists before insert.
+- **In-Memory Duplicate Detection** - `OCCURS` table for the first 100 `ORDER-ID`s to catch duplicates without going to DB2.
+- **DB2 Duplicate Key Handling (`-803`)** - relies on DB2 primary key constraint to catch any remaining duplicates.
+- **Date Conversion** - transforms `YYYYMMDD` string into DB2 `DATE` format `YYYY-MM-DD` before insert.
+- **Batch Commit / Rollback** - controlled commits every 100 records and rollback on severe errors to keep data consistent.
 
 ---
 
