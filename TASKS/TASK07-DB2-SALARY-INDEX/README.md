@@ -1,4 +1,4 @@
-# Task 07 — Employee Salary Indexing System (DB2 Cursor + Update)
+# Task 07 - Employee Salary Indexing System (DB2 Cursor + Update)
 
 ## Overview
 
@@ -38,7 +38,7 @@ DCLGEN host variable structure is declared in [`DCLGEN/TASK7.cpy`](DCLGEN/TASK7.
 |---|---|---|---|---|
 | `OUTDD` | [`REPORT.FILE`](DATA/SALARY.REPORT) | PS | OUTPUT | Salary change report, LRECL=80 |
 
-### Report Record Layout (`OUTDD`) — LRECL=80, RECFM=F
+### Report Record Layout (`OUTDD`) - LRECL=80, RECFM=F
 
 | Field | Content |
 |---|---|
@@ -69,7 +69,7 @@ DCLGEN host variable structure is declared in [`DCLGEN/TASK7.cpy`](DCLGEN/TASK7.
 
 ## Program Flow
 
-1. **OPEN** report file `OUTDD` as OUTPUT — write header line
+1. **OPEN** report file `OUTDD` as OUTPUT - write header line
 2. **OPEN** cursor `CUR-SALARY`:
    ```sql
    DECLARE CUR-SALARY CURSOR WITH HOLD FOR
@@ -87,9 +87,9 @@ DCLGEN host variable structure is declared in [`DCLGEN/TASK7.cpy`](DCLGEN/TASK7.
      - **UPDATE** `TB_EMP_SALARY SET SALARY = :NEW-SALARY WHERE CURRENT OF CUR-SALARY`
        - Error → `ROLLBACK` → `STOP RUN`
      - Increment `TOTAL-RECORDS-UPDATED` and `COMMIT-COUNT`
-     - **PERFORM WRITE-REPORT-LINE** — write detail line to `OUTDD`
+     - **PERFORM WRITE-REPORT-LINE** - write detail line to `OUTDD`
      - If `COMMIT-COUNT >= 100` → **COMMIT WORK**, reset `COMMIT-COUNT = 0`
-4. **COMMIT WORK** — final commit after all records
+4. **COMMIT WORK** - final commit after all records
 5. **CLOSE** cursor `CUR-SALARY`
 6. Write footer line `TOTAL: NNN RECORDS UPDATED` to `OUTDD`
 7. **CLOSE** report file → `DISPLAY` completion message → `STOP RUN`
@@ -122,33 +122,33 @@ SALARY INDEXING COMPLETED:  10
 
 ## How to Run
 
-1. **Create DB2 table** — run [`CREATE.TABLE.sql`](SQL/CREATE.TABLE.sql) via SPUFI or DSNTEP2
-2. **Load test data** — run [`INSERT.DATA.sql`](SQL/INSERT.DATA.sql) via SPUFI or DSNTEP2
-3. **Compile and run** — run [`COBDB2CP.jcl`](JCL/COBDB2CP.jcl)
+1. **Create DB2 table** - run [`CREATE.TABLE.sql`](SQL/CREATE.TABLE.sql) via SPUFI or DSNTEP2
+2. **Load test data** - run [`INSERT.DATA.sql`](SQL/INSERT.DATA.sql) via SPUFI or DSNTEP2
+3. **Compile and run** - run [`COBDB2CP.jcl`](JCL/COBDB2CP.jcl)
 4. **Compare output files and sysout** - see [`TB.TB_EMP_SALARY.AFTER`](DATA/TB.TB_EMP_SALARY.AFTER), [`SALARY.REPORT`](DATA/SALARY.REPORT) and [`SYSOUT.txt`](OUTPUT/SYSOUT.txt)
 
 ---
 
 ## Key COBOL/DB2 Concepts Used
 
-- `DECLARE CURSOR WITH HOLD` — keeps cursor open across `COMMIT` statements; required for batch updates with intermediate commits
-- `FOR UPDATE OF SALARY` — locks only the `SALARY` column for update, signals intent to DB2 optimizer
-- `UPDATE ... WHERE CURRENT OF` — updates the exact row pointed to by the cursor without needing a key in the `WHERE` clause
-- `FETCH INTO :DCLTB-EMP-SALARY` — bulk fetch into DCLGEN host variable structure
-- `SQLCODE = 100` — standard DB2 end-of-cursor indicator
-- `COMMIT WORK` every 100 records — prevents long-running unit of work and log space exhaustion
-- `ROLLBACK WORK` on any error — ensures data consistency on failure
-- `EXEC SQL INCLUDE TASK7 END-EXEC` — includes DCLGEN copybook with host variable declarations
-- `EVALUATE TRUE` — clean multi-branch logic for department salary rules
+- `DECLARE CURSOR WITH HOLD` - keeps cursor open across `COMMIT` statements; required for batch updates with intermediate commits
+- `FOR UPDATE OF SALARY` - locks only the `SALARY` column for update, signals intent to DB2 optimizer
+- `UPDATE ... WHERE CURRENT OF` - updates the exact row pointed to by the cursor without needing a key in the `WHERE` clause
+- `FETCH INTO :DCLTB-EMP-SALARY` - bulk fetch into DCLGEN host variable structure
+- `SQLCODE = 100` - standard DB2 end-of-cursor indicator
+- `COMMIT WORK` every 100 records - prevents long-running unit of work and log space exhaustion
+- `ROLLBACK WORK` on any error - ensures data consistency on failure
+- `EXEC SQL INCLUDE TASK7 END-EXEC` - includes DCLGEN copybook with host variable declarations
+- `EVALUATE TRUE` - clean multi-branch logic for department salary rules
 
 ---
 
 ## Notes
 
-- `CURSOR WITH HOLD` survives `COMMIT` — cursor position is preserved after each intermediate commit, so `FETCH` continues from where it left off
-- `UPDATE WHERE CURRENT OF` requires the cursor to be declared `FOR UPDATE OF` — without it DB2 returns an error
-- All SQL errors trigger immediate `ROLLBACK` followed by `STOP RUN` — no partial updates are left in the table
-- `COMMIT-COUNT` is reset to `0` after each intermediate commit — it counts records since the last commit, not total records
+- `CURSOR WITH HOLD` survives `COMMIT` - cursor position is preserved after each intermediate commit, so `FETCH` continues from where it left off
+- `UPDATE WHERE CURRENT OF` requires the cursor to be declared `FOR UPDATE OF` - without it DB2 returns an error
+- All SQL errors trigger immediate `ROLLBACK` followed by `STOP RUN` - no partial updates are left in the table
+- `COMMIT-COUNT` is reset to `0` after each intermediate commit - it counts records since the last commit, not total records
 - Records where `NEW-SALARY` exactly equals `100000` after the multiplier (not capped) get status `OK`, not `MAXCAP`
 - Tested on IBM z/OS with Enterprise COBOL and DB2 for z/OS
 
