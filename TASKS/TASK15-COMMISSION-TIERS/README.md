@@ -1,9 +1,9 @@
-# Task 15 — Commission Tiers (Tiered Table Lookup / In-Memory Array)
+# Task 15 - Commission Tiers (Tiered Table Lookup / In-Memory Array)
 
 ## Overview 
 
 Reads a commission tiers reference file [`COMM.TIERS`](./DATA/COMM.TIERS) into an in-memory array (`TIER-TABLE`), then processes an employee salary file [`SALES.WEEKLY`](./DATA/SALES.WEEKLY) and writes a commission output [`PAYOUT.RPT`](./DATA/PAYOUT.RPT) with the calculated commission for each employee.
-The core technique is a **Tiered Table Lookup**: instead of a simple key match, the program finds the first tier where `WS-LIMIT >= SAL-AMT` — the salary bracket determines the commission rate.
+The core technique is a **Tiered Table Lookup**: instead of a simple key match, the program finds the first tier where `WS-LIMIT >= SAL-AMT` - the salary bracket determines the commission rate.
 The tier table is loaded once into memory before any salary record is processed.
 
 ---
@@ -12,7 +12,7 @@ The tier table is loaded once into memory before any salary record is processed.
 
 > **[`COMM.TIERS`](./DATA/COMM.TIERS) must be sorted by `COMM-LIMIT` in ascending order before this program runs.**
 
-The lookup algorithm selects the **first tier where `WS-LIMIT >= SAL-AMT`**. If the tiers are unsorted, a lower limit may match a salary that should fall into a higher tier — producing an incorrect commission rate **without any error message or ABEND**. Use a `SORT` step in the JCL before the program step if your input is not already sorted.
+The lookup algorithm selects the **first tier where `WS-LIMIT >= SAL-AMT`**. If the tiers are unsorted, a lower limit may match a salary that should fall into a higher tier - producing an incorrect commission rate **without any error message or ABEND**. Use a `SORT` step in the JCL before the program step if your input is not already sorted.
 
 ---
 
@@ -20,25 +20,25 @@ The lookup algorithm selects the **first tier where `WS-LIMIT >= SAL-AMT`**. If 
 
 | DD Name | File | Org | Mode | Description |
 |---|---|---|---|---|
-| `COMMDD` | [`COMM.TIERS`](./DATA/COMM.TIERS) | PS | INPUT | Commission tiers table — salary limit + commission rate; loaded into memory at startup |
-| `SALDD` | [`SALES.WEEKLY`](./DATA/SALES.WEEKLY) | PS | INPUT | Employee salary records — ID and weekly sales amount |
-| `OUTDD` | [`PAYOUT.RPT`](./DATA/PAYOUT.RPT) | PS | OUTPUT | Commission results — one line per employee with salary, rate, and commission amount |
+| `COMMDD` | [`COMM.TIERS`](./DATA/COMM.TIERS) | PS | INPUT | Commission tiers table - salary limit + commission rate; loaded into memory at startup |
+| `SALDD` | [`SALES.WEEKLY`](./DATA/SALES.WEEKLY) | PS | INPUT | Employee salary records - ID and weekly sales amount |
+| `OUTDD` | [`PAYOUT.RPT`](./DATA/PAYOUT.RPT) | PS | OUTPUT | Commission results - one line per employee with salary, rate, and commission amount |
 
-### Input Record Layout — (`COMMDD`), LRECL=9, RECFM=F
+### Input Record Layout - (`COMMDD`), LRECL=9, RECFM=F
 
 | Field | Picture | Offset | Description |
 |---|---|---|---|
 | `COMM-LIMIT` | `9(6)` | 1 | Salary upper bound for this tier |
-| `COMM-PCT` | `V999` | 7 | Commission rate — implied 3 decimal places (e.g. `020` = 0.020 = 2%) |
+| `COMM-PCT` | `V999` | 7 | Commission rate - implied 3 decimal places (e.g. `020` = 0.020 = 2%) |
 
-### Input Record Layout — (`SALDD`), LRECL=13, RECFM=F
+### Input Record Layout - (`SALDD`), LRECL=13, RECFM=F
 
 | Field | Picture | Offset | Description |
 |---|---|---|---|
 | `SAL-ID` | `9(5)` | 1 | Employee ID |
-| `SAL-AMT` | `9(6)V99` | 6 | Weekly sales amount — implied 2 decimal places |
+| `SAL-AMT` | `9(6)V99` | 6 | Weekly sales amount - implied 2 decimal places |
 
-### Output Record Layout — (`OUTDD`), LRECL=80, RECFM=F
+### Output Record Layout - (`OUTDD`), LRECL=80, RECFM=F
 
 | Field | Picture | Offset | Description |
 |---|---|---|---|
@@ -55,7 +55,7 @@ The lookup algorithm selects the **first tier where `WS-LIMIT >= SAL-AMT`**. If 
 
 ## Business Logic: Two-Phase Processing
 
-### Phase 1 — Load Commission Table (Initialization)
+### Phase 1 - Load Commission Table (Initialization)
 
 The program loads the entire tiers file into a Working-Storage table.
 
@@ -72,7 +72,7 @@ CLOSE COMM.TIERS
 
 After this phase, the `TIER-TABLE` lives in memory. `TIERS-LOADED` holds the entry count. The table is bounded by `OCCURS 20 TIMES`.
 
-### Phase 2 — Process Salary File (Tiered Lookup)
+### Phase 2 - Process Salary File (Tiered Lookup)
 
 For each salary record, the program finds the correct bracket.
 
@@ -101,17 +101,17 @@ END-PERFORM
 
 ## Program Flow
 
-1.  **PERFORM OPEN-COMM-FILE** — opens `COMMDD` (INPUT) for initialization.
-2.  **PERFORM LOAD-COMM-TABLE** — reads `COMM.TIERS` into `WS-TIER-TABLE` until EOF. Increments `TIERS-LOADED`.
-3.  **PERFORM CLOSE-COMM-FILE** — closes `COMMDD`.
-4.  **PERFORM OPEN-SALES-FILES** — opens `SALDD` (INPUT) and `OUTDD` (OUTPUT).
-5.  **PERFORM PROCESS-SALES-RECORDS** — main loop `UNTIL EOF` on `SALES.WEEKLY`.
+1.  **PERFORM OPEN-COMM-FILE** - opens `COMMDD` (INPUT) for initialization.
+2.  **PERFORM LOAD-COMM-TABLE** - reads `COMM.TIERS` into `WS-TIER-TABLE` until EOF. Increments `TIERS-LOADED`.
+3.  **PERFORM CLOSE-COMM-FILE** - closes `COMMDD`.
+4.  **PERFORM OPEN-SALES-FILES** - opens `SALDD` (INPUT) and `OUTDD` (OUTPUT).
+5.  **PERFORM PROCESS-SALES-RECORDS** - main loop `UNTIL EOF` on `SALES.WEEKLY`.
     *   **READ SALES-FILE**.
-    *   **PERFORM LOOKUP-TIER** — linear search in `WS-TIER-TABLE` using `WS-LIMIT(IDX) >= SAL-AMT`.
+    *   **PERFORM LOOKUP-TIER** - linear search in `WS-TIER-TABLE` using `WS-LIMIT(IDX) >= SAL-AMT`.
     *   **IF FOUND** --> `COMPUTE OUT-RES`, format output line, and **WRITE COMMISSION-REC**.
     *   **IF NOT FOUND** --> Increment `NO-TIER-MATCH` (record skipped).
-6.  **DISPLAY-SUMMARY** — prints final statistics to SYSOUT (tiers loaded, employees processed, matches vs. no-matches).
-7.  **PERFORM CLOSE-SALES-FILES** — closes `SALDD` and `OUTDD`.
+6.  **DISPLAY-SUMMARY** - prints final statistics to SYSOUT (tiers loaded, employees processed, matches vs. no-matches).
+7.  **PERFORM CLOSE-SALES-FILES** - closes `SALDD` and `OUTDD`.
 8.  **STOP RUN**.
 
 ---
@@ -149,7 +149,7 @@ Actual job output is stored in [`SYSOUT.txt`](./OUTPUT/SYSOUT.txt).
 ## How to Run
 
 1.  Upload [`COMM.TIERS`](./DATA/COMM.TIERS) and [`SALES.WEEKLY`](./DATA/SALES.WEEKLY) to your mainframe datasets manually through option '3.4 and edit your dataset' or
-2.  Submit [`COMPRUN.jcl`](./JCL/COMPRUN.jcl) — it includes a insert data step
+2.  Submit [`COMPRUN.jcl`](./JCL/COMPRUN.jcl) - it includes a insert data step
 3.  Compare output files and sysout - see [`PAYOUT.RPT`](./DATA/PAYOUT.RPT) and [`SYSOUT.txt`](OUTPUT/SYSOUT.txt)
 
 > **PROC reference:** [`COMPRUN.jcl`](./JCL/COMPRUN.jcl) uses the [`MYCOMPGO`](../../JCLPROC/MYCOMPGO.jcl) catalogued procedure.
@@ -158,10 +158,10 @@ Actual job output is stored in [`SYSOUT.txt`](./OUTPUT/SYSOUT.txt).
 
 ## Key COBOL Concepts Used
 
-*   **`OCCURS` + `INDEXED BY`** — defining a Working-Storage table for tiered data.
-*   **Tiered (Bracket) Lookup** — using `>=` comparison in a linear search to find the correct range.
-*   **Two-phase processing** — loading reference data into memory once to avoid repeated file I/O.
-*   **Linear Search via `PERFORM VARYING`** — iterating through the table until the first condition match.
+*   **`OCCURS` + `INDEXED BY`** - defining a Working-Storage table for tiered data.
+*   **Tiered (Bracket) Lookup** - using `>=` comparison in a linear search to find the correct range.
+*   **Two-phase processing** - loading reference data into memory once to avoid repeated file I/O.
+*   **Linear Search via `PERFORM VARYING`** - iterating through the table until the first condition match.
 
 ---
 
