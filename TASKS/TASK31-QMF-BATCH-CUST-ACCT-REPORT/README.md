@@ -1,8 +1,8 @@
-# Task 31 — QMF Batch Customer Account Report
+# Task 31 - QMF Batch Customer Account Report
 
 ## Overview
 
-Runs two QMF queries against DB2 tables in batch mode using the QMF batch executor (`DSQQMFE`). Query 1 counts active customers grouped by region and segment. Query 2 calculates total balances and account counts per account type and region, joining `T_ACCOUNT` and `T_CUSTOMER`. Both query outputs are exported to PS datasets, then merged and assembled into a single dated final report using DFSORT. There is no COBOL program in this task — the entire pipeline is driven by JCL, a QMF PROC, QMF queries, and QMF forms.
+Runs two QMF queries against DB2 tables in batch mode using the QMF batch executor (`DSQQMFE`). Query 1 counts active customers grouped by region and segment. Query 2 calculates total balances and account counts per account type and region, joining `T_ACCOUNT` and `T_CUSTOMER`. Both query outputs are exported to PS datasets, then merged and assembled into a single dated final report using DFSORT. There is no COBOL program in this task - the entire pipeline is driven by JCL, a QMF PROC, QMF queries, and QMF forms.
 
 ---
 
@@ -54,7 +54,7 @@ CREATE TABLE T_ACCOUNT (
 
 ## QMF Objects
 
-### QMF PROC — [`TASK31P.proc`](QMF/PROС/TASK31P.proc)
+### QMF PROC - [`TASK31P.proc`](QMF/PROС/TASK31P.proc)
 
 The QMF PROC is the entry point invoked by `DSQQMFE` at startup via `I=TASK31P`. It runs both queries in sequence and exports their results to PS datasets.
 
@@ -139,8 +139,8 @@ All intermediate and final files are stored in the [`DATA/`](DATA/) folder:
 |---|---|
 | [`QUERY1`](DATA/QUERY1) | QMF text export of Query 1 (customer counts by region/segment) |
 | [`QUERY2`](DATA/QUERY2) | QMF text export of Query 2 (balances by account type/region) |
-| [`QMF.GDG.G0001V00`](DATA/QMF.GDG.G0001V00) | GDG generation `(+1)` — VB separator header for Query 1 |
-| [`QMF.GDG.G0002V00`](DATA/QMF.GDG.G0002V00) | GDG generation `(+2)` — VB separator header for Query 2 |
+| [`QMF.GDG.G0001V00`](DATA/QMF.GDG.G0001V00) | GDG generation `(+1)` - VB separator header for Query 1 |
+| [`QMF.GDG.G0002V00`](DATA/QMF.GDG.G0002V00) | GDG generation `(+2)` - VB separator header for Query 2 |
 | [`SORTED.REPORT`](DATA/SORTED.REPORT) | Final merged and dated report |
 | [`TB.T_ACCOUNT`](DATA/TB.T_ACCOUNT) | INPUT DATA FROM T_ACCOUNT TABLE |
 | [`TB.T_CUSTOMER`](DATA/TB.T_CUSTOMER) | INPUT DATA FROM T_CUSTOMER TABLE |
@@ -150,29 +150,29 @@ All intermediate and final files are stored in the [`DATA/`](DATA/) folder:
 
 ## How to Run
 
-1. **Define GDG base** — run [`DEFGDG.jcl`](JCL/DEFGDG.jcl) to allocate the GDG base `Z73460.TASK31.QMF.GDG`
-2. **Create DB2 tables and load data** — run SQL from [`SQL/`](SQL/) folder: [`CREATE.T_CUSTOMER.sql`](SQL/CREATE.T_CUSTOMER.sql), [`CREATE.T_ACCOUNT.sql`](SQL/CREATE.T_ACCOUNT.sql), then INSERT scripts [`INSERT.T_CUSTOMER.sql`](SQL/INSERT.T_CUSTOMER.sql), [`INSERT.T_ACCOUNT.sql`](SQL/INSERT.T_ACCOUNT.sql)
-3. **Import QMF objects into QMF catalog** — load [`TASK31P.proc`](QMF/PROС/TASK31P.proc), [`Q1TASK31.sql`](QMF/QUERY/Q1TASK31.sql), [`Q2TASK31.sql`](QMF/QUERY/Q2TASK31.sql), [`Q1TASK31F.form`](QMF/FORM/Q1TASK31F.form), [`Q2TASK31F.form`](QMF/FORM/Q2TASK31F.form) into QMF using ISPF QMF panels
-4. **Run the pipeline** — submit [`DB2PROC.jcl`](JCL/DB2PROC.jcl)
-5. **Review output** — see [`DATA/SORTED.REPORT`](DATA/SORTED.REPORT)
+1. **Define GDG base** - run [`DEFGDG.jcl`](JCL/DEFGDG.jcl) to allocate the GDG base `Z73460.TASK31.QMF.GDG`
+2. **Create DB2 tables and load data** - run SQL from [`SQL/`](SQL/) folder: [`CREATE.T_CUSTOMER.sql`](SQL/CREATE.T_CUSTOMER.sql), [`CREATE.T_ACCOUNT.sql`](SQL/CREATE.T_ACCOUNT.sql), then INSERT scripts [`INSERT.T_CUSTOMER.sql`](SQL/INSERT.T_CUSTOMER.sql), [`INSERT.T_ACCOUNT.sql`](SQL/INSERT.T_ACCOUNT.sql)
+3. **Import QMF objects into QMF catalog** - load [`TASK31P.proc`](QMF/PROС/TASK31P.proc), [`Q1TASK31.sql`](QMF/QUERY/Q1TASK31.sql), [`Q2TASK31.sql`](QMF/QUERY/Q2TASK31.sql), [`Q1TASK31F.form`](QMF/FORM/Q1TASK31F.form), [`Q2TASK31F.form`](QMF/FORM/Q2TASK31F.form) into QMF using ISPF QMF panels
+4. **Run the pipeline** - submit [`DB2PROC.jcl`](JCL/DB2PROC.jcl)
+5. **Review output** - see [`DATA/SORTED.REPORT`](DATA/SORTED.REPORT)
 
 ---
 
 ## Key QMF + JCL Concepts Used
 
-- **`DSQQMFE` batch executor** — QMF has no COBOL program; the entire report generation is driven by invoking the QMF batch program with `M=B` (batch mode), connecting it to DB2 via plan `QMFD10` and a startup PROC `I=TASK31P`
-- **QMF PROC as orchestrator** — `TASK31P.proc` replaces COBOL `PROCEDURE DIVISION`; the `---` separator between `RUN QUERY` commands is the QMF statement delimiter that sequences multiple operations in one PROC
-- **`EXP TO ... (DATAFORMAT=TEXT)`** — exports QMF query results to a z/OS PS dataset as formatted text using the layout defined in the associated FORM; this is what bridges QMF output to standard JCL datasets
-- **GDG for section headers** — section separator lines (plain text) are written as VB files into GDG generations `(+1)` and `(+2)` using `FTOV` conversion, so they can later be merged in order with the VB query output
-- **DFSORT `VTOF` + `REMOVECC`** — the final SORT step converts all VB parts back to fixed-length records with `VTOF`, strips QMF carriage control characters with `REMOVECC`, and injects a dated header line using `HEADER1=(DATE=(MD4/),'@',TIME)`
-- **`IEFBR14` cleanup step** — `STEP005` deletes all intermediate work datasets from the previous run before any new data is written; without this, `DISP=(NEW,CATLG)` on subsequent steps would fail with a duplicate dataset error
+- **`DSQQMFE` batch executor** - QMF has no COBOL program; the entire report generation is driven by invoking the QMF batch program with `M=B` (batch mode), connecting it to DB2 via plan `QMFD10` and a startup PROC `I=TASK31P`
+- **QMF PROC as orchestrator** - `TASK31P.proc` replaces COBOL `PROCEDURE DIVISION`; the `---` separator between `RUN QUERY` commands is the QMF statement delimiter that sequences multiple operations in one PROC
+- **`EXP TO ... (DATAFORMAT=TEXT)`** - exports QMF query results to a z/OS PS dataset as formatted text using the layout defined in the associated FORM; this is what bridges QMF output to standard JCL datasets
+- **GDG for section headers** - section separator lines (plain text) are written as VB files into GDG generations `(+1)` and `(+2)` using `FTOV` conversion, so they can later be merged in order with the VB query output
+- **DFSORT `VTOF` + `REMOVECC`** - the final SORT step converts all VB parts back to fixed-length records with `VTOF`, strips QMF carriage control characters with `REMOVECC`, and injects a dated header line using `HEADER1=(DATE=(MD4/),'@',TIME)`
+- **`IEFBR14` cleanup step** - `STEP005` deletes all intermediate work datasets from the previous run before any new data is written; without this, `DISP=(NEW,CATLG)` on subsequent steps would fail with a duplicate dataset error
 
 ---
 
 ## Notes
 
-- There is no COBOL program in this task — the full pipeline is JCL + QMF PROC + QMF queries + DFSORT; this is a pure QMF batch reporting pattern used in production mainframe environments
+- There is no COBOL program in this task - the full pipeline is JCL + QMF PROC + QMF queries + DFSORT; this is a pure QMF batch reporting pattern used in production mainframe environments
 - QMF FORM objects (`Q1TASK31F`, `Q2TASK31F`) control column headers, widths, and totals in the exported text; they must be saved in the QMF catalog under the correct owner before the batch job runs
-- The GDG base must exist before the job is submitted — `DEFGDG.jcl` creates it; if the base is missing, STEP015 and STEP020 will fail with a JCL error on the `(+1)` / `(+2)` references
-- The `---` separator in `TASK31P.proc` is a QMF-specific statement delimiter — it is not a comment and must appear exactly as-is between `RUN QUERY` blocks; omitting it causes the second query to be ignored
+- The GDG base must exist before the job is submitted - `DEFGDG.jcl` creates it; if the base is missing, STEP015 and STEP020 will fail with a JCL error on the `(+1)` / `(+2)` references
+- The `---` separator in `TASK31P.proc` is a QMF-specific statement delimiter - it is not a comment and must appear exactly as-is between `RUN QUERY` blocks; omitting it causes the second query to be ignored
 - Tested on IBM z/OS with QMF 10 and DB2
