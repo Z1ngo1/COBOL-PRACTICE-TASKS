@@ -1,8 +1,8 @@
-# Task 29 — ESDS Operation Log: KSDS and DB2 Reconciliation
+# Task 29 - ESDS Operation Log: KSDS and DB2 Reconciliation
 
 ## Overview
 
-Reads a daily operation log stored in an ESDS sequential file. For each operation record, validates input fields, looks up the account in a VSAM KSDS master file, fetches the current balance from DB2, and verifies business logic. All results (OK / ERROR / SKIPPED) are written to a PS reconciliation report file. No data is updated — this is a read-only reconciliation program.
+Reads a daily operation log stored in an ESDS sequential file. For each operation record, validates input fields, looks up the account in a VSAM KSDS master file, fetches the current balance from DB2, and verifies business logic. All results (OK / ERROR / SKIPPED) are written to a PS reconciliation report file. No data is updated - this is a read-only reconciliation program.
 
 ---
 
@@ -35,7 +35,7 @@ CREATE TABLE TB_ACCOUNT_BAL (
 | `ACCTDD` | [`ACCT.MSTER.KSDS`](DATA/ACCT.MSTER.KSDS) | KSDS | INPUT | Account master file |
 | `RECN` | [`RECON.LOG`](DATA/RECON.LOG) | PS | OUTPUT | Reconciliation report |
 
-### Operation Log Record Layout (`OPR`) — ESDS, LRECL=80
+### Operation Log Record Layout (`OPR`) - ESDS, LRECL=80
 
 | Field | PIC | Position | Description |
 |---|---|---|---|
@@ -46,7 +46,7 @@ CREATE TABLE TB_ACCOUNT_BAL (
 | `OPR-ID` | `X(6)` | 25–30 | Operation ID |
 | FILLER | `X(50)` | 31–80 | Unused |
 
-### Account Master Record Layout (`ACCTDD`) — KSDS, LRECL=80
+### Account Master Record Layout (`ACCTDD`) - KSDS, LRECL=80
 
 | Field | PIC | Position | Description |
 |---|---|---|---|
@@ -56,7 +56,7 @@ CREATE TABLE TB_ACCOUNT_BAL (
 | `ACCT-LIMIT` | `9(7)V99` | 33–41 | Credit limit |
 | FILLER | `X(39)` | 42–80 | Unused |
 
-### Reconciliation Report Layout (`RECN`) — PS, LRECL=80, RECFM=FB
+### Reconciliation Report Layout (`RECN`) - PS, LRECL=80, RECFM=FB
 
 | Field | Description |
 |---|---|
@@ -71,21 +71,21 @@ CREATE TABLE TB_ACCOUNT_BAL (
 
 The program processes each operation record through four sequential phases. No files or tables are modified.
 
-### Phase 1 — Validate Input Fields
+### Phase 1 - Validate Input Fields
 
 | Condition | Result | Detail |
 |---|---|---|
 | `OPR-TYPE` not `D` or `C` | ERROR | `INVALID INPUT DATA` |
 | `OPR-AMT <= 0` | ERROR | `INVALID INPUT DATA` |
 
-### Phase 2 — KSDS Account Lookup
+### Phase 2 - KSDS Account Lookup
 
 | Condition | Result | Detail |
 |---|---|---|
 | File status `23` (not found) | ERROR | `ACCOUNT NOT FOUND IN KSDS` |
 | `ACCT-STATUS = 'C'` (closed) | SKIPPED | `ACCOUNT STATUS CLOSED` |
 
-### Phase 3 — DB2 Balance Fetch
+### Phase 3 - DB2 Balance Fetch
 
 | SQLCODE | Result | Detail |
 |---|---|---|
@@ -93,7 +93,7 @@ The program processes each operation record through four sequential phases. No f
 | `100` | ERROR | `DB2 ROW MISSING` |
 | `< 0` | ERROR | `DB2 ERROR: <SQLCODE>` |
 
-### Phase 4 — Balance Logic Check
+### Phase 4 - Balance Logic Check
 
 | Condition | Result | Detail |
 |---|---|---|
@@ -105,15 +105,15 @@ The program processes each operation record through four sequential phases. No f
 
 ## Program Flow
 
-1. **OPEN** — `OPR-LOG` (INPUT), `ACCT-MASTER` (INPUT), `RECON-LOG` (OUTPUT).
+1. **OPEN** - `OPR-LOG` (INPUT), `ACCT-MASTER` (INPUT), `RECON-LOG` (OUTPUT).
 2. **READ** next record from ESDS sequentially until EOF.
-3. **Phase 1** — Validate `OPR-TYPE` and `OPR-AMT`; write ERROR and skip remaining phases if invalid.
-4. **Phase 2** — Random READ of KSDS by `ACCT-MAST-ID`; write ERROR or SKIPPED if account not found or closed.
-5. **Phase 3** — Execute DB2 `SELECT BALANCE` for `ACCT_ID`; write ERROR if row missing or SQL error.
-6. **Phase 4** — Check debit amount against current balance; write OK or ERROR.
+3. **Phase 1** - Validate `OPR-TYPE` and `OPR-AMT`; write ERROR and skip remaining phases if invalid.
+4. **Phase 2** - Random READ of KSDS by `ACCT-MAST-ID`; write ERROR or SKIPPED if account not found or closed.
+5. **Phase 3** - Execute DB2 `SELECT BALANCE` for `ACCT_ID`; write ERROR if row missing or SQL error.
+6. **Phase 4** - Check debit amount against current balance; write OK or ERROR.
 7. Go to step 2 (Read Next).
 8. **CLOSE** all files.
-9. **DISPLAY SUMMARY** — print totals to SYSOUT.
+9. **DISPLAY SUMMARY** - print totals to SYSOUT.
 
 ---
 
@@ -150,31 +150,31 @@ RECORDS WRITTEN:           9
 
 ## How to Run
 
-1. **Define VSAM KSDS cluster** — run [`DEFKSDS.jcl`](JCL/DEFKSDS.jcl)
-2. **Define ESDS cluster** — run [`DEFESDS.jcl`](JCL/DEFESDS.jcl)
-3. **Create DB2 table and insert data** — run [`CREATE.TABLE`](SQL/CREATE.TABLE.sql) and [`INSERT.DATA`](SQL/INSERT.DATA.sql) from [`SQL/`](SQL/) folder
-4. **Load data, compile, and run** — run [`COBDB2CP.jcl`](JCL/COBDB2CP.jcl) (performs all steps: delete old output, load KSDS and ESDS data via IDCAMS REPRO, compile with DB2 precompile, execute under DB2 subsystem DBDG)
-5. **Review output** — see [`RECON.LOG`](DATA/RECON.LOG) and [`SYSOUT.txt`](OUTPUT/SYSOUT.txt)
+1. **Define VSAM KSDS cluster** - run [`DEFKSDS.jcl`](JCL/DEFKSDS.jcl)
+2. **Define ESDS cluster** - run [`DEFESDS.jcl`](JCL/DEFESDS.jcl)
+3. **Create DB2 table and insert data** - run [`CREATE.TABLE`](SQL/CREATE.TABLE.sql) and [`INSERT.DATA`](SQL/INSERT.DATA.sql) from [`SQL/`](SQL/) folder
+4. **Load data, compile, and run** - run [`COBDB2CP.jcl`](JCL/COBDB2CP.jcl) (performs all steps: delete old output, load KSDS and ESDS data via IDCAMS REPRO, compile with DB2 precompile, execute under DB2 subsystem DBDG)
+5. **Review output** - see [`RECON.LOG`](DATA/RECON.LOG) and [`SYSOUT.txt`](OUTPUT/SYSOUT.txt)
 
 ---
 
 ## Key COBOL Concepts Used
 
-- `ORGANIZATION IS SEQUENTIAL` (ESDS) — entry-sequenced dataset read via sequential access
-- `ORGANIZATION IS INDEXED` + `ACCESS MODE IS RANDOM` — KSDS random lookup by account key
-- `EXEC SQL ... END-EXEC` — embedded DB2 SQL with SQLCA for return code handling
-- `EXEC SQL INCLUDE SQLCA END-EXEC` — SQL Communication Area for SQLCODE checking
-- `EXEC SQL INCLUDE TASK29 END-EXEC` — DCLGEN-generated host variable declaration
-- `EVALUATE TRUE` — multi-branch SQLCODE evaluation (0 / 100 / negative)
-- `STRING ... INTO` — dynamic report line construction
-- `PERFORM UNTIL EOF` — sequential read loop with AT END clause
+- `ORGANIZATION IS SEQUENTIAL` (ESDS) - entry-sequenced dataset read via sequential access
+- `ORGANIZATION IS INDEXED` + `ACCESS MODE IS RANDOM` - KSDS random lookup by account key
+- `EXEC SQL ... END-EXEC` - embedded DB2 SQL with SQLCA for return code handling
+- `EXEC SQL INCLUDE SQLCA END-EXEC` - SQL Communication Area for SQLCODE checking
+- `EXEC SQL INCLUDE TASK29 END-EXEC` - DCLGEN-generated host variable declaration
+- `EVALUATE TRUE` - multi-branch SQLCODE evaluation (0 / 100 / negative)
+- `STRING ... INTO` - dynamic report line construction
+- `PERFORM UNTIL EOF` - sequential read loop with AT END clause
 
 ---
 
 ## Notes
 
 - No records are updated or deleted; the program is strictly read-only
-- ESDS does not support random access or deletion — records are always read sequentially
+- ESDS does not support random access or deletion - records are always read sequentially
 - The KSDS is opened with `ACCESS MODE IS RANDOM` to allow single-record lookup by key without sequential scan
 - If `OPR-STATUS` is non-zero on read (other than EOF), the program abends with `STOP RUN`
 - Tested on IBM z/OS with Enterprise COBOL and DB2 subsystem DBDG
