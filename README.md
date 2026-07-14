@@ -9,8 +9,7 @@ COBOL practice tasks with DB2, JCL, and VSAM examples
 > intentional, as certain patterns (table lookup, control break, batch commit, etc.) are repeated
 > across different contexts to reinforce understanding. Think of this repository as a solid
 > **reference point for beginners** who are just getting started with COBOL, JCL, VSAM, DB2, and
-> related mainframe technologies. Every program here was built from scratch - no copy-paste,
-> no AI-generated code. If something helps you - great!
+> related mainframe technologies. 
 
 ---
 
