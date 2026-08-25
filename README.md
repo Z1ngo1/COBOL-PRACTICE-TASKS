@@ -32,7 +32,7 @@ COBOL-PRACTICE-TASKS/
 
 ---
 
-## 🗂️ Tasks Quick Reference
+## Tasks Quick Reference
 
 A grouped overview of all tasks by the main technology combination used. Click any task name to jump to its folder.
 
@@ -125,7 +125,7 @@ A grouped overview of all tasks by the main technology combination used. Click a
 |------|------|---------------|
 | [TASK27](TASKS/TASK27-GDG-ACCT-ARCHIVE/) | GDG Account Archive | GDG `(+1)` generation write, `DEFGDG.jcl`, daily archive pattern |
 
-## [📁 JCL SAMPLES](JCL%20SAMPLES/)
+## [JCL SAMPLES](JCL%20SAMPLES/)
 
 Reusable JCL templates that support the tasks in this repository. Each member demonstrates a specific JCL pattern or IDCAMS function.
 
@@ -148,7 +148,7 @@ Reusable JCL templates that support the tasks in this repository. Each member de
 
 ---
 
-## [📁 JCLPROC](JCLPROC/)
+## [JCLPROC](JCLPROC/)
 
 Contains the catalogued JCL procedure referenced by nearly all tasks in the `TASKS/` folder.
 
@@ -158,7 +158,7 @@ Contains the catalogued JCL procedure referenced by nearly all tasks in the `TAS
 
 ---
 
-## [📁 TASKS](TASKS/)
+## [TASKS](TASKS/)
 
 Each task is a self-contained project folder with COBOL source, JCL, sample data, and its own README.
 
