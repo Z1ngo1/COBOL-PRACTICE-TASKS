@@ -1,6 +1,6 @@
 COBOL practice tasks with DB2, JCL, and VSAM examples
 
-# 📚 COBOL Practice Tasks
+# COBOL Practice Tasks
 
 > ⚠️ **Disclaimer:** All programs in this repository are **personal learning exercises** - written,
 > designed, and tested entirely by me while studying IBM mainframe development. They may be
