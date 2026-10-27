@@ -1,5 +1,5 @@
-//LOADDATA JOB (123),'DATA TO KSDS',CLASS=A,MSGCLASS=A,MSGLEVEL=(1,1), 
-//             NOTIFY=&SYSUID                                          
+//LOADDATA JOB (123),'DATA TO KSDS',CLASS=A,MSGCLASS=A,MSGLEVEL=(1,1),
+//             NOTIFY=&SYSUID
 //*----------------------------------------------------
 //* STEP1: DELETE IF EXIST AND DEFINE NEW CLUSTER
 //*----------------------------------------------------
@@ -26,8 +26,8 @@
 //STEP2    EXEC PGM=SORT,COND=(0,NE)
 //SYSOUT   DD SYSOUT=*
 //SORTIN   DD *
-YOUR DATA                                       
-/*                                                                     
+YOUR DATA
+/*
 //SORTOUT  DD DSN=&&TEMP,
 //            DISP=(NEW,PASS,DELETE),
 //            SPACE=(TRK,(1,1),RLSE),
@@ -42,15 +42,15 @@ YOUR DATA
 //STEP3    EXEC PGM=IDCAMS,COND=(0,NE)
 //SYSPRINT DD SYSOUT=*
 //INDD     DD DSN=&&TEMP,DISP=(OLD,DELETE)
-//OUTDD    DD DSN=YOUR.VSAM.CLUSTER,DISP=SHR                            
-//SYSIN    DD *                                                        
-  REPRO INFILE(INDD) -                                                 
-        OUTFILE(OUTDD)                                                 
-/*                                                                     
+//OUTDD    DD DSN=YOUR.VSAM.CLUSTER,DISP=SHR
+//SYSIN    DD *
+  REPRO INFILE(INDD) -
+        OUTFILE(OUTDD)
+/*
 //**********************************************************************
-//* USE THIS EXAMPLE IF YOU WANT TO LOAD EXACT LENGHT OF RECORD
-//* Depending on the size and format of the dataset you want to create,
-//* change the DCB settings!!! 
-//* Change all the words from 'YOUR' to your data 
-//* Change the data in SYSUT1 and RECORD FIELD in SYSIN
+//* USE THIS EXAMPLE IF YOU WANT TO LOAD EXACT LENGTH OF RECORD
+//* DEPENDING ON THE SIZE AND FORMAT OF THE DATASET YOU WANT TO CREATE,
+//* CHANGE THE DCB SETTINGS!!!
+//* CHANGE ALL THE WORDS FROM 'YOUR' TO YOUR DATA
+//* CHANGE THE DATA IN SORTIN AND OUTREC BUILD IN SYSIN
 //**********************************************************************
