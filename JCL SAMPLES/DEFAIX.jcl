@@ -1,45 +1,45 @@
-//DEFAIX   JOB (123),'IDCAMS',CLASS=A,MSGCLASS=A,MSGLEVEL=(1,1),       
-//             NOTIFY=&SYSUID                                          
-//*                                                
-//*==================================================================  
+//DEFAIX   JOB (123),'IDCAMS',CLASS=A,MSGCLASS=A,MSGLEVEL=(1,1),
+//             NOTIFY=&SYSUID
+//*
+//*==================================================================
 //* STEP10: DEFINE ALTERNATE INDEX (AIX) FOR KSDS CLUSTER
-//*==================================================================    
-//STEP10   EXEC PGM=IDCAMS                                              
-//SYSPRINT DD SYSOUT=*                                                 
-//SYSOUT   DD SYSOUT=*                                                 
-//SYSIN    DD *                                                        
-  DEFINE AIX                                        -                           
-     (NAME(YOUR.CLUSTER.NAME.AIX)                   -                    
-     RELATE(YOUR.CLUSTER.NAME)                       -                      
-     CISZ(4096)                                     -                           
-     KEYS(20 10)                                    -                          
-     NONUNIQUEKEY                                   -                           
-     UPGRADE                                        -                           
-     RECORDSIZE(80,80)                              -                           
-     TRACKS(2,1)                                    -                          
-     FREESPACE(10,20))                                                 
+//*==================================================================
+//STEP10   EXEC PGM=IDCAMS
+//SYSPRINT DD SYSOUT=*
+//SYSOUT   DD SYSOUT=*
+//SYSIN    DD *
+  DEFINE AIX                                        -
+     (NAME(YOUR.CLUSTER.NAME.AIX)                   -
+     RELATE(YOUR.CLUSTER.NAME)                      -
+     CISZ(4096)                                     -
+     KEYS(20 10)                                    -
+     NONUNIQUEKEY                                   -
+     UPGRADE                                        -
+     RECORDSIZE(80,80)                              -
+     TRACKS(2,1)                                    -
+     FREESPACE(10,20))
 /*
 //**********************************************************************
-//* AIX (Alternate Index) allows access to a KSDS cluster by a field
-//* other than the primary key (e.g. by last name, department, etc.)
+//* AIX (ALTERNATE INDEX) ALLOWS ACCESS TO A KSDS CLUSTER BY A FIELD
+//* OTHER THAN THE PRIMARY KEY (E.G. BY LAST NAME, DEPARTMENT, ETC.)
 //*
-//*   NAME     - name of the AIX dataset itself
-//*   RELATE   - must point to the BASE KSDS cluster
-//*   CISZ     - Control Interval size (match base cluster if possible)
-//*   KEYS     - (length offset) of the ALTERNATE key field in record
-//*   NONUNIQUEKEY - multiple records can share the same alternate key
-//*                - use UNIQUEKEY if alternate key must be unique
-//*   UPGRADE - AIX is automatically updated when base cluster changes
-//*         - use NOUPGRADE if manual rebuild via BLDINDEX is preferred
-//*   RECORDSIZE - (average maximum) must be >= base cluster RECORDSIZE
-//*   TRACKS      - primary and secondary space allocation
-//*   FREESPACE   - (CI CA) free space percentages
+//*   NAME     - NAME OF THE AIX DATASET ITSELF
+//*   RELATE   - MUST POINT TO THE BASE KSDS CLUSTER
+//*   CISZ     - CONTROL INTERVAL SIZE (MATCH BASE CLUSTER IF POSSIBLE)
+//*   KEYS     - (LENGTH OFFSET) OF THE ALTERNATE KEY FIELD IN RECORD
+//*   NONUNIQUEKEY - MULTIPLE RECORDS CAN SHARE THE SAME ALTERNATE KEY
+//*                - USE UNIQUEKEY IF ALTERNATE KEY MUST BE UNIQUE
+//*   UPGRADE - AIX IS AUTOMATICALLY UPDATED WHEN BASE CLUSTER CHANGES
+//*         - USE NOUPGRADE IF MANUAL REBUILD VIA BLDINDEX IS PREFERRED
+//*   RECORDSIZE - (AVERAGE MAXIMUM) MUST BE >= BASE CLUSTER RECORDSIZE
+//*   TRACKS      - PRIMARY AND SECONDARY SPACE ALLOCATION
+//*   FREESPACE   - (CI CA) FREE SPACE PERCENTAGES
 //*
-//* Order of steps to use AIX:
-//*   1. DEFKSDS  - define base KSDS cluster
-//*   2. DEFAIX   - define Alternate Index (this JCL)
-//*   3. DEFPATH  - define PATH to connect AIX to base cluster
-//*   4. BLDINDEX - populate the AIX with data from base cluster
+//* ORDER OF STEPS TO USE AIX:
+//*   1. DEFKSDS  - DEFINE BASE KSDS CLUSTER
+//*   2. DEFAIX   - DEFINE ALTERNATE INDEX (THIS JCL)
+//*   3. DEFPATH  - DEFINE PATH TO CONNECT AIX TO BASE CLUSTER
+//*   4. BLDINDEX - POPULATE THE AIX WITH DATA FROM BASE CLUSTER
 //*
-//* Change all words 'YOUR.CLUSTER.NAME' to your actual dataset name.
+//* CHANGE ALL WORDS 'YOUR.CLUSTER.NAME' TO YOUR ACTUAL DATASET NAME.
 //**********************************************************************
