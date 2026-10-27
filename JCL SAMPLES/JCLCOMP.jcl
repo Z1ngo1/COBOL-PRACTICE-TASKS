@@ -23,12 +23,11 @@ COMPILATION SUCCESSFUL
 /*
 //SYSUT2   DD SYSOUT=*
 // ENDIF
-//*==================================================================
 //**********************************************************************
-//* In COBOL.SYSIN, enter the name of the library 
-//* where your COBOL code is located, and in the parentheses, 
-//* enter the MEMBER name
-//* In LKED.SYSLMOD, enter the name of your LOAD library, 
-//* and in the parentheses, enter the member name
-//* In LKED.SYSLIB again enter the name of your LOAD library
+//* IN COBOL.SYSIN, ENTER THE NAME OF THE LIBRARY
+//* WHERE YOUR COBOL CODE IS LOCATED, AND IN THE PARENTHESES,
+//* ENTER THE MEMBER NAME
+//* IN LKED.SYSLMOD, ENTER THE NAME OF YOUR LOAD LIBRARY,
+//* AND IN THE PARENTHESES, ENTER THE MEMBER NAME
+//* IN LKED.SYSLIB AGAIN ENTER THE NAME OF YOUR LOAD LIBRARY
 //**********************************************************************
