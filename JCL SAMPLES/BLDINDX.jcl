@@ -1,35 +1,35 @@
-//BLDINDEX JOB (123),'IDCAMS',CLASS=A,MSGCLASS=A,MSGLEVEL=(1,1),        
-//             NOTIFY=&SYSUID                                           
-//*                                                
-//*==================================================================          
-//* STEP10: BUILD ALTERNATE INDEX USING BLDINDEX COMMAND                                            
-//*==================================================================          
-//STEP10   EXEC PGM=IDCAMS                                              
-//SYSPRINT DD SYSOUT=*                                                  
-//SYSOUT   DD SYSOUT=*                                                  
-//SYSIN    DD *                                                         
-  BLDINDEX                                          -                                                            
-   INDATASET(YOUR.CLUSTER.NAME)                     -                       
-   OUTDATASET(YOUR.CLUSTER.NAME.AIX)                    
-/*                                                                      
+//BLDINDEX JOB (123),'IDCAMS',CLASS=A,MSGCLASS=A,MSGLEVEL=(1,1),
+//             NOTIFY=&SYSUID
+//*
+//*==================================================================
+//* STEP10: BUILD ALTERNATE INDEX USING BLDINDEX COMMAND
+//*==================================================================
+//STEP10   EXEC PGM=IDCAMS
+//SYSPRINT DD SYSOUT=*
+//SYSOUT   DD SYSOUT=*
+//SYSIN    DD *
+  BLDINDEX                                          -
+   INDATASET(YOUR.CLUSTER.NAME)                     -
+   OUTDATASET(YOUR.CLUSTER.NAME.AIX)
+/*
 //**********************************************************************
-//* BLDINDEX reads the base KSDS cluster and populates the AIX
-//* with alternate key values and pointers to base cluster records.
-//* Must be run AFTER DEFAIX and DEFPATH, and AFTER data is loaded
-//* into the base KSDS cluster.
+//* BLDINDEX READS THE BASE KSDS CLUSTER AND POPULATES THE AIX
+//* WITH ALTERNATE KEY VALUES AND POINTERS TO BASE CLUSTER RECORDS.
+//* MUST BE RUN AFTER DEFAIX AND DEFPATH, AND AFTER DATA IS LOADED
+//* INTO THE BASE KSDS CLUSTER.
 //*
-//*   INDATASET  - base KSDS cluster that contains the source data
-//*   OUTDATASET - AIX to be populated (must already be defined)
+//*   INDATASET  - BASE KSDS CLUSTER THAT CONTAINS THE SOURCE DATA
+//*   OUTDATASET - AIX TO BE POPULATED (MUST ALREADY BE DEFINED)
 //*
-//* BLDINDEX must be re-run manually if UPGRADE was set to NOUPGRADE
-//* in DEFAIX. If UPGRADE(YES) was used, AIX is updated automatically
-//* on every write to the base cluster - no need to re-run BLDINDEX.
+//* BLDINDEX MUST BE RE-RUN MANUALLY IF UPGRADE WAS SET TO NOUPGRADE
+//* IN DEFAIX. IF UPGRADE(YES) WAS USED, AIX IS UPDATED AUTOMATICALLY
+//* ON EVERY WRITE TO THE BASE CLUSTER - NO NEED TO RE-RUN BLDINDEX.
 //*
-//* Full order of steps to set up AIX:
-//*   1. DEFKSDS  - define base KSDS cluster
-//*   2. DEFAIX   - define Alternate Index
-//*   3. DEFPATH  - define PATH to connect AIX to base cluster
-//*   4. BLDINDEX - populate AIX with data (this JCL)
+//* FULL ORDER OF STEPS TO SET UP AIX:
+//*   1. DEFKSDS  - DEFINE BASE KSDS CLUSTER
+//*   2. DEFAIX   - DEFINE ALTERNATE INDEX
+//*   3. DEFPATH  - DEFINE PATH TO CONNECT AIX TO BASE CLUSTER
+//*   4. BLDINDEX - POPULATE AIX WITH DATA (THIS JCL)
 //*
-//* Change all words 'YOUR.CLUSTER.NAME' to your actual dataset name.
+//* CHANGE ALL WORDS 'YOUR.CLUSTER.NAME' TO YOUR ACTUAL DATASET NAME.
 //**********************************************************************
