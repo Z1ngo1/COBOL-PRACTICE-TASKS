@@ -1,29 +1,29 @@
-//DEFPATH  JOB (123),'IDCAMS',CLASS=A,MSGCLASS=A,MSGLEVEL=(1,1),        
-//             NOTIFY=&SYSUID                                           
-//*                                                
-//*==================================================================          
-//* STEP10: DEFINE PATH FOR ALTERNATE INDEX                                            
-//*==================================================================          
-//STEP10   EXEC PGM=IDCAMS                                              
-//SYSPRINT DD SYSOUT=*                                                  
-//SYSOUT   DD SYSOUT=*                                                  
-//SYSIN    DD *                                                         
-  DEFINE PATH (                          -                                                       
-     NAME(YOUR.CLUSTER.NAME.PATH)        -                    
+//DEFPATH  JOB (123),'IDCAMS',CLASS=A,MSGCLASS=A,MSGLEVEL=(1,1),
+//             NOTIFY=&SYSUID
+//*
+//*==================================================================
+//* STEP10: DEFINE PATH FOR ALTERNATE INDEX
+//*==================================================================
+//STEP10   EXEC PGM=IDCAMS
+//SYSPRINT DD SYSOUT=*
+//SYSOUT   DD SYSOUT=*
+//SYSIN    DD *
+  DEFINE PATH (                          -
+     NAME(YOUR.CLUSTER.NAME.PATH)        -
      PATHENTRY(YOUR.CLUSTER.NAME.AIX)    -
-     )                                                                  
-/*                                                                      
+     )
+/*
 //**********************************************************************
-//* PATH connects an Alternate Index (AIX) to the base KSDS cluster.
-//* Without a PATH, the AIX cannot be used to access records.
+//* PATH CONNECTS AN ALTERNATE INDEX (AIX) TO THE BASE KSDS CLUSTER.
+//* WITHOUT A PATH, THE AIX CANNOT BE USED TO ACCESS RECORDS.
 //*
-//*   NAME      - name of the PATH itself (any valid dataset name)
-//*   PATHENTRY - must point to an existing AIX (Alternate Index)
+//*   NAME      - NAME OF THE PATH ITSELF (ANY VALID DATASET NAME)
+//*   PATHENTRY - MUST POINT TO AN EXISTING AIX (ALTERNATE INDEX)
 //*
-//* Before running this JCL, make sure:
-//*   1. Base KSDS cluster already exists
-//*   2. Alternate Index (AIX) is already defined (use DEFAIX template)
-//*   3. After defining PATH - run BLDINDEX to populate the AIX
+//* BEFORE RUNNING THIS JCL, MAKE SURE:
+//*   1. BASE KSDS CLUSTER ALREADY EXISTS
+//*   2. ALTERNATE INDEX (AIX) IS ALREADY DEFINED (USE DEFAIX TEMPLATE)
+//*   3. AFTER DEFINING PATH - RUN BLDINDEX TO POPULATE THE AIX
 //*
-//* Change all words 'YOUR.CLUSTER.NAME' to your actual dataset name.
+//* CHANGE ALL WORDS 'YOUR.CLUSTER.NAME' TO YOUR ACTUAL DATASET NAME.
 //**********************************************************************
